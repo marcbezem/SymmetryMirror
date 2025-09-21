@@ -1,0 +1,1238 @@
+\chapter{Groups, abstractly}
+\label{ch:absgroup}
+
+\section{Brief overview of the chapter}
+Recall from \cref{sec:identity-type-as-abstract} the definition of an 
+abstract group and how to obtain an abstract group from a concrete one. 
+In this chapter we will 
+implement an inverse construction, how to obtain a (concrete) group from
+an abstract one, in \cref{sec:Gsetforabstract}. Likewise, in \cref{sec:homabsisconcr},
+we show how to obtain a (concrete) homomorphism from an abstract one.
+Thus we will have shown that, in principle,\footnote{%
+Of course this is not a reason to stop here, but to continue
+finding out which parts of group theory benefit from the concrete approach.
+Just to mention a few we have seen already: 
+the conceptual simplicity of homomorphisms being pointed maps,
+actions being maps from the classifying type to $\Set$, 
+and the generalizations to \inftygps indicated in \cref{ch:actions}.}
+it doesn't matter whether
+one develops group theory on the concrete or on the abstract level.
+
+Before we implement the above constructions, 
+we first introduce in \cref{sec:monoids} a simpler structure, 
+called monoid, of which abstract groups are a special case.\footnote{%
+One could advocate for the name `abstract monoid' here, were it not the
+case that we have no concrete analogue for monoids in our setting.
+The reason is the symmetry of the identity types.}
+We then define in \cref{sec:abshom} the notion of homomorphism for
+abstract groups.
+
+After groups and homomorphism, it is natural to continue to group actions,
+in \cref{sec:Gsetsabstrconcr}, and again relate the abstract to the concrete.
+
+ In the optional~\cref{sec:heaps} we look at how general
+identities types $a \eqto_A a'$ relate to groups.
+
+\section{Monoids and abstract groups}
+\label{sec:monoids}
+
+  A monoid is a collection of data consisting only of \ref{struc:under-set}, 
+  \ref{struc:unit}, and \ref{struc:mult-op} from the list in
+  \cref{def:abstractgroup}.
+  In other words, the existence of inverses is not assumed.
+  For convenience we reproduce the shortened list here.
+
+\begin{definition}\label{def:monoid}
+  A \emph{monoid}\index{monoid} consists of the following data.
+  \begin{enumerate}
+  \item\label{struc:monoid-set} A set $S$, called the \emph{underlying set}.
+  \item\label{struc:monoid-unit} An element $e:S$, called the \emph{unit} or the \emph{neutral element}.\index{neutral element}
+  \item\label{struc:monoid-mult} A function $S\to S\to S$, called \emph{multiplication},
+    taking two elements $g_1,g_2:S$ to their \emph{product}, denoted by $g_1\cdot g_2:S$.
+    \par \noindent
+    Moreover, the following equations should hold, for all $g,g_1,g_2,g_3 : S$.
+    \begin{enumerate}[label=(\alph*),ref=\ref{struc:monoid-mult} (\alph*)]
+    \item\label{monoid:unit-laws} $g\cdot e=g$ and $e\cdot g=g$ (the \emph{unit laws})
+    \item\label{monoid:ass-law} $g_1\cdot(g_2\cdot g_3)=(g_1\cdot g_2)\cdot g_3$ 
+         (the \emph{associativity law})
+    \end{enumerate}
+  \end{enumerate}
+ The property that $S$ is a set, the
+  unit laws, and the associativity law, are together known as the \emph{monoid laws}.
+\end{definition}
+
+\begin{example}\label{exa:monoid}
+Let $S$ be a set, and consider the type $S^*$ of lists of elements of $S$
+as defined in \cref{def:lists}. Then $S^*$ is a set according to
+\cref{thm:isset-inductive-types}. We can give $S^*$ the structure
+of a monoid with the empty list $\varepsilon$ as unit, and concatenation
+from \cref{xca:reverse} as multiplication, denoted $\ast$.
+Then the monoid laws can easily be proven to hold and hence
+$(S^*,\varepsilon,\ast)$ is a monoid.
+\end{example}
+
+
+  Building on the definition of a monoid, we may encode the type of abstract 
+  groups as follows. We let $S$ denote the underlying set, $e : S$ denote the unit, 
+  $\mu:S\to S\to S$ denote the multiplication operation 
+  $g\mapsto (h \mapsto g\cdot h)$, and $\iota : S \to S$ denote 
+  the inverse operation $g \mapsto g^{-1}$.  Using\label{not:GroupLaws}
+  that notation, we introduce names for the relevant propositions.
+  \begin{align*}
+    \mathrm{UnitLaws}(S,e,\mu)   & \defequi
+    \prod_{g:S} \bigl((\mu{}(g)(e) = g)\times(\mu{}(e)(g) = g) \bigr)\\
+    \mathrm{AssocLaw}(S,\mu{})   & \defequi\prod_{g_1,g_2,g_3:S} 
+    \bigl( \mu{}(g_1)(\mu{}(g_2)(g_3))=\mu{}(\mu{}(g_1)(g_2))(g_3) \bigr)\\
+    \mathrm{MonoidLaws}(S,e,\mu) & \defequi \isset{(S)} 
+    \times \mathrm{UnitLaws}(S,e,\mu) \times \mathrm{AssocLaw}(S,\mu{}) \\
+    \mathrm{InverseLaw}(S,e,\mu,\iota) & \defequi 
+    \prod_{g:S}\bigl( \mu(g)(\iota(g)) = e \bigr) \\
+    \mathrm{GroupLaws}(S,e,\mu,\iota) & \defequi 
+    \mathrm{MonoidLaws}(S,e,\mu) \times \mathrm{InverseLaw}(S,e,\mu,\iota)
+  \end{align*}
+
+\begin{definition}
+  \label{def:type-abstrgp}
+  Recall the definition of abstract group in \cref{def:abstractgroup}.
+  \index{type!of abstract groups}
+  \glossary(Groupabs){$\protect\typeabsgp$}{type of abstract groups}
+  The type of abstract groups is
+  \[
+    \typeabsgp \defequi \sum_{S:\UU} \sum_{e:S}\sum_{\mu{}:S\to S\to S}
+    \sum_{\iota\colon S\to S} \mathrm{GroupLaws}(S,e,\mu,\iota).\qedhere
+  \]
+\end{definition}
+
+  Thus, following the convention introduced in \cref{rem:iterated-sums},
+  an abstract group $\mathscr G$ will be a quintuple of the form
+  $\mathscr G \jdeq (S,e,\mu,\iota,!)$.  For brevity, we will usually 
+  omit the proof of the properties from the display, since it's unique,
+  and write an abstract group as though it were a quadruple 
+  $\mathscr G \jdeq (S,e,\mu,\iota)$.
+
+
+\begin{remark}\label{rem:inverses-as-property}
+  Instead of including the inverse operation as part
+  \ref{monoid:inv-op} of the structure (including the property
+  \ref{monoid:inv-law}), some authors assume the existence of inverses
+  by positing the property \ref{monoid:inv-law} below.
+  \begin{enumerate}[start=4]
+    \item\label{monoid:inv-op} A function $(\blank)^{-1}:S\to S$, 
+    the \emph{inverse operation}, satisfying:
+    \begin{enumerate}[start=3,label=(\alph*),ref=\ref{monoid:inv-op} (\alph*),resume*]
+    \item\label{monoid:inv-law} $g\cdot g^{-1} = e$ for all $g:S$ (the \emph{law of inverses}).
+    \end{enumerate}
+    \item\label{axiom:mere-inverse} For all $g:S$ there exists an element
+    $h:S$ such that $e = g \cdot h$.
+  \end{enumerate}
+
+  We will now compare \ref{axiom:mere-inverse} to \ref{monoid:inv-op}.
+  Property \ref{axiom:mere-inverse} contains the phrase ``there exists'', and thus its translation into type theory
+  uses the quantifier $\exists$, as defined in \cref{sec:prop-trunc}.  Under this translation, property \ref{axiom:mere-inverse} does
+  not immediately allow us to speak of ``the inverse of $g$''.
+  However, the following lemma shows that we can define an inverse operation as in \ref{monoid:inv-op} from a witness of \ref{axiom:mere-inverse}
+  -- its proof goes by using the unit laws \ref{monoid:unit-laws} and the
+associativity law \ref{monoid:ass-law} to prove that inverses are unique.  
+As a consequence, we can speak of ``\emph{the} inverse of $g$''.
+\end{remark}
+
+\begin{lemma}%
+  \label{lem:group-inv-operation}%
+  Given a set $S$ together with $e$ and $\cdot$ as in
+  \cref{def:monoid} satisfying the unit laws, the associativity
+  law, and property \ref{axiom:mere-inverse}, we have a unique ``inverse'' function
+  $S \to S$ having property \ref{axiom:inv-law} of \cref{def:abstractgroup}.
+\end{lemma}
+
+\begin{proof}
+  Consider the function $\mu: S \to (S \to S)$ defined as
+  $g\mapsto (h \mapsto g\cdot h)$. Let $g:S$. We claim that the fiber
+  $\inv{\mu(g)}(e)$ is contractible.  Contractibility is a proposition, 
+  hence to
+  prove it from \ref{axiom:mere-inverse}, one can as well assume the
+  actual existence of $h$ such that $g\cdot h = e$. Then $(h,!)$ is an
+  element of the fiber $\inv{\mu(g)}(e)$. We will now prove that it is
+  a center of contraction. For any other element $(h',!)$, we want to
+  prove $(h,!) = (h',!)$, which is equivalent to the equation $h=h'$. In
+  order to prove the latter, we show that $h$ is also an inverse on
+  the left of $g$, meaning that $h\cdot g=e$.  This equation is also a
+  proposition, so we can assume from \ref{axiom:mere-inverse} that we have an
+  element $k:S$ such that $h\cdot k = e$.  Multiplying that equation by
+  $g$ on the left, one obtains
+  \begin{displaymath}
+    k = e \cdot k = (g\cdot h)\cdot k = g\cdot (h\cdot k) = g\cdot e = g,
+  \end{displaymath}
+  from which we see that $h\cdot g=e$.
+  Now it follows that
+  \begin{displaymath}
+    h = h \cdot e = h \cdot (g\cdot h') = (h \cdot g) \cdot h' = e \cdot h' = h',
+  \end{displaymath}
+  as required. Hence $\inv{\mu(g)}(e)$ is contractible, and we may define $g^{-1}$ to
+  be the center of the contraction, for any $g:S$.
+  The function $g \mapsto \inv g$ satisfies the law of inverses 
+  \ref{monoid:inv-law}, as required.\footnote{%
+  Note that this proof also shows that  $\inv{(\inv g)} = g$ and hence
+  $\inv g \cdot g = e$, for any $g:S$.}
+  Since the inverse of each $g:S$ is unique, it follows by function
+  extensionality that this `inverse' function is unique.
+\end{proof}
+
+\begin{remark}
+  That the concept of an abstract group synthesizes the idea of symmetries
+  will be justified in \cref{sec:Gsetforabstract} where we prove that
+  the function $\abstr:\typegroup\to\typegroup^{\abstr}$ from 
+  \cref{def:abstrG} is an equivalence.
+\end{remark}
+
+\begin{remark}\label{rem:abs-iso}
+  If $\agp G\jdeq (S,e,\mu,\iota)$ and $\agp G'\jdeq(S',e',\mu',\iota')$
+  are abstract groups, an element of the identity type
+  $\agp G\eqto\agp G'$ consists of quite a lot of information,
+  provided we interpret it by repeated application of \cref{lem:isEq-pair=}.
+  First and foremost, we need an identification $p:S\eqto S'$ of sets, but
+  from there on the information is a proof of a conjunction of propositions.\footnote{%
+    \label{ft:no-abs-inftygp}
+    Even though we are able to give a concise definition of \inftygps 
+    in \cref{sec:inftygps}, we don't know how to define
+    the type of ``abstract \inftygps'' in a way similar
+    to~\cref{def:abstractgroup}:
+    such a definition would require infinitely many 
+    levels of operations producing
+    identifications of instances of operations of lower levels.
+    And an identification would similarly require infinitely
+    many operations identifying the operations at all levels.
+    See also \cref{rem:ee=e_coherence}.}
+  An analysis shows that this conjunction can be shortened to the equations $e'=p(e)$ and
+  $\mu'(p(s),p(t))=p(\mu(s,t))$.  A convenient way of obtaining an 
+  identity $p$ that preserves these equations is to apply univalence to an
+  equivalence $f: S \equivto S'$ that preserves them.
+  We call such a function $f$ an \emph{isomorphism of abstract groups}.%
+  \index{isomorphism!of abstract groups}
+\end{remark}
+
+\begin{xca}
+  Perform the abovementioned analysis.
+\end{xca}
+
+\begin{xca}
+  \label{xca:op-abs-group}
+  Let $\agp G \jdeq (S,e,\mu,\iota)$ be an abstract group.
+  Define another structure $\agp G\op \defeq (S,e,\mu\op,\iota)$,
+  where $\mu\op : S \to S \to S$ sends $a,b:S$ to $\mu(b,a)$,
+  \ie $\mu\op$ swaps the order of the arguments as compared to $\mu$.
+
+  Show that $\iota : S \to S$ defines an isomorphism 
+  $\agp G \equivto \agp G\op$.\footnote{%
+  Hint: in down-to-earth terms this boils down to the equations
+  $\inv e = e$ and $(a\cdot b)^{-1} = b^{-1}\cdot a^{-1}$.}
+\end{xca}
+
+\begin{xca}
+  \label{xca:conj}
+  Let $\agp G\jdeq(S,e,\mu,\iota)$ be an abstract group and let $g:S$.  
+  For any $s:S$, let $\conj^g(s)\defequi g\cdot s\cdot g^{-1}$. 
+  Show that the resulting function $\conj^g:S\to S$ preserves the group 
+  structure (\eg $g\cdot(s\cdot s')\cdot g^{-1}=(g\cdot s\cdot g^{-1} )\cdot(g\cdot s\cdot g^{-1})$) and is an equivalence.  The resulting identification $\conj^g:\agp G\eqto\agp G$ is called \emph{conjugation} by $g$.\index{conjugation}
+\end{xca}
+
+\begin{remark}\label{rem:ee=e_coherence}
+  Without the requirement that the underlying type of an abstract group or monoid 
+  is a set, life would be more complicated.  For instance, for the
+  case when $g$ is $e$, the unit laws \ref{monoid:unit-laws} of \cref{def:monoid}
+  would provide \emph{two} (potentially different)
+  identifications $e\cdot e \eqto e$, and we would have to separately 
+  assume that they agree.  This problem vanishes in the setup we adopted for
+  \inftygps in \cref{sec:inftygps}.
+\end{remark}
+
+\begin{xca}\label{xca:left-inv-involution}
+  Given an element $g$ in an abstract group,
+  prove that $e=\inv g\cdot g$ and $g=(g^{-1})^{-1}$. 
+  (Hint: study the proof of \cref{lem:group-inv-operation}.)
+\end{xca}
+
+\begin{xca}\label{xca:typemonoidisgroupoid}
+  Prove that the types of monoids and abstract groups are groupoids.
+\end{xca}
+
+\begin{xca}
+  \label{xca:cheapgroup}
+  There is a leaner way of characterizing what an abstract group is:
+  define a \emph{sheargroup} to be a set $S$ together with an element $e:S$,
+  a function $\blank * \blank: S\to S\to S$, sending $a,b:S$ to $a*b:S$,
+  and the following propositions,
+  where we use the shorthand $\bar a\defequi a*e$:
+  \begin{enumerate}
+  \item $e*a=a$,
+  \item $a*a=e$, and
+  \item $c*(b*a)=\casoverline{(c*\bar b)}*a$,
+  \end{enumerate}
+  for all $a,b,c:S$.
+  Construct an equivalence from the type of abstract groups to the type of sheargroups.\footnote{%
+      Hint: setting $a\cdot b\defequi \bar b*a$ gives you an abstract group from a sheargroup and conversely, letting $a*b=b\cdot a^{-1}$ takes you back.  On your way you may need at some point to show that $\casoverline{\bar a}=a$: setting $c=\bar a$ and $b=a$ in the third formula will do the trick (after you have established that $\bar e=e$).  This exercise may be good to look back to in the many instances where the inverse inserted when ``multiplying from the right by $a$'' is forced by transport considerations.}
+\end{xca}
+\begin{xca}
+  Another and even leaner way to define abstract groups, highlighting how we can do away with both the inverse and the unit: a \emph{Furstenberg group}\footnote{%
+    Named after Hillel Furstenberg who at the age of 20 published a paper doing this exercise.\footnotemark{}}\footcitetext{Furstenberg}
+  is a nonempty set $S$ together with a function
+  $\blank\circ\blank : S \to S \to S$, sending $a,b:S$ to $a\circ b:S$,
+  with the property that
+  \begin{enumerate}
+  \item for all $a,b,c:S$ we have that $(a\circ c)\circ(b\circ c)=a\circ b$, and
+  \item for all $a,c:S$ there is a $b:S$ such that $a\circ b=c$.
+  \end{enumerate}
+  Construct an equivalence from the type of Furstenberg groups to the type of
+  abstract groups.\footnote{%
+    Hint: show that the function $a\mapsto a\circ a$ is constant, with value, say, $e$.  Then show that $S$ together with the ``unit'' $e$, ``multiplication'' $a\cdot b\defequi a\circ(e\circ b)$ and ``inverse'' $b^{-1}\defequi e\circ b$ is an abstract group.}
+\end{xca}
+
+\section{Abstract homomorphisms}\label{sec:abshom}
+
+In this section we define the notion of homomorphism for
+abstract groups, which we touched upon just above
+\cref{exa:conj-concrete}. We start by an exercise
+that simplifies the requirements for abstract group homomorphisms.
+
+\begin{xca}\label{{xca:onlymult-hom}}
+  Let $\agp G\defequi(S,e_{\agp G},\cdot_{\agp G},\iota_{\agp G})$
+  and $\agp H\defequi(T,e_{\agp H},\cdot_{\agp H},\iota_{\agp H})$
+  be abstract groups, and $f:S\to T$ a function satisfying
+  $f(s\cdot_{\agp G}s')=_Tf(s)\cdot_{\agp H}f(s')$ for all $s,s':S$.
+  Show that $f(e_{\agp G}) = e_{\agp H}$ and 
+  $f(\iota_{\agp G}(s)) = \iota_{\agp H}(f(s))$ for all $s:S$.
+\end{xca}
+
+Thus we see that, due to the properties of the abstract groups,
+if $f$ preserves multiplication, then $f$ also preserves unit and inverses.%
+\footnote{\label{ft:monoid-hom}For monoids this is not true:
+  Let $M$ be the monoid with two elements, $1$ and $0$,
+  with ordinary multiplication, so the unit is $1$. 
+  Consider $\bn1$ as the trivial monoid.
+  Now define $h: \bn1\to M$ by $h(0)=0$. Then $h$ preserves
+  multiplication, but not the unit. Note that $M$ cannot
+  be extended to an abstract group, since giving $0$
+  an inverse would make $0$ equal to $1$.}
+  
+\begin{definition}\label{def:abstrisfunctor}
+  Let $\agp G\defequi(S,e_{\agp G},\cdot_{\agp G},\iota_{\agp G})$
+  and $\agp H\defequi(T,e_{\agp H},\cdot_{\agp H},\iota_{\agp H})$
+  be two abstract groups,\footnote{%
+    Recall from~\cref{def:abstractgroup} that the components comprise
+    the underlying set, the unit element, the multiplication,
+    and the inverse operation. We also need the laws to hold, 
+    but this notation elides the corresponding witnesses.
+
+    In the display, 
+    $f(s\cdot_{\agp G}s')=_Tf(s)\cdot_{\agp H}f(s')$ is a proposition; 
+    hence a homomorphism of abstract groups is uniquely determined
+    by its underlying function of sets, and unless there is danger of
+    confusion we write $f$ instead of $(f,!)$.}
+  then the set of homomorphisms from $\agp G$ to $\agp H$ is
+  \[
+    \absHom(\agp G,\agp H)
+    \defequi\sum_{f:S\to T}
+    \prod_{s,s':S}\bigl(f(s\cdot_{\agp G}s')=_Tf(s)\cdot_{\agp H}f(s')\bigr).
+  \]
+  \index{type!of abstract homomorphisms}\index{homomorphism!of abstract group}
+  \glossary(Homabs){$\protect\absHom(\agp G,\agp H)$}{type of abstract homomorphisms}
+  For groups $G$ and $H$, the function
+  \[
+    \abstr:\Hom(G,H)\to\absHom(\abstr(G),\abstr(H))
+  \]
+  is defined as the function $f\mapsto \abstr(f)\defequi(\USymf,!)$
+  made explicit in \cref{def:USym-hom} and satisfying the
+  properties by~\cref{lem:grouphomomaxioms}.
+\end{definition}
+
+\begin{remark}\label{rem:monoid-hom}
+  With our definition it is immediate that a homomorphism of abstract
+  groups also defines a homomorphism of the underlying monoids,
+  preserving multiplication and thereby unit. However,
+  for monoids as defined in~\cref{def:monoid}, it is possible to preserve
+  multiplication but not the unit, as shown in \cref{ft:monoid-hom}.
+  Hence, for monoids we define the set of homomorphisms
+  from $M \jdeq (S,e_M,\cdot_M)$ to $N \jdeq(T,e_N,\cdot_N)$ by
+  \[
+    \sum_{f:S\to T}\Bigl(\bigl(f(e_M) =_T e_N\bigr)\times
+    \prod_{s,s':S}\bigl(f(s\cdot_M s')=_T f(s)\cdot_N f(s')\bigr)\Bigr).%
+    \qedhere
+  \]
+\end{remark}
+
+\begin{xca}\label{xca:abshomcomposition}
+Prove that the composition of two composable abstract homomorphisms\footnote{%
+Composition here means composition of the functions on the underlying
+sets, and composable means that these functions have types such 
+that they indeed can be composed. The latter is sometimes tacitly assumed.}
+is again an abstract homomorphism. Prove also that
+  $$\abstr(\id_G)=\id_{\abstr(G)} \quad\text{and}\quad
+  \abstr(f_1f_0)=\abstr(f_1)\abstr(f_0)$$ 
+for all $f_0:\Hom(G_0,G_1)$ and $f_1:\Hom(G_1,G_2)$.\footnote{%
+In other words, for composable homomorphisms $f_0,f_1$.}
+Show that $\Hom(G,G)$ and $\absHom(\agp G,\agp G)$ are monoids.
+\end{xca}
+
+\begin{example}
+  \label{ex:conjhom}
+  Let $\agp G=(S,e,\mu,\iota)$ be an abstract group and let $g:S$. 
+  In \cref{xca:conj} we defined $\conj^g:S\to S$ by setting 
+  $\conj^g(s)\defequi g\cdot s\cdot g^{-1}$ for all $s:S$,
+  and asked you to show that it ``preserves the group structure'',
+  \ie it is a homomorphism
+  \[
+    \conj^g:\absHom(\agp G,\agp G)
+  \]
+  called \emph{conjugation by} $g$\index{conjugation}.
+  Actually, we asked for more: namely that conjugation by $g$ is 
+  an isomorphism, and hence determines an identification
+  (for which we used the same symbol) $\conj^g:\agp G\eqto\agp G$.
+
+  If $\agp H$ is some other abstract group, transport along $\conj^g$
+  gives an identification
+  $\conj^g_*:\Hom(\agp H,\agp G) \eqto \Hom(\agp H,\agp G)$
+  which should be viewed as ``postcomposing with conjugation by $g$''.
+  Similarly for elements in $\agp H$,
+  giving rise to ``precomposition with conjugation by $h$''.
+  
+  The connection with inner automorphisms of a given group $G$ is
+  as follows. Recalling \cref{exa:conj-concrete} and \cref{def:inner-autos},
+  we have that $\abstr(\Binn)(g)=\loops(\id_{\BG},\inv g)=\conj^g$,
+  for every $g:\USymG$.
+\end{example}
+
+\begin{xca}\label{xca:abs-homgroup}
+Let $\agp G\defequi(S,e_{\agp G},\cdot_{\agp G},\iota_{\agp G})$
+and $\agp H\defequi(T,e_{\agp H},\cdot_{\agp H},\iota_{\agp H})$
+be abstract groups and consider the set $\absHom(\agp H,\agp G)$
+of homomorphisms from $\agp H$ to $\agp G$.
+For any $f,g: \absHom(\agp H,\agp G)$, define
+the function $(f\cdot_{\agp G}g): T\to S$
+by $(f\cdot_{\agp G}g)(t)\defeq f(t)\cdot_{\agp G}g(t)$ for $t:T$.
+Show that $\agp G$ is abelian if and only if
+any $(f\cdot_{\agp G}g)$ is a homomorphism.
+\end{xca}
+
+\section{Groups: from abstract to concrete and back}
+\label{sec:Gsetforabstract}
+
+For constructing a group from an abstract group, we draw our inspiration
+from \cref{def:BG2TorsG} and \cref{lem:BGbytorsor},
+which identify each group $G$ with the group classified by
+the type of its torsors, pointed by its principal torsor.
+That is, in total analogy, we define the torsors for an abstract group,
+and it will then be relatively simple to show that the constructions of
+\begin{enumerate}
+\item forming the abstract group of a group and
+\item taking the group classified by the torsors of an abstract group
+\end{enumerate}
+ are inverse to each other.
+\marginnote{%
+Recall \cref{ft:no-abs-inftygp}, explaining why we do not consider an
+``abstract'' counterpart of the concept of \inftygp.
+Consequently, all we do in this section is set-based.
+}
+
+Let $G$ be a group and $X:\BG\to\Set$ a $G$-set. Using the
+underlying set $X(\sh_G)$, we can restrict the
+codomain of $X$ to $\Set_{(X(\sh_G))}$, the classifying type of 
+$\SG_{X(\sh_G)}$. Then we can view $X$ as the classifying function of 
+a group homomorphism from $G$ to $\SG_{X(\sh_G)}$.
+We already know the abstract versions of all three ingredients,
+the two groups and the homomorphism. Thus, the abstract version
+of $X$ can be expected to consist of the set $X(\sh_G)$ and 
+$\abstr(X)$, the abstract homomorphism from $\abstr(G)$ 
+to $\abstr(\SG_{X(\sh_G)})$.
+
+A case in point is the principal $G$-torsor $\princ G \jdeq
+(z\mapsto (\sh_G\eqto z))$. Its underlying set is $\USymG$.
+The abstract version of the corresponding homomorphism,
+defined by transport, is the function $\USymG\to(\USymG\eqto\USymG)$
+mapping $g$ to $(g\cdot\blank)$, \ie postcomposition with $g$.%
+\footnote{\label{ft:choicePshG}A (free) choice has been made to define 
+$\princ G$ using $(\sh_G\eqto z)$ and not $(z\eqto\sh_G)$. In the latter
+case the abstract homomorphism would map $g$ to $(\blank\cdot\inv g)$, \ie
+precomposition with the inverse of $g$. See also \cref{xca:absprtorsor}.}
+A small generalization now leads to the following definition.
+
+\begin{definition}
+\label{def:abstrGtorsors}
+Given an abstract group ${\agp G}\jdeq(S,e,\mu,\iota)$, a \emph{$\agp G$-set}%
+\glossary(GSet){\protect{$\absGSet$}}{type of $\agp G$-sets}
+\index{GSet@$\agp G$-set (of abstract group)}
+is a set $S$ together with a homomorphism
+$\agp G\to\abstr(\Sigma_S)$
+from $\agp G$ to the abstract permutation group of $S$.
+Then the type of $\agp G$-sets is defined as 
+$$\absGSet\defequi \sum_{S:\Set}\absHom({\agp G},\abstr(\Sigma_{S})).$$
+
+The \emph{principal ${\agp G}$-torsor} $\absprtor$ is the 
+${\agp G}$-set consisting of the underlying set $S$ together with 
+the homomorphism ${\agp G}\to\abstr(\Sigma_{S})$ with underlying 
+function $S\to (S\eqto S)$ given by sending $g:S$ to $(s\mapsto \mu(g,s))$.
+
+The type of \emph{${\agp G}$-torsors} is
+\[
+\absGTor\defequi\sum_{\absGSetvar:\absGSet}
+  \Trunc{\absprtor \eqto \absGSetvar}.\qedhere
+\]
+\end{definition}
+
+\begin{xca}\label{xca:absprtorsor}
+In the setting of the above definition,
+give an identification of $(S,(s\mapsto \mu(g,s)))$ with
+$(S,(s\mapsto \mu(s,\iota(g))))$
+in the type $\absGSet$.\footnote{Every abstract group $(S,e,\mu,\iota)$
+has an isomorphic \emph{opposite} group $(S,e,\mu',\iota)$, where
+$\mu'(g,g')=\mu(g',g)$ for all $g,g':S$. 
+The canonical isomorphism is $\iota$.}
+\end{xca}
+
+\begin{example}
+  Given a group $G$, recall from \cref{lem:idtypesgiveabstractgroups}
+  that the abstract group is 
+  $\abstr(G)\jdeq(\USymG,e_G,\cdot,\inv{(\blank)})$ 
+  with $\USymG\jdeq(\sh_G\eqto\sh_G)$ and $e_G\jdeq\refl{\sh_G}$,
+  and $\cdot$ and $\inv{(\blank)})$ as usual for paths.
+  Unravelling the definition, and \cref{def:abstrisfunctor},
+  we see that an $\abstr(G)$-set consists of
+  \begin{enumerate}
+  \item a set $S$, and
+  \item a function $f:\USymG\to (S\eqto S)$ such that
+  \item for all $p,q:\USymG$ we have that $f(p\, q)=f(p)\,f(q)$.\qedhere
+  \end{enumerate}
+\end{example}
+
+Clearly, the types $\absGSet$ and $\absGTor$ are groupoids,
+and the latter is by definition connected. Thus we define:
+
+\begin{definition}\label{def:concr}
+  For any abstract group ${\agp G}$, the (concrete) 
+  \emph{group $\concr({\agp G})$ associated with ${\agp G}$} 
+  is the group classified by the pointed connected groupoid 
+  $(\absGTor,\absprtor)$.
+\end{definition}
+
+To help reading the coming proofs we introduce some notation that is
+redundant, but may aid the memory in cluttered situations.
+Let $x,y,z$ be elements in some type, then define:%
+\footnote{We recognize $\preinv$ from \cref{lem:pathsptransportiseq}
+as the induced map of identity types $\pathsp{\blank}\colon (y\eqto x)
+\to(\pathsp y \eqto \pathsp x)$, followed by evaluation at $z$.
+Post-composition $\post$ is transport in the family $\pathsp x$,
+while $\preinv$ is precomposition by the inverse of its argument.
+We will sometimes write $\preinv_z$ to stress the variable $z$
+in the type of $\preinv$, and likewise write $\post_x$.}
+\begin{align*}
+%  \pre:(x\eqto y)\to ((y\eqto z)\eqto (x\eqto z)),\qquad&\pre(q)(p)\defequi pq\\
+  \preinv:(y\eqto x)\to ((y\eqto z)\eqto (x\eqto z)),\quad&\preinv(q)(p)\defequi\pathsp qp\defequi pq^{-1}\\
+  \post:(y\eqto z)\to ((x\eqto y)\eqto (x\eqto z)),\quad&\post(p)(q)\defequi\post_pq\defequi pq
+  %\adjoint:(x\eqto y)\to((x\eqto x)\eqto (y\eqto y)),\qquad&\adjoint(q)(p)\defequi\adjoint_qp\defequi qpq^{-1}
+\end{align*}
+
+\begin{example}\label{ex:BqG}
+  Given a group $G$ and $z:\BG$, the principal $G$-torsor
+  \emph{evaluated at $z$}, \ie the set $\princ G(z)\jdeq (\sh_G\eqto z)$,
+  has a natural structure of an $\abstr(G)$-set by means of
+  $$\preinv_z:\USymG\to ((\sh_G\eqto z)\eqto (\sh_G\eqto z)).$$
+  Indeed, $\preinv_z$ is an abstract homomorphism since,
+  for all $p,q:\USymG$, we have that 
+  $\preinv_z(p\,q)=\preinv_z(p)\preinv_z(q)$.% 
+  \footnote{For any $r\colon \sh_G\eqto z$ we have that
+  $\preinv_z(p\, q)(r)=r\,(p\,q)^{-1}=r\,q^{-1} p^{-1}=
+  \preinv_z(p)(\preinv_z(q)(r))$.
+  Without the inverse, this would have gone badly wrong.
+  Moreover, referring to \cref{xca:absprtorsor},
+  $\preinv$ is here more natural than $\post$:
+  $\USymG$ consists of the symmetries of $\sh_G$, and the $z$ is fixed.}
+
+  Furthermore, for any $z:\BG$, the $\abstr(G)$-set 
+  $(\sh_G\eqto z,\preinv,!)$ is an $\abstr(G)$-torsor.
+  Since this is a proposition and $\BG$ is connected, it suffices
+  to verify this for $z\jdeq\sh_G$, for which it follows from
+  \cref{xca:absprtorsor}.  
+  We give this construction a short name by defining, for all $z:\BG$,
+  the map
+  \[
+  \Bq_G:\BG\ptdto (\absGTor[\abstr(G)],\absprtor[\abstr(G)]),\quad \Bq_G(z)
+  \defeq(\princ G(z),\preinv_z,!),
+  \]
+  pointed by \cref{xca:absprtorsor}. The name $\Bq_G$ anticipates
+  its use as classifier of a homomorphism.
+\end{example}
+
+\begin{definition}\label{def:qG-concr-abstr}
+  Let $G$ be a group.
+  The group homomorphism
+  $$q_G:\Hom(G,\concr(\abstr(G)))$$
+  is classified by the function $\Bq_G$ defined in \cref{ex:BqG}.
+\end{definition}
+
+\begin{lemma}
+  \label{lem:Groupsareidentitytypes}
+For all groups $G$, the homomorphism $q_G$ is an isomorphism.
+\end{lemma}
+\begin{proof}
+  To prove that $\Bq_G$ is an equivalence it is, by \cref{cor:fib-vs-path}\ref{conn-fib-vs-path}, enough to show that for $x,y:\BG$ the induced map
+$$\Bq_G:(x\eqto_{\BG}y)\to (\Bq_G(x)\eqto \Bq_G(y))
+$$
+is an equivalence.
+  Now, $\Bq_G(x)\eqto \Bq_G(y)$ can be unfolded to
+$$
+((\sh_G\eqto x),\preinv_x)\eqto_{\absGSet[\abstr(G)]}((\sh_G\eqto y),\preinv_y)$$
+which, by \cref{def:pathover-trp} and \cref{lem:isEq-pair=}, is equivalent to
+\[
+\sum_{f:(\sh_G\eqto x)\equivto (\sh_G\eqto y)}
+\prod_{g:\USymG} f\circ(\preinv_x(g))=(\preinv_y(g))\circ f.
+\]
+Under these identities, and using function extensionality,
+$\Bq_G$ is given by (with the type of $f$ as above)
+\[
+\post_{\sh_G}:(x\eqto y)\to \sum_{f}
+\prod_{g:\USymG}\,\prod_{p:\sh_G\eqto x}\bigl(f(p\inv g)= f(p)\inv g\bigr).
+\]
+Given a function $f$ such that
+$\prod_{g:\USymG}\,\prod_{p:\sh_G\eqto x}\bigl(f(pg)= f(p)g\bigr)$,%
+\footnote{No need to invert $g$ here.}
+the preimage $\post_{\sh_G}^{-1}(f)$ unfolds to
+$\sum_{r:x\eqto y}(f=\post_{\sh_G}(r))$. For proving that $\post_{\sh_G}$,
+and hence $\Bq_G$, is an equivalence, we have to show that the
+latter preimage is contractible. This goal is a proposition
+and $\BG$ is connected, so we may assume that we have a 
+path $p_0:\sh_G\eqto x$. Then any $r,s:x\eqto y$ such that
+$\post_{\sh_G}(r)= f=\post_{\sh_G}(s)$ satisfy $r\,p_0=f(p_0)=s\,p_0$,
+so that $r=s$. Thus the preimage is a proposition. It remains
+to find an $r$ such that $f=\post_{\sh_G}(r)$. 
+We take $r=f(p_0)\inv{p_0}$ and verify, using
+the property of $f$, for any $p:\sh_G\eqto x$, that
+\[
+f(p) = f(p_0(\inv{p_0}p)) = f(p_0)(\inv{p_0} p) = (f(p_0) \inv{p_0}) p
+= \post_{\sh_G}(r)(p).\qedhere
+\]
+\end{proof}
+
+We are now ready to prove the main result of this section.
+
+\begin{theorem}\label{thm:Groupsareidentitytypes}
+The map ${\abstr}:\typegroup\to\typegroup^{\abstr}$ is an equivalence.
+\end{theorem}
+
+\begin{proof}
+Applying \cref{lem:weq-iso} with \cref{def:concr} as 
+candidate inverse, one half of the the work has been done 
+in \cref{lem:Groupsareidentitytypes}. It remains to give,
+for any ${\agp G}$, an isomorphism of type
+\[
+{\agp G}\equivto_{\typegroup^{\abstr}}\abstr(\concr({\agp G})).
+\]
+Let ${\agp G}=(S,e,\mu,\iota)$ be an abstract group.
+Then the underlying set of $\abstr(\concr({\agp G}))$ is 
+$\absprtor \eqto_{\absGTor}\absprtor$.
+Unraveling the definitions and using \cref{def:pathover-trp},
+we see that this set is equivalent to
+\[
+\sum_{\pi:S\equivto S}\prod_{s,t:S}\bigl(\pi(\mu(s,t))=\mu(s,\pi(t)\bigr).
+\]
+Setting $t\defequi e$ in the last equation, we see that $\pi(s)=\mu(s,\pi(e))$,
+that is, $\pi$ is simply multiplication with an element $\pi(e):S$.
+In other words,\footnote{Indeed, conversely, $\mu(u,\blank)$
+satisfies the condition for $\pi$. Prove this!}
+the function
+\[
+r_{\agp G}:S\to  \sum_{\pi:S\equivto S}\prod_{s,t:S}
+\bigl(\pi(\mu(s,t))=\mu(s,\pi(t)\bigr),
+\qquad r_{\agp G}(u)\defequi(\mu(u,\blank),!)
+\]
+is an equivalence of sets.
+
+We have to promote $r_{\agp G}$ from an equivalence of sets to
+an isomorphism of abstract groups, with $\agp G$ as domain.
+The codomain of $r_{\agp G}$ has its abstract group structure induced by
+the equivalence with $\abstr(\concr({\agp G}))$.
+The abstract group structure of $\abstr(\concr({\agp G}))$ is given by 
+the symmetries of $\absprtor$; translated to the codomain
+$\sum_{\pi:S\equivto S}\prod_{s,t:S}\bigl(\pi(\mu(s,t))=\mu(s,\pi(t)\bigr)$ 
+this corresponds via the first projection to a subset of permutations of $S$,
+with the abstract group structure given by composition $\circ$.
+In view of \cref{def:abstrisfunctor}, for $r_{\agp G}$ to be an isomorphism,
+it suffices that $r_{\agp G}$ preserves multiplication:
+$r_{\agp G}(\mu(u,v))=r_{\agp G}(u)\circ r_{\agp G}(v)$.
+This follows directly from function extensionality and 
+the associativity of $\mu$. Hence the equivalence $r_{\agp G}$ is 
+indeed an isomorphism of abstract groups.\footnote{%
+ \label{ft:abstract-Cayley}
+ This amounts to Cayley's Theorem for abstract groups,
+ stating that every abstract group $\agp G$ is isomorphic to an 
+ abstract subgroup of the abstract permutation group of the underlying 
+ set $S$ of $\agp G$. The abstract subgroup is the codomain of $r_{\agp G}$
+ with $\id_S$, $\circ$ and $\inv{(\blank)}$.
+}\qedhere
+\end{proof}
+
+%The proof above shows that every abstract group encodes the symmetries 
+%of something essentially unique.  
+
+
+\section{Homomorphisms, from abstract to concrete and back}
+\label{sec:homabsisconcr}
+
+Now that we know how to identify the type of groups with the type 
+of abstract groups, it is natural to ask if the respective notions of 
+group homomorphism also coincide.
+
+They do, and we provide two independent and somewhat different arguments.
+Translating from group homomorphisms to abstract group homomorphisms is easy:
+if $G$ and $H$ are groups, then we defined
+$$\abstr:\Hom(G,H)\to\absHom(\abstr(G),\abstr(H))$$
+in \cref{def:USym-hom} and \cref{def:abstrisfunctor} as the function
+which takes a homomorphism, classified by a pointed map $\Bf:\BG\ptdto\BH$,
+to the induced map of identity types
+$$\USymf \jdeq \loops\Bf:\USymG\to\USymH$$
+together with the proof that this is an abstract group 
+homomorphism from $\abstr(G)$ to $\abstr(H)$.
+
+Going back is somewhat more involved, and it is here we consider
+two approaches. The first is a compact argument showing directly how to
+reconstruct a pointed map $\Bf:\BG\ptdto\BH$ from an abstract group
+homomorphism from $\abstr(G)$ to $\abstr(H)$. The second translates 
+back and forth via our equivalence between abstract and concrete groups.
+
+The next subsections offer two proofs of the statement we are after:
+\begin{lemma}
+  \label{lem:homomabstrconcr}
+  If $G$ and $H$ are groups, then
+$$\abstr:\Hom(G,H)\to\absHom(\abstr(G),\abstr(H))$$
+is an equivalence.
+\end{lemma}
+
+\sususe{``Delooping'' a group homomorphism}
+\label{sec:delooping} %after Coquand, after Deligne
+We now explore the first approach.
+It might be helpful to review \cref{lem:S1-delooping}
+for a simple example of delooping in the special case of the circle.
+Here we elaborate the general case.
+
+\begin{proof}
+  Suppose we are given an abstract group homomorphism
+$$f:\absHom(\abstr(G),\abstr(H))$$
+and we explain how to build a map $\Bg:\BG \rightarrow \BH$ with
+a path $p:\sh_H \eqto \Bg(\sh_G)$ such that $p f(\omega) = \Bg(\omega) p$
+for all $\omega:\sh_G \eqto \sh_G$ (so that $g:\Hom(G,H)$ is a ``delooping'' of $f$, 
+that is, $f=\abstr(g)$).%
+\footnote{We will thus have displayed a map
+$\deloop:\absHom(\abstr(G),\abstr(H))\to\Hom(G,H)$ with 
+$({\abstr}\circ\deloop)=\id$. We leave it to the reader 
+to prove that $\deloop\circ{\abstr}=\id$. }
+
+To get an idea of our strategy, let us assume the problem solved. The map $\Bg:\BG\rightarrow \BH$
+will then send any path $\alpha:\sh_G \eqto x$ to a path $\Bg(\alpha):\Bg(\sh_G) \eqto \Bg(x)$
+and so we get a family of paths $p(\alpha) \defequi \Bg(\alpha) p$ in ${\sh_H} \eqto \Bg(x)$ such that
+$$p(\alpha\omega) = \Bg(\alpha)\Bg(\omega)p
+  = \Bg(\alpha)pf(\omega) = p(\alpha)f(\omega)$$
+for all $\omega:\sh_G \eqto \sh_G$ and $\alpha : \sh_G \eqto x$.
+
+This suggests to introduce the following family
+$$
+C(x)~:=~ \sum_{y:\BH}\,\sum_{p:(\sh_G \eqto x)\rightarrow (\sh_H \eqto y)}~\prod_{\omega:\sh_G \eqto {\sh_G}}\,\prod_{\alpha:\sh_G \eqto x}~
+ p(\alpha\omega) = p(\alpha)f(\omega)
+$$
+ An element of $C(x)$ has three components, the last component being
+ a proposition since $\BH$ is a groupoid.
+
+ The type $C({\sh_G})$ has a simpler description. An element of $C({\sh_G})$ is
+ a pair $y,p$ such that $p(\alpha\omega) = p(\alpha)f(\omega)$ for
+ any $\alpha$ and $\omega$ in $\sh_G \eqto {\sh_G}$.
+ Since $f$ is an abstract group homomorphism, this condition
+ can be simplified to $p(\omega) = p(\refl{\sh_G})f(\omega)$, and the map $p$
+ is completely determined by $p(\refl{\sh_G})$.
+ Thus $C({\sh_G})$ is equal to $\sum_{y:\BH}\sh_H \eqto y$ and is contractible.
+ Since $\BG$ is connected, we have
+ $\prod_{x:\BG}\iscontr~ C(x)$
+ and so, in particular, we have an element of $\prod_{x:\BG}C(x)$.
+
+ By projecting out the centers we get a map $\Bg:\BG\rightarrow \BH$
+ together with a map $p:({\sh_G}\eqto x)\rightarrow ({\sh_H} \eqto \Bg(x))$ 
+ such that $p (\alpha\omega) = p(\alpha) f(\omega)$
+ for all $\alpha$ in $\sh_G \eqto x$ and $\omega$ in $\sh_G \eqto {\sh_G}$.
+We have, for $\alpha:\sh_G \eqto x$
+$$\prod_{x':\BG}\prod_{\lambda:x\eqto x'}~p(\lambda\alpha) = \Bg(\lambda)p(\alpha)$$
+since this holds for $\lambda = \refl x$.
+In particular, $p(\omega) = \Bg(\omega)p(\refl{\sh_G})$.
+
+We also have $p(\omega) = p(\refl{\sh_G})f(\omega)$, hence
+$p(\refl{\sh_G})\Bg(\alpha) =  f(\alpha)p(\refl{\sh_G})$
+for all $\alpha:\sh_G\eqto \sh_G$ and we have found a delooping of $f$.
+\end{proof}
+
+
+\sususe{From concrete to abstract homomorphisms via torsors.}
+\label{sec:absconctorsor}
+
+For the second approach to \cref{lem:homomabstrconcr} we need
+some preparation. We first give the analogue of
+\cref{def:restrictandinduce} for inducing $H$-sets from
+$G$-sets by an \emph{abstract} homomorphism. \MB{New:}
+There we defined, for all $X:\BG\to\Set$, $f:\Hom(G,H)$ and $w:\BH$,
+$f_*X(w)\defeq
+\setTrunc{\sum_{z:\BG}\bigl((\Bf(z) \eqto w)\times X(z)\bigr)}$.
+As explained in \cref{rem:set-trunc-as-quotient},
+the set truncation can be defined by taking the quotient with
+truncated identity on $\sum_{z:\BG}((\Bf(z) \eqto w)\times X(z))$.
+Recall the $G$-set $(z:\BG)\mapsto((\Bf(z) \eqto w)\times X(z))$ 
+from \cref{ft:f_*X(w)-orbitset}. Using \cref{cor:orbit-equiv},
+we can equivalently quotient its underlying set 
+$\princ H(w)\times X(\sh_G)$ with the induced equivalence 
+relation $\Trunc{(p,x)\eqto(q,y)}$, 
+which is equivalent to
+$\exists_{g:\USymG}((p=(q\cdot\USymf(g)))\times(g\cdot_X x = y))$.
+This motivates the following:
+
+\begin{definition}\label{def:abshom_*}
+  Given groups $G$, $H$ and an abstract homomorphism
+  $\phi:\absHom(\abstr(G),\abstr(H))$, we define the map $\phi_*$
+  from $G$-sets to $H$-sets as follows. 
+  For any $G$-set $X:\BG\to\Set$ and $w:\BH$, define
+  \[
+    \phi_*X(w)\defequi \bigl((\sh_H \eqto w) \times_\phi X(\sh_G)\bigr)
+  \]
+  to be the set quotient of $(\sh_H\eqto w)\times X(\sh_G)$ modulo
+  the equivalence relation $(p,x)\sim(q,y)$ if there exists a $g:\USymG$
+  such that $p=q\phi(g)$ and $g\cdot_X x = y$.
+\end{definition}
+
+\begin{lemma}\label{lem:abshom_*}
+  With $\phi_*$ as in \cref{def:abshom_*}, the map 
+  $\eta_\phi:\phi_*\princ G \equivto \princ H$ sending, for all $w:\BH$,
+  $[(p,x)]: (\sh_H \eqto w) \times_\phi \USymG$ to $p\phi(x):(\sh_H\eqto w)$,
+  is a well defined (fiberwise) equivalence. Consequently,
+  $(\phi_*,\inv{\eta_\phi})$ is a pointed map from
+  $(\typetorsor_G,\princ G)$  to $(\typetorsor_H,\princ H)$.
+\end{lemma}
+\begin{proof}
+First we show that $\eta_\phi$ respects the equivalence relation.
+Let $(p,x)\sim(q,y)$ with $p,q:(\sh_H \eqto w)$ and $x,y:\USymG$.
+Then there exists a $g:\USymG$ such that $p=q\phi(g)$ and $g\cdot_X x = y$.
+Now, $p\phi(x)=q\phi(gx) = q\phi(y)$, so $\eta_\phi$
+is indeed well defined.
+It is also clearly a surjection. So it remains to prove that $\eta_\phi$
+is injective. Assume $(p,x)$ and $(q,y)$ are such that
+$p\phi(x) = q\phi(y)$. Then $p= q\phi(y\inv{x})$ and 
+$y\inv{x}\cdot_X x = y$. 
+Hence $(p,x)\sim(q,y)$, so their classes are equal.
+This shows that $\eta_\phi$ is injective, and completes the proof.
+\end{proof}
+
+Now comes the second proof of \cref{lem:homomabstrconcr}.
+\begin{proof}
+The family of equivalences $\pathsp{\blank}^G:\BG\we(\typetorsor_G,\princ G)$,
+for any $G:\Group$, from \cref{def:BG2TorsG} and \cref{lem:BGbytorsor}
+induces an equivalence
+$$\pathsp{}:\Hom(G,H)\we
+\bigl((\typetorsor_G,\princ G)\ptdto(\typetorsor_H,\princ H)\bigr)
+$$
+by mapping, for any $f:\Hom(G,H)$, $\Bf$ to 
+$\pathsp{\blank}^H\circ \Bf \circ (\pathsp{\blank}^G)^{-1}$. Now define
+$A\defeq ({\abstr}\circ\pathsp{}^{-1})\jdeq
+(g\mapsto\USym\pathsp{}^{-1}(g))$.
+Then $A$ is a map\footnote{\MB{Better first the type and then the definition.
+Also $C$ could be defined here, for stating more clearly what we have
+to prove, including moving the smaller diagram to here. Finally,
+there could be an easier proof using a HIT (zoom 17/7/2025).}}
+\[
+A:\bigl((\typetorsor_G,\princ G)\ptdto(\typetorsor_H,\princ H)\bigr)
+    \to \absHom(\abstr(G),\abstr(H)).
+\]
+In order to show that 
+$\abstr:\Hom(G,H)\to \absHom(\abstr(G),\abstr(H))$ is an equivalence,
+we factor $\abstr$ as $A\circ \pathsp{}$. It then suffices to prove that 
+$A$ is an equivalence, since we already know that $\pathsp{}$.
+
+For all $h$ in the domain of $A$, we have
+${\loops h}\circ \loops\pathsp{\blank}^G=
+\loops\pathsp{\blank}^H \circ A(h)$.
+The situation is visualized by the following ``flattened cube'':%
+\footnote{The outer square is the bottom face, the middle square
+is the top. The edges labelled with ${\loops}$ connect the back
+face with the front face.}
+%see \cref{fig:mapA}
+\[%begin{marginfigure}
+      \begin{tikzcd}[ampersand replacement=\&]
+        (\typetorsor_G,\princ G) 
+          \ar[r,"h"]
+          \ar[ddd, bend right=80,"{\loops}"']\& 
+        (\typetorsor_H,\princ H)
+          \ar[ddd, bend left=80,"{\loops}"]  \\       
+        \BG 
+          \ar[r,"\B\pathsp{}^{-1}(h)"]
+          \ar[u,eqr,"{\pathsp{\blank}^G}"] 
+          \ar[d,"{\loops}"'] \& 
+        \BH 
+          \ar[u,eql,"{\pathsp{\blank}^H}"'] 
+          \ar[d,"{\loops}"] \\      
+        \USymG 
+          \ar[r,"\jdeq A(h)"',"\USym\pathsp{}^{-1}(h)"]
+          \ar[d,eql,"{\loops\pathsp{\blank}^G}"'] \& 
+        \USymH 
+          \ar[d,eqr,"{\loops\pathsp{\blank}^H}"] \\
+        (\princ G\eqto\princ G) 
+          \ar[r,"{\loops h}"'] \& 
+        (\princ H\eqto\princ H)
+      \end{tikzcd}
+     % \caption{\label{fig:mapA}caption}
+\]%end{marginfigure}
+It follows that $A(h)$ is an abstract group homomorphism. 
+We are done if we show that $A$ is an equivalence.
+
+For any $\phi:\absHom(\abstr(G),\abstr(H))$, recall the pointed map
+\[
+(\phi_*,\inv{\eta_\phi}): 
+ \bigl((\typetorsor_G,\princ G)\ptdto (\typetorsor_H,\princ H)\bigr)
+\] 
+from \cref{def:abshom_*} and \cref{lem:abshom_*}.
+Let
+\[
+C: \absHom(\abstr(G),\abstr(H))\to ((\typetorsor_G,\princ G)
+         \ptdto(\typetorsor_H,\princ H)
+\]
+be given by $C(\phi)\defeq(\phi_*,\inv{\eta_\phi})$
+
+We show that $A$ and $C$ are inverse equivalences. 
+Given an abstract group homomorphism $\phi:\absHom(\abstr(G),\abstr(H))$, 
+we have the following commutative diagram%
+\footnote{This is the instance $h\jdeq C(\phi)$ of the
+front face of the ``flattened cube'' above.}
+for $A(C(\phi))$:
+\[%begin{marginfigure}
+   \begin{tikzcd}[ampersand replacement=\&]
+     \USymG 
+       \ar[r,"A(C(\phi))"]
+       \ar[d,eql,"{\loops\pathsp{\blank}^G}"'] \& 
+     \USymH
+       \ar[d,eqr,"{\loops\pathsp{\blank}^H}"] \\
+     (\princ G\eqto\princ G) 
+       \ar[r,"{\loops C(\phi)}"'] \& 
+     (\princ H\eqto\princ H)
+   \end{tikzcd}
+     % \caption{\label{fig:mapA}caption}
+\]%end{marginfigure}
+We have to prove $A(C(\phi))=\phi$. When we start with a $g:\USymG$, 
+then $\loops\pathsp{\blank}^G$ sends $g$ to\footnote{%
+Note that $\pathsp{\blank}^G$ is pointed by reflexivity.}
+\[
+\pathsp{g}^G\defeq\preinv_{\blank}(g)\jdeq((z:\BG)\mapsto\preinv_z(g)):
+(\princ G\eqto\princ G).
+\]
+We have $\loops C(\phi)\jdeq \loops(\phi_*,\inv{\eta_\phi})$.
+It follows from \cref{xca:phi_*-on-paths} that the latter sends 
+$\preinv_{\blank}(g)$ to $\preinv_{\blank}(\phi(g))\jdeq
+((w:\BH)\mapsto\preinv_w(\phi(g)))$ in 
+$\princ H=\princ H$, which corresponds to $\phi(g):\USymH$ under 
+$\loops\pathsp{\blank}^H$. In other words, $A(C(\phi))=\phi$.  
+
+``The composite $CA$ is similar.''\footnote{\MB{Work in progress}}
+Given $h:((\typetorsor_G,\princ G)\ptdto (\typetorsor_H,\princ H))$,
+we must prove the proposition $(A(h)_*,\inv{\eta_{A(h)}}) = h$.
+We know already that 
+$h_\pt\eta_{A(h)}: A(h)_*\princ G = h\princ G$. TBD...
+\end{proof}
+
+\begin{xca}\label{xca:phi_*-on-paths}
+Recall \cref{def:abshom_*} and show that $\phi_*\pi(w)$ maps $[(p,x)]$ 
+in $\phi_*X(w)$ to $[(p,\pi_{\sh_G}(x))]$ in $\phi_*X'(w)$,
+for any path $\pi: X \eqto X'$ and $w:\BH$.
+Then prove that $\loops(\phi_*,\inv{\eta_\phi})$ sends 
+$\preinv_{\blank}(g)$ to $\preinv_{\blank}(\phi(g))$.
+Hint: recall \cref{def:loops-map} and start by 
+making $\inv{\eta_\phi}$ explicit.
+\end{xca}
+
+
+\begin{xca}\label{xca:SG2=SG2-contractible} 
+Show that $\Iso(\SG_2,\SG_2)$ is contractible.
+\end{xca}
+
+\section{Actions, from abstract to concrete and back}
+\label{sec:Gsetsabstrconcr}
+
+Given a group $G$ it should by now come as no surprise that the type 
+of $G$-sets is equivalent to the type of $\abstr(G)$-sets.
+As explained in the introduction to \cref{sec:Gsetforabstract},
+just above \cref{def:abstrGtorsors}, $G$-sets are closely
+connected to homomorphisms from $G$ to a permutation group.
+According to \cref{lem:homomabstrconcr}
+$$\abstr:\Hom(G,\SG_S)\to\absHom(\abstr(G),\abstr(\SG_S))$$
+is an equivalence, where the group $\SG_S$ is classified by the 
+component of the groupoid $\Set$, pointed at $S$. 
+The component information is moot by \cref{xca:ptd-conn-to-comp}.
+
+Using \cref{remark:GsetsareGsets},
+we have the following chain of known equivalences and definitions:
+\begin{align*}
+\GSet 
+&\we \sum_{S:\Set} \Hom(G,\SG_S) \\
+&\we\sum_{S:\Set} \absHom(\abstr(G),\abstr(\SG_S)) \\
+&\jdeq \absGSet[\abstr(G)].
+\end{align*}
+
+Backtracking these equivalences we see that we have established
+\begin{lemma}\label{lem:actionsconcreteandabstract}
+Let $G$ be a group. Then the map
+\[
+\ev_{\sh_G}:\GSet\to\absGSet[\abstr(G)],\qquad \ev_{\sh_G}(X)
+\defequi(X(\sh_G),a_X)
+\]
+is an equivalence, where the abstract homomorphism $a_X$ from
+$\abstr(G)\jdeq\USymG$ to 
+$\abstr(\Sigma_{X(\sh_G)})) \jdeq (X(\sh_G)\eqto X(\sh_G))$ is given by
+the group action of $X$: $a_X(g) \defeq X(g) \jdeq (g\cdot_X \blank)$,
+for all $g:\USymG$.
+\end{lemma}
+
+\begin{example}\label{ex:abstrandconj}
+Let $H$ and $G$ be groups.  Recall from \cref{ex:HomHGasGset}
+that the set of homomorphisms from $H$ to $G$ is a $G$-set in a natural way:
+\[
+\Hom(H,G):\BG\to\Set,\quad \Hom(H,G)(z)\defeq\Hom(H,\mkgroup(BG_\div,z)) 
+\]
+
+What abstract $\abstr(G)$-set does this correspond to?
+In particular, under the equivalence 
+$\abstr:\Hom(H,G)\to\absHom(\abstr(H)\abstr(G))$, what is the 
+corresponding action of $\abstr(G)$ on the abstract homomorphisms?
+The answer is that $g:\USymG$ acts on $\absHom(\abstr(H),\abstr(G))$ by
+postcomposing with conjugation $\conj^g$ by $g$ as defined in
+\cref{ex:conjhom}.
+
+Let us spell this out in some detail. Consider a path $p:\sh_G\eqto z$.
+Transport along $p$ in the family $\Hom(H,G)(z)$
+is postcomposing a homomorphism in $\Hom(H,G)$ with the
+isomorphism $\mkgroup(\id_\BG,\inv p): \Hom(G,\mkgroup(\BG_\div,z))$,
+see \cref{exa:conj-concrete}. Indeed, postcomposition with 
+$\mkgroup(\id_\BG,\inv g)$ is an abstract homomorphism from 
+$\USymG$ to the abstract permutation group of the set $\Hom(H,G)$. 
+This answers the first question above. As to the second question,
+recall from \cref{exa:conj-concrete}
+that $\abstr(\mkgroup(\id_\BG,\inv g)) = \conj^g$. Therefore the action
+of $g$ on $\absHom(\abstr(H),\abstr(G))$ is postcomposition with $\conj^g$.
+\end{example}
+
+For reference we list the conclusion of this example as a lemma:
+\begin{lemma}\label{lem:abstrandconj}
+  If $H$ and $G$ are groups, then the equivalence of \cref{lem:actionsconcreteandabstract} sends the $G$-set $\Hom(H,G)$ to the $\abstr(G)$-set $\absHom(\abstr(H),\abstr(G))$ with action given by postcomposing with conjugation by elements of $\abstr(G)$.
+\end{lemma}
+
+Let $G$ and $G'$ be groups and $f:\Hom(G,G')$ a homomorphism.
+Recall from \cref{def:restrictandinduce} the restriction map
+\[
+f^*: \GSet[G']\to\GSet, \qquad f^*(X) \defeq X\circ \Bf.
+\]
+
+We will have the occasion to use the following result which essentially 
+says that if $f:\Hom(G,G')$ is such that $\USymf$ is surjective,\footnote{%
+In \cref{lem:eq-mono-cover} we will call such an $f$ an \emph{epimorphism},
+just as we called in \cref{def:typeofmono} $f$ an \emph{monomorphism} 
+when $\USymf$ is injective.}
+then $f^*$ embeds the type of $G'$-sets as some of the components
+of the type of $G$-sets.
+
+\begin{lemma}\label{lem:epifullyfaithful}
+Let $G$ and $G'$ be groups and 
+let $f:\Hom(G,G')$ be such that $\USymf$ is surjective.
+Then the map $f^*$ from \cref{def:restrictandinduce} is an injection.
+\end{lemma}
+
+\begin{proof}
+We prove that, for all $G$-sets $X$ and $Y$, the induced map 
+$f^*:(X\eqto Y)\to(f^*X\eqto f^*Y)$ is an equivalence.
+
+Since $\BG$ is connected, evaluation at $\sh_G$  yields an injection
+\[
+\ev_{\sh_G}:(f^*X\eqto f^*Y)\to(X(\Bf(\sh_G)\eqto Y(\Bf(\sh_G))),
+\]
+For the same reason the composite
+\[
+\ev_{\sh_G}f^*\jdeq \ev_{f(\sh_G)}:(X\eqto Y)\to(X(f(\sh_G)\eqto Y(f(\sh_G)))
+\]
+is likewise injective. Since all indentity types involved are sets,
+we can conclude that the induced
+$f^*:(X\eqto Y)\to(f^*X\eqto  f^*Y)$ is injective.
+
+For surjectivity, let $F':f^*X\eqto f^*Y$ and write, for typographical
+ convenience, $a:X(\Bf(\sh_G)\eqto Y(\Bf(\sh_G))$ for 
+ $\ev_{\sh_G}F'\defequi F'_{\sh_G}$.
+By the equivalence between $G$-sets and $\abstr(G)$-sets,\footnote{%
+\MB{NB This seems to be only place with $\abstr(\_)$.
+Can't we have a more direct argument and move the lemma to \cref{ch:actions}?
+For example, we know that the fiber of $f^*$ at $F'$ is a proposition and
+in proving it we can perhaps use connectedness of $\BG(')$, $\USymf$
+surjective and the like.}} 
+$F'$ is uniquely pinned down by $a$ and the requirement that 
+for all $g'=\Bf(g)$ with $g:\USymG$ the diagram
+$$\xymatrix{X(\Bf(\sh_G))\ar@{=}[r]^{X({g'})}\ar@{=}[d]_{a}&
+  X(\Bf(\sh_G))\ar@{=}[d]_{a}\\
+  Y(\Bf(\sh_G))\ar@{=}[r]^{Y({g'})}&Y(\Bf(\sh_G))}
+$$
+commutes.  Likewise, (using transport along the identification
+$f_\pt:\sh_{G'}\eqto f(\sh_G)$) an $F:X\eqto Y$ in the preimage of $a$ 
+is pinned down by the commutativity of the same diagram, 
+but with $g':\Bf(\sh_G)\eqto \Bf(\sh_G)$ arbitrary (an a priori more severe
+requirement, again reflecting injectivity).
+However, when $f:\USymG\to\USymG'$ is surjective these 
+requirements coincide, showing that the induced $f^*$ is an equivalence.
+\qedhere
+% Fix for the moment an  $a:X(f(\sh_G)=Y(f(\sh_G))$
+
+% Now, by transport along the identity $f_\pt:\sh_{G'}=f(\sh_G)$ and the equivalence between $G'$-sets and $\abstr(G')$-sets, an identity $F':X=Y$ of $G'$-sets is uniquely pinned down by an identity $F'_{f(\sh_G)}:X(f(\sh_G)=Y(f(\sh_G))$ together with the proposition that for all $g':f(\sh_G)=f(\sh_G)$ the diagram $$\xymatrix{X(f(\sh_G))\ar@{=}[r]^{X_{g'}}\ar@{=}[d]_{F'_{f(\sh_G)}}&
+%   X(f(\sh_G))\ar@{=}[d]_{F'_{f(\sh_G)}}\\
+%   Y(f(\sh_G))\ar@{=}[r]^{Y_{g'}}&Y(f(\sh_G))}
+% $$
+% commutes.  Likewise, an identity $F:f^*X=f^*Y$ is given by exactly the same data, except that the diagram is only required to commute for $g'=f(g)$ for all $g:\USymG$.  But when $f:\USymG\to\USymG'$ these requirements coincide.
+
+
+% ; $F:X=Y$ is in the preimage of $a:X(f(\sh_G)=Y(f(\sh_G))$ if and only if $a=F_{f(\sh_G)}$ and for all $g':f(\sh_G)=f(\sh_G)$ the diagram
+% $$\xymatrix{X(f(\sh_G))\ar@{=}[r]^{X_{g'}}\ar@{=}[d]_{F_{f(\sh_G)}}&
+%   X(f(\sh_G))\ar@{=}[d]_{F_{f(\sh_G)}}\\
+%   Y(f(\sh_G))\ar@{=}[r]^{Y_{g'}}&Y(f(\sh_G))}
+% $$
+% commutes.  However, since $f$ is surjective there is a $g:\USymG$ so that $g'=f(g)$.  Therefore, anything in $f^*X=f^*Y$ which is in the preimage of $a$ is in the image of $f^*:X=Y$ and we have shown that $f^*$ is also a surjection.
+\end{proof}
+
+
+\section{Heaps \texorpdfstring{$(\dagger)$}{(\textdagger) \color{red} just moved from symmetry without proofreading BID211116}}
+\label{sec:heaps}
+
+Recall that we in \cref{rem:heap-preview} wondered about
+the status of general identity types $a\eqto_A a'$,
+for $a$ and $a'$ elements of a groupoid $A$,
+as opposed to the more special loop types $a\eqto_Aa$.\marginnote{%
+  This section has no implications for the rest of the book,
+  and can thus safely be skipped on a first reading.}
+Here we describe the resulting algebraic structure
+and how it relates to groups.
+
+We proceed in a fashion entirely analogous to that of \cref{sec:typegroup},
+but instead of looking a pointed types, we look at \emph{bipointed types}.
+
+\begin{definition}\label{def:bipt-conn-groupoid}
+  The type of \emph{bipointed, connected groupoids} is the type
+  \[
+    \UUppone \defeq \sum_{A:\UU^{=1}}(A \times A).\qedhere
+  \]
+\end{definition}
+Recall that $\UU^{=1}$ is the type of connected groupoids $A$,
+and that we also write $A:\UU$ for the underlying type.
+We write $(A,a,a'):\UUppone$ to indicate the two endpoints.
+
+Analogous to the loop type of a pointed type,
+we have a designated identity type of a bipointed type,
+where we use the two points as the endpoints of the identifications:
+We set $\ISym(A,a,a') \defeq (a \eqto_A a')$.
+
+\needspace{6\baselineskip}
+\begin{definition}\label{def:heap}
+  The type of \emph{heaps}\footnote{%
+    The concept of heap (in the abelian case)
+    was first introduced by Prüfer\footnotemark{}
+    under the German name \emph{Schar} (swarm/flock).
+    In Anton Sushkevich's book
+    \casrus{Теория Обобщенных Групп}
+    (\emph{Theory of Generalized Groups}, 1937),
+    the Russian term \casrus{груда} (heap)
+    is used in contrast to \casrus{группа} (group).
+    For this reason, a heap is sometimes
+    known as a ``groud'' in English.}%
+  \footcitetext{Pruefer-AG}
+  is a wrapped copy (\cf \cref{sec:unary-sum-types})
+  of the type of bipointed, connected groupoids $\UUppone$,
+  \[
+    \Heap \defeq \Copy_{\mkheap}(\UUppone),
+  \]
+  with constructor $\mkheap : \UUppone \to \Heap$.
+\end{definition}
+We call the destructor $\B : \Heap \to \UUppone$,
+and call $\BH$ the \emph{classifying type} of the heap $H \jdeq\mkheap\BH$,
+just as for groups,
+and we call the first point in $BH$ is \emph{start shape} of $H$,
+and the second point the \emph{end shape} of $H$.
+
+The identity type construction $\ISym : \UUppone \to \Set$
+induces a map $\USym : \Heap \to \Set$,
+mapping $\mkheap X$ to $\ISym X$.
+These are the \emph{underlying identifications} of the heaps.
+
+These is an obvious map (indeed a functor) from groups to heaps,
+given by doubling the point.
+That is, we keep the classifying type and use the designated shape
+as both start and end shape of the heap.
+In fact, this map lifts to the type of heaps with a chosen identification.
+\begin{exercise}\label{xca:group+torsor-heap}
+  Define \emph{two} equivalences $l,r:\Heap \equivto \sum_{G:\Group}\BG$,
+  and one $c:\Group \equivto \sum_{H:\Heap}\USymH$.
+\end{exercise}
+Recalling the equivalence between $\BG$ and the type of $G$-torsors
+from~\cref{lem:BGbytorsor},
+we can also say that a heap is the same
+as a group $G$ together with a $G$-torsor.\footnote{%
+  But be aware that are \emph{two} such descriptions,
+  according to which endpoint is the designated shape,
+  and which is the ``twisted'' torsor.}
+It also follows that the type of heaps is a (large) groupoid.
+
+In the other direction,
+there are \emph{two} obvious maps (functors) from heaps to groups,
+taking either the start or the end shape to be the designated shape.
+
+Here's an \emph{a priori} different map from heaps to groups:
+For a heap $H$, consider all the
+symmetries of the underlying set of identifications $\USymH$
+that arise as $r \mapsto p\inv q r$ for $p,q\in \USymH$.
+
+Note that $(p,q)$ and $(p',q')$ determine the same symmetry
+if and only if $p\inv q = p'\inv{q'}$, and if and only if
+$\inv{p'}p = \inv{q'}q$.
+
+For the composition, we have $(p,q)(p',q') = (p\inv{q}p',q') = (p,q'\inv{p'}q)$.
+
+\begin{exercise}
+  Complete the argument that this defines a map
+  from heaps to groups. Can you identify the resulting group
+  with the symmetry group of the start or end shape?
+  How would you change the construction to get the other endpoint?
+\end{exercise}
+
+\begin{exercise}
+  Show that the symmetry groups of the two endpoints of a heap
+  are \emph{merely} isomorphic.
+
+  Define the notion of an \emph{abelian heap},
+  and show that for abelian heaps,
+  the symmetry groups of the endpoints are (\emph{purely}) isomorphic.
+\end{exercise}
+
+Now we come to the question of describing the algebraic structure
+of a heap.
+Whereas for groups we can define the abstract structure
+in terms of the reflexivity path and the binary operation of path composition,
+for heaps, we can define the abstract structure
+in terms of a \emph{ternary operation},
+as envisioned by the following exercise.
+
+\begin{exercise}\label{xca:heap-variety}
+  Fix a set $S$.
+  Show that the fiber $\inv{\USym}(S)\jdeq\sum_{H:\Heap}(S\eqto\USymH)$ is a set.
+
+  Now fix in addition a ternary operation $t:S\times S\times S\to S$ on $S$.
+  Show that the fiber of the map $\Heap \to \sum_{S:\Set}(S\times S\times S \to S)$,
+  mapping $H$ to $(\USymH,(p,q,r)\mapsto p \inv{q} r)$,
+  at $(S,t)$ is a proposition,
+  and describe this proposition in terms of equations.
+\end{exercise}
+
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% fill-column: 144
+%%% latex-block-names: ("lemma" "theorem" "remark" "definition" "corollary" "fact" "properties" "conjecture" "proof" "question" "proposition" "exercise")
+%%% TeX-master: "book"
+%%% TeX-command-extra-options: "-fmt=macros"
+%%% compile-command: "make book.pdf"
+%%% End:

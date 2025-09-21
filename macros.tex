@@ -1,0 +1,999 @@
+%% document class
+\documentclass[10pt,oneside,leqno,openright]{memoir}
+%% packages
+\usepackage{microtype}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[osf,helvratio=.9]{newpxtext}     % largsc
+\renewcommand{\rmdefault}{pplx} % use FPL text for better sc
+\usepackage[vvarbb]{newpxmath}
+\DeclareSymbolFont{largesymbols}  {OMX}{zplm}{m}{n}
+\makeatletter
+\re@DeclareMathSymbol{\sumop}{\mathop}{largesymbols}{"50}
+\re@DeclareMathSymbol{\prodop}{\mathop}{largesymbols}{"51}
+\re@DeclareMathSymbol{\intop}{\mathop}{largesymbols}{"52}
+\makeatother
+\renewcommand*{\coprod}{\amalg}
+\usepackage[cal=cm,scr=zapfc,scrscaled=1.2,frak=euler]{mathalfa}
+\let\pxopenbox\openbox % pxmath already has openbox but amsthm also defines it
+\let\openbox\relax
+\usepackage{csquotes}
+\usepackage[russian,ngerman,main=english,shorthands=off]{babel}
+\usepackage{amsthm}
+\renewcommand*{\openbox}{\pxopenbox}
+\usepackage{mathtools}          %to get \vcentcolon
+\usepackage{thmtools}
+\usepackage{xspace}
+\usepackage{booktabs}
+\usepackage{ragged2e}           % to hyphenate marginals
+\usepackage{marginfix}          % to get \mparshift
+\usepackage{scalerel}           % to scale \div
+\usepackage[all]{xy}
+\usepackage{pgfplots,tikz,tikz-cd,tikz-3dplot}
+\pgfplotsset{compat=1.11}
+\usepackage{enumitem}
+\usepackage{xifthen}
+
+\input tikzsetup
+
+%% mathtools does not define an extensible equal sign, so we do so here:
+\makeatletter
+\def\Equalfill@{\arrowfill@\Relbar\Relbar\Relbar}
+\MHInternalSyntaxOn
+\providecommand*\xEqual[2][]{%
+  \ext@arrow 0055{\Equalfill@}{#1}{#2}}
+\MHInternalSyntaxOff
+\makeatother
+\mathtoolsset{mathic}
+
+% bibliography
+\usepackage{hyphenat}
+\usepackage[backref=true,
+            style=verbose,
+            autocite=footnote,
+            autolang=hyphen,
+            useprefix=false,
+            backend=biber,
+            bibencoding=utf8]{biblatex}
+\addbibresource{papers.bib}
+\newcommand*{\citeerror}{\PackageError{cas}{Don't use \protect\cite\space: %
+    use \protect\footcite\space instead,\MessageBreak %
+    perhaps together with \protect\citeauthor}{}}
+\let\cite\citeerror
+\DefineBibliographyStrings{english}{%
+  backrefpage = {page},% originally "cited on page"
+  backrefpages = {pages},% originally "cited on pages"
+}
+\newcommand*{\arxiv}[1]{Preprint available at arXiv: \href{http://arxiv.org/abs/#1}{\nolinkurl{#1}}}
+\newbibmacro*{related:samevol}[1]{%
+  \renewcommand*{\newunitpunct}{\space}%
+  \entrydata{#1}{\usebibmacro{doi+eprint+url}}}
+
+% hyperref should be the package loaded last
+\usepackage[colorlinks,
+            bookmarksnumbered=true,
+            bookmarksdepth=2,
+            bookmarksopenlevel=2,
+            citecolor=linkcolor,
+            linkcolor=linkcolor,
+            urlcolor=linkcolor,
+            pdfborderstyle=,
+            unicode]{hyperref}
+% To get unicode in pdfinfo, we need to use hypersetup, not package options
+\hypersetup{
+  pdfauthor={Marc Bezem, Ulrik Buchholtz, Pierre Cagne, Bjørn Ian Dundas, Daniel R. Grayson},
+  pdftitle={Symmetry},
+  pdfsubject={Mathematics},
+  pdfkeywords={type theory, group theory, univalence axiom}}
+% - except for cleveref!
+\usepackage[capitalize,noabbrev]{cleveref}
+
+%% Colors: link color, and a red/blue pair that remains contrasting
+%% for colorblind individuals (https://davidmathlogic.com/colorblind)
+\definecolor{linkcolor}{rgb}{0,0,0.5}
+%\definecolor{casred}{rgb}{0.863,0.196,0.125}
+%\definecolor{casblue}{rgb}{0.0,0.353,0.71}
+\definecolor{casred}{rgb}{0.831,0.067,0.349}
+\definecolor{casblue}{rgb}{0.102,0.522,1.0}
+\definecolor{casgreen}{rgb}{0.608,0.761,0.039}
+
+
+%% Enable synctex
+\pdfadjustspacing=1
+\brokenpenalty=10000 %%% No hyphenation across page breaks
+\synctex=1
+
+%% redefine \em to use \slshape
+\makeatletter
+\DeclareRobustCommand\em
+  {\@nomath\em \ifdim \fontdimen\@ne\font >\z@
+    \eminnershape \else \slshape \fi}%
+\makeatother
+
+%% To mark a chapter or section as optional
+\newcommand*{\titledagger}{ (\texorpdfstring{$\dagger$}{†})}
+%% macros
+\newcommand{\DELETE}[1]{} % no star on purpose: argument may contain \par
+
+%%% Lists (uses enumitem)
+\setlist{itemsep=0.5ex}
+\setlist[1]{labelindent=\parindent}
+\setlist[1]{leftmargin=*}
+\setlist[enumerate,1]{label=(\arabic*),ref=(\arabic*)}
+\setlist[description]{font=\normalfont\scshape}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% THEOREMS
+\newcommand*\qefsymbol{\ensuremath{\lrcorner}}
+\declaretheoremstyle[headfont=\normalfont\scshape,bodyfont=\slshape]{cas-thm}
+\declaretheoremstyle[headfont=\normalfont\scshape,qed=\qefsymbol]{cas-def}
+\declaretheorem[sibling=subsection,style=cas-thm]{theorem}
+\declaretheorem[sibling=theorem,style=cas-thm]{lemma}
+\declaretheorem[sibling=theorem,style=cas-thm]{corollary}
+\declaretheorem[sibling=theorem,style=cas-thm]{conjecture}
+\declaretheorem[sibling=theorem,style=cas-thm]{axiom}
+\declaretheorem[sibling=theorem,style=cas-thm]{construction}
+\declaretheorem[sibling=theorem,style=cas-def]{definition}
+\declaretheorem[sibling=theorem,style=cas-def]{remark}
+\declaretheorem[sibling=theorem,style=cas-def]{example}
+\declaretheorem[sibling=theorem,style=cas-def]{exercise}
+\declaretheorem[sibling=theorem,style=cas-def,name=Exercise]{xca}
+\declaretheorem[sibling=theorem,style=cas-def,name=Principle]{principle}
+\def\implementation#1{\proof[Implementation of \cref{#1}]}
+\def\endimplementation{\endproof}
+\numberwithin{equation}{section}
+\Crefname{xca}{Exercise}{Exercises}
+\Crefname{construction}{Construction}{Constructions}
+
+%% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Palatino line width
+\setlength{\normalrulethickness}{0.59pt}
+
+%%% The occasional Russian
+\newcommand{\casrus}[1]{\foreignlanguage{russian}{%
+    \fontfamily{Tempora-TLF}\selectfont #1}}
+
+%%% Tufte font size
+%%
+% Set the font sizes and baselines to match Tufte's books
+\makeatletter
+\renewcommand\normalsize{%
+   \@setfontsize\normalsize\@xpt{14}%
+   \abovedisplayskip 10\p@ \@plus2\p@ \@minus5\p@
+   \abovedisplayshortskip \z@ \@plus3\p@
+   \belowdisplayshortskip 6\p@ \@plus3\p@ \@minus3\p@
+   \belowdisplayskip \abovedisplayskip
+   \let\@listi\@listI}
+\normalbaselineskip=14pt
+\normalsize
+\renewcommand\small{%
+   \@setfontsize\small\@ixpt{12}%
+   \abovedisplayskip 8.5\p@ \@plus3\p@ \@minus4\p@
+   \abovedisplayshortskip \z@ \@plus2\p@
+   \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+   \def\@listi{\leftmargin\leftmargini
+               \topsep 4\p@ \@plus2\p@ \@minus2\p@
+               \parsep 2\p@ \@plus\p@ \@minus\p@
+               \itemsep \parsep}%
+   \belowdisplayskip \abovedisplayskip
+}
+\renewcommand\footnotesize{%
+   \@setfontsize\footnotesize\@viiipt{10}%
+   \abovedisplayskip 6\p@ \@plus2\p@ \@minus4\p@
+   \abovedisplayshortskip \z@ \@plus\p@
+   \belowdisplayshortskip 3\p@ \@plus\p@ \@minus2\p@
+   \def\@listi{\leftmargin\leftmargini
+               \topsep 3\p@ \@plus\p@ \@minus\p@
+               \parsep 2\p@ \@plus\p@ \@minus\p@
+               \itemsep \parsep}%
+   \belowdisplayskip \abovedisplayskip
+}
+\renewcommand\scriptsize{\@setfontsize\scriptsize\@viipt\@viiipt}
+\renewcommand\tiny{\@setfontsize\tiny\@vpt\@vipt}
+\renewcommand\large{\@setfontsize\large\@xipt{15}}
+\renewcommand\Large{\@setfontsize\Large\@xiipt{16}}
+\renewcommand\LARGE{\@setfontsize\LARGE\@xivpt{18}}
+\renewcommand\huge{\@setfontsize\huge\@xxpt{30}}
+\renewcommand\Huge{\@setfontsize\Huge{24}{36}}
+\makeatother
+
+%%% Layout
+\stockaiv
+\pageaiv
+\settypeblocksize{*}{26pc}{*}
+\setlrmargins{1in}{*}{*}
+\setulmarginsandblock{1in}{1in}{*}
+\setheadfoot{\baselineskip}{2\baselineskip}
+\setheaderspaces{*}{2\baselineskip}{*}
+\setmarginnotes{2pc}{11pc}{\baselineskip}
+\checkandfixthelayout
+\raggedbottom
+\setlength{\parindent}{1em}
+
+%%% Tufte margins
+\marginparmargin{right}
+\footnotesinmargin
+\renewcommand*{\thefootnote}{\arabic{footnote}}
+\setlength{\footmarkwidth}{-1sp}
+\setlength{\footmarksep}{0pt}
+\renewcommand{\foottextfont}{\footnotesize\RaggedRight}
+\newlength{\extrawidth}
+\setlength{\extrawidth}{\marginparsep}
+\addtolength{\extrawidth}{\marginparwidth}
+\newenvironment{fullwidth}{\begin{adjustwidth}{0mm}{-\extrawidth}%
+  \blockmargin}%
+  {\unblockmargin\end{adjustwidth}}
+\setmpjustification{\RaggedLeft}{\RaggedRight}%
+\newcommand*{\marginnote}[2][]{%
+  \ifthenelse{\isempty{#1}}{\relax}{\mparshift{#1}}%
+  \marginpar{\mpjustification\normalfont\footnotesize #2}}
+\setmarginfloatcaptionadjustment{figure}{\captionnamefont{\footnotesize\scshape}%
+  \captiontitlefont{\footnotesize}\captionstyle{\mpjustification}}
+\setmarginfloatcaptionadjustment{table}{\captionnamefont{\footnotesize\scshape}%
+  \captiontitlefont{\footnotesize}\captionstyle{\mpjustification}}
+\sidecapmargin{right}
+\setsidecappos{t}
+\renewcommand*{\sidecapstyle}{\captionnamefont{\footnotesize\scshape}%
+  \captiontitlefont{\footnotesize}\captionstyle{\mpjustification}}
+
+%%% Space after period
+\DeclareMathSymbol{.}{\mathpunct}{letters}{"3A}
+\DeclareMathSymbol{\decimalperiod}{\mathord}{letters}{"3A}
+
+%%% Title page
+\newcommand{\thetitlepage}{{%
+    \thispagestyle{empty}
+    \noindent{\huge \textls[250]{SYMMETRY}}
+
+    \vspace*{10ex}
+
+    \noindent{\itshape\Large\foreignlanguage{ngerman}{Am Anfang war die Symmetrie}
+      --
+      In the beginning was symmetry!}\\
+
+    \vspace{2ex}
+
+    \noindent\hfill\parbox{.62\textwidth}{Werner Heisenberg,
+      \emph{\foreignlanguage{ngerman}{Der Teil
+          und das Ganze: Gespr\"ache im Umkreis der Atomphysik}}, 1969,
+      English translation, \emph{Physics and Beyond}, 1971.}
+
+    \vfill
+
+    \begin{center}
+      \tdplotsetmaincoords{45}{135}
+      \begin{tikzpicture}[tdplot_main_coords,scale=2.0,opacity=0.5]
+        \draw (-1.00000, -1.61803, 0.00000) -- (-0.00000, -1.00000, -1.61803);
+        \draw (-1.61803, 0.00000, -1.00000) -- (-0.00000, -1.00000, -1.61803);
+        \draw (-1.00000, -1.61803, 0.00000) -- (-1.61803, -0.00000, -1.00000);
+        \draw (1.00000, -1.61803, 0.00000) -- (-0.00000, -1.00000, -1.61803);
+        \draw (1.00000, -1.61803, 0.00000) -- (-1.00000, -1.61803, 0.00000);
+        \draw (-1.61803, 0.00000, 1.00000) -- (-1.00000, -1.61803, -0.00000);
+        \draw (-1.61803, 0.00000, -1.00000) -- (0.00000, 1.00000, -1.61803);
+        \draw (-1.61803, 0.00000, 1.00000) -- (-1.61803, 0.00000, -1.00000);
+        \draw (0.00000, 1.00000, -1.61803) -- (0.00000, -1.00000, -1.61803);
+        \fill[casgreen] (0.00000, 0.00000, 0.00000) -- (0.00000, -1.61803, 0.00000) -- (-1.00000, -1.61803, 0.00000) -- (-1.00000, 0.00000, 0.00000) -- cycle;
+        \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, -1.61803) -- (0.00000, -1.00000, -1.61803) -- (0.00000, -1.00000, 0.00000) -- cycle;
+        \fill[casred] (0.00000, 0.00000, 0.00000) -- (-1.61803, 0.00000, 0.00000) -- (-1.61803, 0.00000, -1.00000) -- (0.00000, 0.00000, -1.00000) -- cycle;
+        \draw (0.00000, -1.00000, 1.61803) -- (-1.00000, -1.61803, 0.00000);
+        \draw (1.61803, 0.00000, -1.00000) -- (0.00000, -1.00000, -1.61803);
+        \draw (-1.00000, 1.61803, 0.00000) -- (-1.61803, 0.00000, -1.00000);
+        \fill[casred] (0.00000, 0.00000, 0.00000) -- (-1.61803, 0.00000, 0.00000) -- (-1.61803, 0.00000, 1.00000) -- (0.00000, 0.00000, 1.00000) -- cycle;
+        \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, -1.61803) -- (0.00000, 1.00000, -1.61803) -- (0.00000, 1.00000, 0.00000) -- cycle;
+        \fill[casgreen] (0.00000, 0.00000, 0.00000) -- (0.00000, -1.61803, 0.00000) -- (1.00000, -1.61803, 0.00000) -- (1.00000, 0.00000, 0.00000) -- cycle;
+        \draw (0.00000, -1.00000, 1.61803) -- (1.00000, -1.61803, 0.00000);
+        \draw (0.00000, -1.00000, 1.61803) -- (-1.61803, 0.00000, 1.00000);
+        \draw (1.61803, 0.00000, -1.00000) -- (1.00000, -1.61803, 0.00000);
+        \draw (-1.61803, 0.00000, 1.00000) -- (-1.00000, 1.61803, 0.00000);
+        \draw (0.00000, 1.00000, -1.61803) -- (1.61803, 0.00000, -1.00000);
+        \draw (-1.00000, 1.61803, 0.00000) -- (0.00000, 1.00000, -1.61803);
+        \fill[casred] (0.00000, 0.00000, 0.00000) -- (1.61803, 0.00000, 0.00000) -- (1.61803, 0.00000, -1.00000) -- (0.00000, 0.00000, -1.00000) -- cycle;
+        \fill[casgreen] (0.00000, 0.00000, 0.00000) -- (0.00000, 1.61803, 0.00000) -- (-1.00000, 1.61803, 0.00000) -- (-1.00000, 0.00000, 0.00000) -- cycle;
+        \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, 1.61803) -- (0.00000, -1.00000, 1.61803) -- (0.00000, -1.00000, 0.00000) -- cycle;
+        \draw (0.00000, 1.00000, 1.61803) -- (-1.61803, 0.00000, 1.00000);
+        \draw (1.61803, 0.00000, 1.00000) -- (1.00000, -1.61803, 0.00000);
+        \draw (1.00000, 1.61803, 0.00000) -- (0.00000, 1.00000, -1.61803);
+        \fill[casgreen] (0.00000, 0.00000, 0.00000) -- (0.00000, 1.61803, 0.00000) -- (1.00000, 1.61803, 0.00000) -- (1.00000, 0.00000, 0.00000) -- cycle;
+        \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, 1.61803) -- (0.00000, 1.00000, 1.61803) -- (0.00000, 1.00000, 0.00000) -- cycle;
+        \fill[casred] (0.00000, 0.00000, 0.00000) -- (1.61803, 0.00000, 0.00000) -- (1.61803, 0.00000, 1.00000) -- (0.00000, 0.00000, 1.00000) -- cycle;
+        \draw (0.00000, -1.00000, 1.61803) -- (1.61803, 0.00000, 1.00000);
+        \draw (0.00000, 1.00000, 1.61803) -- (0.00000, -1.00000, 1.61803);
+        \draw (1.61803, 0.00000, 1.00000) -- (1.61803, 0.00000, -1.00000);
+        \draw (1.00000, 1.61803, 0.00000) -- (1.61803, 0.00000, -1.00000);
+        \draw (0.00000, 1.00000, 1.61803) -- (-1.00000, 1.61803, 0.00000);
+        \draw (-1.00000, 1.61803, 0.00000) -- (1.00000, 1.61803, 0.00000);
+        \draw (0.00000, 1.00000, 1.61803) -- (1.61803, 0.00000, 1.00000);
+        \draw (0.00000, 1.00000, 1.61803) -- (1.00000, 1.61803, 0.00000);
+        \draw (1.61803, 0.00000, 1.00000) -- (1.00000, 1.61803, 0.00000);
+      \end{tikzpicture}
+    \end{center}
+
+    \vfill
+
+    by\\[5ex]
+    Marc Bezem\\
+    Ulrik Buchholtz\\
+    Pierre Cagne\\
+    Bjørn Ian Dundas\\
+    Daniel R.~Grayson
+
+    \vfill
+
+    \indent\hfill{\Large Book version: \texttt{\OPTcommit} (\OPTdate)}
+
+    \vfill\clearpage}}
+
+\def\BibTeX{{B\kern-.05em{\scshape i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+%%% Copyright page
+\newcommand{\thecopyrightpage}{{%
+    \begin{fullwidth}
+    \noindent Copyright \textcopyright{} 2025 by Marc Bezem, Ulrik Buchholtz,
+    Pierre Cagne,\\
+    Bjørn Ian Dundas, and Daniel R.~Grayson.
+    All rights reserved.
+
+    \vspace{10ex}
+
+    \noindent
+    \begin{minipage}[c]{0.20\linewidth}\centering
+      \includegraphics[width=0.9\linewidth]{cc-by-sa.pdf}
+    \end{minipage}
+    \begin{minipage}{0.75\linewidth}
+      This work is licensed under the
+      Creative Commons Attribution-ShareAlike\\ 4.0 International License. To view a copy of this license, visit:\\
+      \url{http://creativecommons.org/licenses/by-sa/4.0/}
+    \end{minipage}
+
+    \vspace{10ex}
+
+    \noindent This book is available at:
+    \url{https://unimath.github.io/SymmetryBook/book.pdf}
+
+    \vspace{10ex}
+
+    \noindent To cite the book, the following \BibTeX{} code may be useful:
+
+    \vspace{5ex}
+
+    \noindent{\ttfamily%
+      \halign{{}\hspace{2em} ## \hfil & ## & ## \hfil \cr
+        \noalign{@misc\{Symmetry,}
+        title        &=& \{Symmetry\},\cr
+        author       &=& \{Marc Bezem and Ulrik Buchholtz and Pierre Cagne\cr
+                     & &  {}~and Bjørn Ian Dundas and Daniel R.~Grayson\},\cr
+        date         &=& \{\OPTdate\},\cr
+        howpublished &=& \{\textbackslash url%
+                          \{https://github.com/UniMath/SymmetryBook\}\},\cr
+        note         &=& \{Commit:~\textbackslash texttt\{\OPTcommit\}\}\cr
+        \noalign{\}}}}
+
+    \vfill\end{fullwidth}\clearpage}}
+
+%%% Table of contents
+\renewcommand*{\cftchapterfont}{\itshape\LARGE}
+\renewcommand*{\cftchapterleader}{\kern1pc\textperiodcentered}
+\renewcommand*{\cftchapterformatpnum}[1]{\kern1pc\normalfont\LARGE #1}
+\renewcommand*{\cftchapterafterpnum}{\cftparfillskip}
+\renewcommand*{\chapternumberline}[1]{\llap{#1\kern2pc}}
+\renewcommand*{\cftsectionfont}{\normalfont}
+\renewcommand*{\cftsectionleader}{\enskip\textperiodcentered}
+\renewcommand*{\cftsectionformatpnum}[1]{\enskip\normalfont #1}
+\renewcommand*{\cftsectionafterpnum}{\cftparfillskip}
+\setrmarg{0pt plus 1fil}
+\setlength{\cftsectionnumwidth}{3em}
+\setlength{\cftsectionindent}{0pt}
+\setpnumwidth{2pc}
+\maxtocdepth{section}
+
+%%% Headers
+\setlength{\headwidth}{\textwidth}
+\addtolength{\headwidth}{\marginparsep}
+\addtolength{\headwidth}{\marginparwidth}
+\makepagestyle{cas}
+\makerunningwidth{cas}{\headwidth}
+\makeheadposition{cas}{flushright}{flushleft}{}{}
+\newcommand*{\headtitle}{\normalfont\scshape\textls{symmetry}}
+\makeevenhead{cas}{\thepage\kern2pc\normalfont\scshape\textls{\leftmark}}{}{}
+\makeoddhead{cas}{}{}{{\normalfont\scshape\textls{\rightmark}}\kern2pc\thepage}
+\def\memUChead{\MakeTextLowercase}
+\makeatletter
+\makepsmarks{cas}{%
+  \createmark{chapter}{both}{nonumber}{\@chapapp\ }{. \ }
+  \createplainmark{toc}{both}{\contentsname}
+  \createplainmark{lof}{both}{\listfigurename}
+  \createplainmark{lot}{both}{\listtablename}
+  \createplainmark{bib}{both}{\bibname}
+  \createplainmark{index}{both}{\indexname}
+  \createplainmark{glossary}{both}{\glossaryname}
+}
+\makeatother
+\pagestyle{cas}
+
+%%% Chapters
+\makeatletter
+\makechapterstyle{cas}{%
+  \setlength{\beforechapskip}{2\onelineskip}%
+  \setlength{\midchapskip}{3pt}%
+  \setlength{\afterchapskip}{4\onelineskip \@plus .1\onelineskip
+    \@minus 0.167\onelineskip}%
+  \renewcommand*{\printchaptername}{}%
+  \renewcommand*{\chapternamenum}{}%
+  \renewcommand*{\chapnumfont}{\raggedright\normalfont\huge\itshape}%
+  \renewcommand*{\chaptitlefont}{\raggedright\normalfont\huge\slshape}%
+  \renewcommand*{\printchaptertitle}[1]{%
+    \begin{adjustwidth}{}{-\extrawidth}
+      \chaptitlefont ##1\par\nobreak
+    \end{adjustwidth}}%
+  \renewcommand*{\printchapternum}{\chapnumfont \thechapter}%
+  \renewcommand*{\printchapternonum}{\raggedright}}
+\makeatother
+\chapterstyle{cas}
+
+%%% Sectioning
+\setsecnumdepth{subsection}
+\maxsecnumdepth{subsection}
+\setsecheadstyle{\normalfont\Large\slshape}
+\setsubsecheadstyle{\normalfont\large\slshape}
+\setsubsubsecheadstyle{\normalfont\slshape}
+
+%%% Symbol index (Glossary)
+\renewcommand*{\glossaryname}{Symbol index}
+\renewcommand{\glossitem}[4]{#1\enskip\textperiodcentered\enskip #2, #3 #4\\}
+%\twocolglossary
+
+% for the glossary item
+\newcommand*{\bang}{!}
+\newcommand*{\mthroot}[2]{\!\sqrt[\uproot{2}{#1}]{#2}} % \! added by MB 30012024
+
+% deprecated!!
+\renewcommand*{\sc}{\scshape}
+
+% save old div and equiv
+\let\olddiv\div
+\renewcommand*{\div}{{\mathchoice%
+  {\olddiv}%
+  {\olddiv}%
+  {\vcenter{\hbox{\fontsize{.5em}{0}\selectfont$\olddiv$}}}%
+  {\vcenter{\hbox{\fontsize{.45em}{0}\selectfont $\olddiv$}}}%
+}}%
+
+% replace exists with a bigop version
+\let\oldexists\exists
+\let\exists\relax
+\DeclareMathOperator*\exists{%
+  \mathop{\vphantom\sum\mathchoice%
+    {\vcenter{\hbox{\fontsize{1.75em}{0}\selectfont$\oldexists$}}}%
+    {\vcenter{\hbox{\fontsize{1.25em}{0}\selectfont$\oldexists$}}}%
+    {\vcenter{\hbox{\fontsize{0.9em}{0}\selectfont$\oldexists$}}}%
+    {\vcenter{\hbox{\fontsize{0.75em}{0}\selectfont$\oldexists$}}}%
+  }}%
+\DeclareMathOperator*\existsuniq{%
+  \mathop{\vphantom\sum\mathchoice%
+    {\vcenter{\hbox{\fontsize{1.75em}{0}\selectfont$\oldexists!$}}}%
+    {\vcenter{\hbox{\fontsize{1.25em}{0}\selectfont$\oldexists!$}}}%
+    {\vcenter{\hbox{\fontsize{0.9em}{0}\selectfont$\oldexists!$}}}%
+    {\vcenter{\hbox{\fontsize{0.75em}{0}\selectfont$\oldexists!$}}}%
+  }}%
+
+% Meta-macros for:
+\newcommand*{\constant}[1]{\mathrm{#1}} % defined constants / functions : roman
+\newcommand*{\constructor}[1]{\mathrm{#1}} % constructors : roman
+\newcommand*{\typeformer}[1]{\mathrm{#1}} % (uppercase) typeformers : roman
+\newcommand*{\var}[1]{\mathit{#1}} % variable : italics
+\newcommand*{\UU}{{\mathscr{U}}} % universes (special case) : calligraphic
+\newcommand*{\UUp}{{\mathscr{U}_*}}
+
+\newcommand*{\fakeslant}[1]{%
+  \pdfliteral{1 0 0.167 1 0 0 cm}#1\pdfliteral{1 0 -0.167 1 0 0 cm}}
+\newcommand*{\bn}[1]{{%
+  \if!\ifnum9<1#1!\else_\fi%
+  \mathbb{#1}\else\fakeslant{\mathbb{#1}}\fi}}
+
+% our version of \operatorname with a font change (so we can use the appropriate meta-macro)
+\makeatletter
+\newcommand*{\casop}[1]{\mathop{\newmcodes@\kern\z@ #1}\nolimits@}
+\makeatother
+
+% Typeformers
+\newcommand*{\bool}{\typeformer{Bool}}
+\newcommand*{\charstring}{\typeformer{String}}
+\newcommand*{\integer}{\typeformer{Int}}
+\newcommand*{\real}{\typeformer{Real}}
+\newcommand*{\true}{\typeformer{True}}
+\newcommand*{\false}{\typeformer{False}}
+\newcommand*{\Prop}{\typeformer{Prop}}
+\newcommand*{\Set}{\typeformer{Set}}
+\newcommand*{\Groupoid}{\typeformer{Groupoid}}
+\newcommand*{\FinSet}{\typeformer{FinSet}}
+\newcommand*{\Cyc}{\typeformer{Cyc}}% cycles
+\newcommand*{\InfCyc}{\typeformer{InfCyc}}% infinite ditto
+\newcommand*{\FinCyc}{\typeformer{FinCyc}}% finite ditto
+\newcommand*{\CycGe}[1]{\typeformer{Cyc}_{#1|}}% cycles greater than
+\newcommand*{\CycLe}[1]{\typeformer{Cyc}_{|#1}}% cycles less than
+\newcommand*{\Bicyc}{\typeformer{Bicyc}}% bicycles
+\newcommand*{\GSet}[1][G]{\mathord{#1\textrm{-}\Set}}
+\newcommand*{\absGSet}[1][{\agp G}]{\mathord{#1\textrm{-}\Set^{\abstr}}}
+\newcommand*{\Group}{\typeformer{Group}}
+\newcommand*{\AbGroup}{\typeformer{AbGroup}}
+\newcommand*{\Ring}{\typeformer{Ring}}
+\newcommand*{\RingProps}{\typeformer{RingProperties}}
+\newcommand*{\CRing}{\typeformer{CRing}}
+\newcommand*{\NTRing}{\typeformer{NonTrivRing}}
+\newcommand*{\Field}{\typeformer{Field}}
+\newcommand*{\Bunch}{\typeformer{Bunch}}
+\newcommand*{\AbBunch}{\typeformer{AbBunch}}
+\newcommand*{\Band}{\typeformer{Band}}
+\newcommand*{\AbBand}{\typeformer{AbBand}}
+\newcommand*{\Monoid}{\typeformer{Monoid}}
+\newcommand*{\Tors}{\typeformer{Torsor}}
+\newcommand*{\Copy}{\casop{\typeformer{Copy}}}
+\newcommand*{\Fin}{\casop{\typeformer{Fin}}}
+\newcommand*{\Heap}{\typeformer{Heap}}
+
+\newcommand*{\zet}{\typeformer{Z}} % the SET of integers
+\newcommand*{\QQ}{{\mathbb{Q}}}
+\newcommand*{\ZZ}{{\mathbb{Z}}}
+\newcommand*{\NN}{{\mathbb{N}}}
+\newcommand*{\NNN}{\mathbb{N}^{-}} % negated natural numbers
+\newcommand*{\CC}{{\mathbb{C}}}
+\newcommand*{\RR}{{\mathbb{R}}}
+\newcommand*{\ii}{{\constant{i}}} % unit complex imaginary
+\newcommand*{\ee}{{\constant{e}}} % base of natural logarithm
+\newcommand*{\emptytype}{\emptyset}
+\newcommand*{\UUscone}{\UU_\ast^{=1}} % pointed connected groupoids
+\newcommand*{\UUsctwo}{\UU_\ast^{=2}} % pointed 1-connected 2-types
+\newcommand*{\UUpconn}{\UU_\ast^{>0}} % pointed connected types
+\newcommand*{\UUppone}{\UU_{{\ast}{\ast}}^{=1}} % bipointed conn gpds
+
+% Constructors
+\newcommand*{\yes}{\constructor{yes}}
+\newcommand*{\no}{\constructor{no}}
+\newcommand*{\triv}{\constructor{triv}}
+\newcommand*{\refl}[1]{\constructor{refl}_{#1}}
+\newcommand*{\rrfl}{\constructor{rrfl}}
+\newcommand*{\inl}[1]{\casop{\constructor{inl}}_{#1}}
+\newcommand*{\inr}[1]{\casop{\constructor{inr}}_{#1}}
+\newcommand*{\inc}[1]{\casop{\constructor{in}}_{#1}}
+\newcommand*{\zeq}{\constructor{zeq}}
+
+% Functions and defined elements
+\newcommand*{\refloi}[1]{\casop{\constant{refl}^{-\mathrm{o}}_{#1}}} % exception
+\newcommand*{\fact}{\casop{\constant{fact}}}
+\newcommand*{\id}{\mathord{\constant{id}}}
+\newcommand*{\pt}{\constant{pt}}
+\newcommand*{\shape}{\constant{sh}} % the basepoint of the classifying type of a group G, referred to as the designated shape of G.  Note: "\sh" is already in use.
+\newcommand*{\ad}{\constant{ad}}
+\newcommand*{\symm}{\casop{\constant{symm}}}
+\newcommand*{\trans}{\casop{\constant{trans}}}
+\newcommand*{\trp}[2][]{\casop{\constant{trp}^{#1}_{#2}}}
+\newcommand*{\fst}{\casop{\constant{fst}}}
+\newcommand*{\snd}{\casop{\constant{snd}}}
+\newcommand*{\len}{\casop{\constant{len}}}
+\newcommand*{\hd}{\casop{\constant{hd}}}
+\newcommand*{\tl}{\casop{\constant{tl}}}
+\newcommand*{\rev}{\casop{\constant{rev}}}
+\newcommand*{\zpos}{\casop{\constant{pos}}}
+\newcommand*{\zneg}{\casop{\constant{neg}}}
+\newcommand*{\zzero}{\casop{\constant{zero}}}
+\newcommand*{\preim}{\casop{\constant{preim}}}
+\newcommand*{\fold}{\casop{\constant{fold}}}
+\newcommand*{\tot}{\casop{\constant{tot}}}
+\newcommand*{\Tot}{\casop{\constant{Tot}}}
+\newcommand*{\funext}{\casop{\constant{funext}}}
+\newcommand*{\ptw}{\casop{\constant{ptw}}}
+\newcommand*{\trptw}{\casop{\constant{trptw}}}
+\newcommand*{\wdg}{\casop{\constant{wdg}}}
+\newcommand*{\ap}[1]{\casop{\constant{ap}}_{#1}}
+\newcommand*{\apd}[1]{\casop{\constant{apd}}_{#1}}
+\newcommand*{\apap}[3]{\casop{\constant{apap}_{#1}(#2)(#3)}}
+\newcommand*{\apc}{\casop{\constant{ap}{\ct}}}
+\newcommand*{\ns}{\casop{\constant{ns}}}
+\newcommand*{\ev}{\casop{\constant{ev}}}
+\newcommand*{\secfun}{\casop{\constant{sec}}}
+\newcommand*{\pow}[1]{\casop{\constant{pow}}_{#1}} % power bundle/map
+\newcommand*{\ve}{\casop{\constant{ve}}} % cute: the inverse of \ev
+\newcommand*{\out}{\casop{\constant{out}}} % projection from copy
+\newcommand*{\permgrp}[1]{\Sigma_{{#1}}}%
+\newcommand*{\cast}{\casop{\constant{cast}}}
+\newcommand*{\etop}[1]{\bar {#1}}   % equivalence to path
+\newcommand*{\overetop}[1]{\overbracket[0.76pt][-1pt]{#1}}
+\newcommand*{\casoverline}[1]{\overbracket[0.59pt][-1pt]{#1}}
+\newcommand*{\ptoe}[1]{\tilde {#1}} % path to equivalence
+\newcommand*{\ua}{\casop{\constant{ua}}} % univalence
+\newcommand*{\cst}[1]{\casop{\constant{cst}}_{#1}} % constant function at
+\newcommand*{\N}{\constant{N}} % normalizer
+\renewcommand*{\ker}{\casop{\constant{ker}}}
+\newcommand*{\lcm}{{\casop{\constant{lcm}}}}
+\newcommand*{\typekernel}{{\constant{Ker}}}
+\newcommand*{\Img}{\casop{\constant{Im}}}
+\newcommand*{\img}{\casop{\constant{im}}}
+\newcommand*{\image}{\Img}
+\newcommand*{\Fact}{\casop{\constant{Fact}}}
+\newcommand{\prj}{\constant{pr}}
+\newcommand{\prjim}{\prj^{\img}}
+\newcommand*{\incl}{\constant{in}}%the homomorphism in an element #1 in \Mono_G
+\newcommand*{\Order}{\constant{Order}}
+\newcommand*{\ord}{\casop{\constant{ord}}}% order of cycle/group element
+\newcommand*{\Sub}{\casop{\constant{Sub}}}% subtype through predicates
+\newcommand*{\Inj}{\casop{\constant{Inj}}}% subtype through injections
+\newcommand*{\Coker}{\casop{\constant{Coker}}}
+\newcommand*{\coker}{\casop{\constant{coker}}}
+\newcommand*{\Nor}{\constant{Nor}}
+\newcommand{\nor}{{\casop{\constant{nor}}}}
+\newcommand*{\Sym}{\casop{\constant{Sym}}}
+\newcommand*{\USym}{\constant{U}} % underlying symmetries (no space!) formerly \sh_G=\hs_G
+\newcommand*{\US}[1]{\USym #1}%changes e.g f^\abstr changed to to Uf
+\newcommand*{\ISym}{\constant{I}} % underlying identities
+\newcommand*{\Card}{\casop{\constant{\#}}}
+\newcommand*{\Cay}{\casop{\constant{Cay}}}
+\newcommand*{\Con}{\casop{\constant{Con}}}
+\newcommand*{\bunch}{\casop{\constant{bunch}}}
+\newcommand*{\Ad}{\casop{\constant{Ad}}}
+\newcommand*{\AC}{\casop{\constant{AC}}} % axiom of choice
+\newcommand*{\lAC}[1]{\casop{#1\textrm{-}\constant{AC}}} % local axiom of choice
+\newcommand*{\band}{\casop{\constant{band}}}
+\newcommand*{\fiber}{\casop{\constant{fiber}}}
+\newcommand*{\zs}{\casop{\constant{s}}} % successor on the integers
+\newcommand*{\Succ}{\casop{\constant{succ}}}
+\newcommand*{\Pred}{\casop{\constant{pred}}}
+\newcommand*{\El}{\casop{\constant{El}}}
+\newcommand*{\clf}{\constant{B}} % classifying space operator (no space)
+\newcommand*{\B}{\constant{B}}            % without extra space
+\newcommand*{\BB}{\B^2}
+\newcommand*{\PP}{\constant{PP}}
+\newcommand*{\grpcenter}{\casop{\constant{Z}}}
+\newcommand*{\im}{\casop{\constant{im}}}
+\newcommand*{\iscontr}{\casop{\mathrm{isContr}}}
+\newcommand*{\isprop}{\casop{\mathrm{isProp}}}
+\newcommand*{\isset}{\casop{\mathrm{isSet}}}
+\newcommand*{\isgrpd}{\casop{\mathrm{isGrpd}}}
+\newcommand*{\isfinset}{\casop{\mathrm{isFinSet}}}
+\newcommand*{\isEq}{\casop{\mathrm{isEquiv}}}
+\newcommand*{\isAb}{\casop{\mathrm{isAb}}}
+\newcommand*{\isonetype}{\casop{\mathrm{is1Type}}}
+\newcommand*{\isconn}{\casop{\mathrm{isConn}}}
+\newcommand*{\iszeroconn}{\casop{\mathrm{is0Conn}}}
+\newcommand*{\iszerotrunc}{\casop{\mathrm{is0Trunc}}}
+\newcommand*{\isnconn}{\casop{\mathrm{is\mathit{n}Conn}}}
+\newcommand*{\isntrunc}{\casop{\mathrm{is\mathit{n}Trunc}}}
+\newcommand*{\istrans}{\casop{\mathrm{isTrans}}}
+\newcommand*{\isinj}{\casop{\mathrm{isInj}}}
+\newcommand*{\issurj}{\casop{\mathrm{isSurj}}}
+\newcommand*{\ismono}{\casop{\mathrm{isMono}}}
+\newcommand*{\isepi}{\casop{\mathrm{isEpi}}}
+\newcommand*{\cy}[1]{\casop{\mathrm{cy}}_{#1}}
+\newcommand*{\flt}{\casop{\constant{flt}}} % map in flattening lemma/construction
+
+
+\newcommand*{\fundgrp}{\casop{\pi_1}}
+\newcommand*{\fundgrpd}{\casop{\Pi_1}}
+
+\newcommand*{\dg}[1]{\delta_{#1}} % degree m map on circle
+\newcommand*{\cdg}[1]{\rho_{#1}} % degree m map on cycles (root)
+\newcommand*{\mathdegree}{\textup{\textdegree}}
+
+% Operators that produce groups typically come in pairs
+% The delooping and the group itself
+\makeatletter
+\newcommand*{\newBcommand}{\@dblarg\@newBcommand}
+\newcommand*{\newBvariable}{\@dblarg\@newBvariable}
+\def\@newBcommand[#1]#2{%
+  \expandafter\newcommand\csname #2\endcsname{\casop{\constant{#1}}}%
+  \expandafter\newcommand\csname B#2\endcsname{\casop{\constant{B#1}}}%
+  \expandafter\newcommand\csname U#2\endcsname{\casop{\constant{U#1}}}%
+}
+\def\@newBvariable[#1]#2{%
+  \expandafter\newcommand\csname B#2\endcsname{{\mathit{B}\mathit{#1}}}%
+  \expandafter\newcommand\csname USym#2\endcsname{{\mathit{U}\mathit{#1}}}%
+}
+\makeatother
+\newBcommand{AUT}
+\newBcommand{Aut}
+\newBcommand{Out}
+\newBcommand{OUT}
+\newBcommand{INN}
+\newBcommand{Inn}
+\newBcommand{inn}
+\newBcommand{Ker}
+\newBcommand{Hom}
+\newBcommand{Iso}
+\newBcommand{sgn} % sign homomorphism
+\newBcommand{conj} % conjugation homomorphism MB c := conj 040124
+\newBcommand{Z} % center
+\newBcommand[F]{FG} % free group
+\newBcommand[V]{VG} % Vierer group
+\newBcommand[C]{CG} % cyclic group
+\newBcommand{D} % dihedral group
+\newBcommand{Dic} % dicyclic group
+\newBcommand[A]{AG} % alternating group
+\newBcommand[O]{OG} % orthogonal/octahedral group
+\newBcommand[U]{UG} % unitary group
+\newBcommand{GL} % general linear group
+\newBcommand{PGL} % projective general linear group
+\newBcommand{SL} % special linear group
+\newBcommand{SO} % special orthogonal group
+\newBcommand{SU} % special unitary group
+\newBcommand[\Sigma]{SG} % symmetric group
+\newBcommand{Q} % quaternion group
+
+% Common multi-letter variables
+% A bit of a hack. If we use \var{...} we get a big box
+% with the wrong sub-/super-script positions
+\newBvariable{G}
+\newBvariable{H}
+\newBvariable{K}
+\newBvariable{L}
+\newBvariable{M}
+\newBvariable{N}
+\newBvariable{R}
+\newBvariable{W}
+\newBvariable{A}
+\newBvariable{f}
+\newBvariable{g}
+\newBvariable{h}
+\newBvariable{i}
+\newBvariable{j}
+\newBvariable{k}
+\newBvariable{l}
+\newBvariable{p}
+\newBvariable{q}
+\newBvariable{r}
+% Latin abbreviations and initialisms
+\newcommand*{\cf}{cf.~}
+\newcommand*{\ie}{i.e., }
+\newcommand*{\eg}{e.g., }
+\newcommand*{\viz}{viz., }
+
+% disputed phrases
+\newcommand*{\nonempty}{nonempty\xspace}
+\newcommand*{\covering}{set bundle\xspace}
+\newcommand*{\coverings}{set bundles\xspace}
+\newcommand*{\Covering}{Set bundle\xspace}
+\newcommand*{\Coverings}{Set bundles\xspace}
+\newcommand*{\inftygp}{$\infty$-group\xspace}
+\newcommand*{\aninftygp}{an $\infty$-group\xspace}
+\newcommand*{\inftygps}{$\infty$-groups\xspace}
+\newcommand*{\gporder}{cardinality\xspace}
+\newcommand*{\gporders}{cardinalities\xspace}
+\renewcommand*{\th}{\textsuperscript{th}\xspace}
+\newcommand*{\st}{\textsuperscript{st}\xspace}
+\newcommand*{\nd}{\textsuperscript{nd}\xspace}
+\newcommand*{\rd}{\textsuperscript{rd}\xspace}
+\newcommand*{\casredname}{{\color{casred}amaranth}\xspace}
+\newcommand*{\casbluename}{{\color{casblue}bluebell}\xspace}
+\newcommand*{\casgreenname}{{\color{casgreen}citrine}\xspace}
+
+% relations
+\let\oldequiv\equiv
+\renewcommand*{\equiv}{\simeq}
+\newcommand*{\weq}{\simeq}
+\def\ordinaryequals{\mathchar`\=}
+\newcommand*{\eq}{\mathrel{\ordinaryequals}}
+% \newtocommand makes a new command for an arrow with a symbol
+% on top that looks better than \xrightarrow
+\newcommand{\doalign}[2]{%
+ {\vbox{\offinterlineskip\ialign{\hfil##\hfil\cr$#1$\cr$#2$\cr}}}%
+}
+\newcommand{\newtocommand}[2]{%
+  \expandafter\newcommand\csname #1to\endcsname{\mathrel{\mathchoice%
+    {\doalign{\scriptstyle #2\,}{\displaystyle\to}}%
+    {\doalign{\scriptstyle #2\,}{\textstyle\to}}%
+    {\doalign{\scriptscriptstyle #2\,}{\scriptstyle\to}}%
+    {\doalign{\scriptscriptstyle #2\,}{\scriptscriptstyle\to}}%
+}}}
+\newtocommand{eq}{\ordinaryequals}
+\newtocommand{equiv}{\simeq}
+\newtocommand{isom}{\cong}
+\newtocommand{sim}{\simeq}
+\newcommand*{\we}{\simto}
+\newcommand*{\isom}{\cong}
+\newcommand*{\liff}{\weq}
+\newcommand*{\jdeq}{\oldequiv}
+\newcommand*{\defeq}{\vcentcolon\mathrel{\mkern-0.8mu}\jdeq}
+\newcommand*{\defequi}{\defeq} % equal by definition
+\newcommand*{\defis}{\coloneqq}
+
+% make colon active (an active topic of discussion)
+\makeatletter
+\def\ordinarycolon{\mathchar`\:}
+\def\colon{\,\mathord\ordinarycolon\,}
+\def\idxcolon{\mathrel\ordinarycolon}
+\protected\edef\tikz@nonactivecolon{%
+  \noexpand\ifmmode\noexpand\colon\noexpand\else:\noexpand\fi
+}
+\begingroup\lccode`\~=`\:\lowercase{\endgroup
+  \protected\def~}{\new@ifnextchar={\coloneqq\@gobble}{\colon}}
+\AtBeginDocument{\mathcode`\:="8000 }
+% use prefix for displaying name prefixes, but not for sorting names
+\AtBeginDocument{\toggletrue{blx@useprefix}}
+\AtBeginBibliography{\togglefalse{blx@useprefix}}
+\makeatother
+
+% binary operations
+\newcommand*{\ct}{*}
+\newcommand*{\cto}{*_{\constant{o}}}
+\newcommand*{\dblslash}{\mathbin{/\kern-3pt/}}
+
+% paired delimiters (can change size via optional argument)
+\DeclarePairedDelimiter\Trunc{\lVert}{\rVert} % truncated type
+\DeclarePairedDelimiter\trunc{\lvert}{\rvert} % truncation constructor
+\DeclarePairedDelimiter\merely{\lVert}{\rVert_{-1}}
+\DeclarePairedDelimiter\angled{\langle}{\rangle}
+\DeclarePairedDelimiter\FinOrd[] % constructor for nonempty finite ordinals
+\DeclarePairedDelimiter\set\lbrace\rbrace
+\DeclarePairedDelimiter\sem\llbracket\rrbracket % semantic interpretation
+\DeclarePairedDelimiterX\setof[2]\lbrace\rbrace{\, #1 \,\delimsize\vert\, #2 \,}
+
+% special truncations and truncation constructors
+\newcommand*{\myTrunc}[2]{{\Trunc{#1}}{}_{#2}}
+\newcommand*{\mytrunc}[2]{{\trunc{#1}}{}_{#2}}
+\newcommand*{\setTrunc}[1]{{\Trunc{#1}}_0}
+\newcommand*{\settrunc}[1]{{\trunc{#1}}_0}
+\newcommand*{\grpdTrunc}[1]{{\Trunc{#1}}_1}
+\newcommand*{\grpdtrunc}[1]{{\trunc{#1}}_1}
+
+% footnote without number, no star: may contain \par
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup}
+
+% deprecated macros (but still in active use! MB 20250422)
+\newcommand*{\princ}[1]{{\pathsp{\sh_{#1}}}}
+\newcommand*{\absprtor}[1][\agp G]{{\pathsp{#1}^{\abstr}}}
+\newcommand*{\absGTor}[1][\agp G]{{\Tors_{#1}^{\abstr}}}
+\newcommand*{\absHom}{\Hom^{\abstr}}
+\newcommand*{\grpHom}{\underline{\Hom}}
+\newcommand*{\absGSetvar}[1][X]{\mathcal{#1}}
+\newcommand*{\pathsp}[1]{\constant{\mathbb P}_{\!#1}} % NB negative thin space
+\newcommand*{\uc}[1]{{\pathsp{#1}}}%universal set bundle
+\newcommand*{\abstr}{\casop{\constant{abs}}}
+\newcommand*{\deloop}{\casop{\constant{deloop}}}
+\newcommand*{\agp}[1]{\mathcal #1} %generic abstract group
+\newcommand*{\grpcenterinc}[1]{\mathrm z_{{#1}}} %
+
+\newcommand*{\pre}{\constant{pre}}%these may be open for discussion
+\newcommand*{\preinv}{\constant{preinv}}
+\newcommand*{\post}{\constant{post}}
+\newcommand*{\adjoint}{\ad}
+\newcommand*{\concr}{\constant{concr}}
+
+%some special types
+\newcommand*{\TG}{{1\!\!1}} % trivial group, no B symbol, experimental MAB
+\newcommand*{\SetBundle}{\constant{SetBundle}}
+\newcommand*{\typegroup}{\Group}
+\newcommand*{\typeabgroup}{\AbGroup}
+\newcommand*{\typering}{\Ring}
+\newcommand*{\typecommring}{\CRing}
+\newcommand*{\typefield}{\Field}
+\newcommand*{\typesubgroup}{\constant{Sub}}%"gp" removed - is evident from the type of the subscript G
+\newcommand*{\typemono}{\constant{Mono}}%monomorphisms into a group (subscript)
+\newcommand*{\typeepi}{\constant{Epi}}%epimorphisms out of a group (subscript)
+\newcommand*{\typenormal}{\constant{Nor}}
+\newcommand*{\typeset}{\Set}
+\newcommand*{\typeinftygp}{{\infty}\Group}
+\newcommand*{\typemonoid}{\Monoid}
+\newcommand*{\typetorsor}{\Tors}
+\newcommand*{\pttype}{\UUp}
+\newcommand*{\typeabsgp}{\Group^{\abstr}}
+\newcommand*{\twist}[1]{^{\curvearrowright{#1}}}%twist by action
+\newcommand*{\swap}{\constant{swap}}%loop in BC_2
+\newcommand*{\Sc}{{\typeformer{S}^1}}%the circle
+%\newcommand{\sbt}{\begin{picture}(-1,1)(-1,-3)\circle*{2}\end{picture}}%
+\newcommand*{\sbt}{\mathchoice%
+  {\vcenter{\hbox{\scriptsize\textbullet}}}%
+  {\vcenter{\hbox{\scriptsize\textbullet}}}%
+  {\vcenter{\hbox{\tiny\textbullet}}}%
+  {\vcenter{\hbox{\fontsize{4}{5}\selectfont\textbullet}}}}% {\mathop{\bullet}}
+%{\tikz[anchor=base,baseline]{\node[scale=.7,inner
+%    sep=0, outer sep=0, circle]%
+%    {$\bullet$};}}%
+\newcommand*{\base}{{\sbt}}%point in circle
+\newcommand*{\Cloop}{\mathop\circlearrowleft}% loop in circle \InfCycSet
+\newcommand*{\Sloop}{\mathop\circlearrowleft}% loop in circle \Sc
+\newcommand*{\qedge}{\mathop\curvearrowright}% edge in graph quotient
+
+\newcommand*{\conncomp}[2]{{{#1}_{\left(#2\right)}}}%
+\newcommand*{\univcover}[2]{{{#1}_{\left(#2\right)}\langle1\rangle}}%
+
+\newcommand*{\blank}{\_}%
+\newcommand*{\op}{^{\constant{op}}}%
+\newcommand*{\inv}[1]{#1^{-1}}%
+%% \newcommand*{\invo}[1]{#1^{-1\mathop{\constant{o}}}}%mathop deliberately to center the o
+\newcommand*{\cbid}[2]{{}_{#2}\square_{#1}}% change-of-basis identification
+\newcommand*{\ptdto}{\to_\ast}%
+\newcommand*{\ptdweto}{\equivto_\ast}%
+\newcommand*{\mono}{\hookrightarrow}%
+\newcommand*{\epi}{\twoheadrightarrow}%
+\newcommand*{\loops}[1][\null]{\Omega^{#1}} % no space
+\newcommand*{\mkgroup}[1][\null]{\underline{\Omega}^{#1}}
+\newcommand*{\mkhom}[1][\null]{\underline{\Omega}^{#1}}
+\newcommand*{\mkheap}{\underline{\constant{I}}}
+%% \newcommand*{\cdoto}{\cdot^{\constant{o}}} % concat in pathover
+\newcommand*{\tvdots}{\raisebox{-4.5pt}[5.5pt][5pt]{$\vdots$}}% tight vdots
+\DeclareMathOperator*{\pathovercomp}{\underline\circ}
+
+%% paths over paths
+\newcommand*{\pathover}[4]{\mathchoice%
+  {#1 \xrightarrow[#3]{=} #4}%
+  {#1 \xrightarrow[#3]{=} #4}%
+  {#1 \xrightarrow[#3]{=} #4}%
+  {#1 \xrightarrow[#3]{=} #4}}
+\newcommand*{\po}{\casop{\constant{po}}}
+\newcommand*{\pair}{\casop{\constructor{pair}}}
+\newcommand*{\rec}{\casop{\constant{rec}}}
+\newcommand*{\ind}{\casop{\constant{ind}}}
+\newcommand*\pathpair[2]{\casoverline{({#1},{#2})}}
+
+%% Euclidean geometry
+
+\newcommand*{\EE}{\mathbb E}
+\newcommand*{\VV}{\mathbb V}
+\newcommand*{\ES}{{\tilde \EE}}
+\newcommand*{\EucObj}{\casop{\constant{EucObj}}}
+\newcommand*{\OS}{{\tilde \VV}}
+\newcommand*{\OrthGp}[1]{\constant{O}(#1)}
+\newcommand*{\EucGp}[1]{\constant{E}(#1)}
+\newcommand*{\Vectors}{\casop{\constant{Vec}}}
+\newcommand*{\Points}{\casop{\constant{Pts}}}
+\newcommand*{\typeRealVectorSpace}{\constant{Vect}_{\RR}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Peter & Benedikt's macros for referring to coqdoc
+% d2c4e86
+% see https://tex.stackexchange.com/a/35314/ for help understanding the following:
+
+\newcommand{\longhash}{e47ce20acce953129e34e021a10976ed27948a39}
+\newcommand{\shorthash}{e47ce20}
+
+%fragile, better to freeze with stable hash
+\newcommand{\coqdocbasebaseurl}{https://unimath.github.io/doc/UniMath/\shorthash/}
+
+%\coqident call are relative to this long path
+\newcommand{\coqdocbaseurl}{\coqdocbasebaseurl UniMath.}
+\newcommand{\urlhash}{\#}
+
+\newcommand{\coqdocurl}[2]{\coqdocbaseurl #1.html\urlhash #2}
+
+%nolinkurl from url or hyperref package
+\newcommand{\nolinkcoqident}[1]{\nolinkurl{#1}} % TODO: give better def for this?
+\makeatletter
+\newcommand{\coqident}{\begingroup\@makeother\#\@coqident}
+\newcommand{\@coqident}[3][]{% empty default first and optional argument
+  \ifthenelse{\isempty{#2}}%
+  {\nolinkcoqident{#3}}%           [optional]{}{printme}
+  {\ifthenelse{\isempty{#1}}%
+  {\href{\coqdocurl{#2}{#3}}{\nolinkcoqident{#3}}}% []{file}{identifier+printed}
+  {\href{\coqdocurl{#2}{#3}}{\nolinkcoqident{#1}}}}% [printme]{file}{identifier}
+\endgroup}
+% optional argument allows link text to differ from link url
+\newcommand{\coqfile}[2]{%
+  \ifthenelse{\isempty{#1}}%
+  {\href{\coqdocbaseurl #2.html}{#2.v}}%
+  {\href{\coqdocbaseurl #1.#2.html}{#2.v}}}
+\makeatother
+
+%sususe is a replacement for subsubsection.  sususe is the same as subsubsection but numbers correctly bid
+%\newenvironment{sususe}[1]{\refstepcounter{theorem}%
+%\vspace{.5\baselineskip}\par\medskip\noindent%
+%{\normalfont\normalsize\bfseries{\thetheorem. #1}}%
+%\vspace{.5\baselineskip}\newline}
+\let\sususe\subsubsection
+
+
+%To get correct fraktur (BID)
+\usepackage{yfonts}
+
+% Pierre Cagne macros
+  \newcommand{\loopspace}[1][]{\constructor{Aut}^2_{#1}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "book"
+%%% End:

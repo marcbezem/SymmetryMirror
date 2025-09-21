@@ -1,0 +1,149 @@
+\usetikzlibrary{decorations.markings,decorations.pathreplacing,
+  shapes.geometric,matrix,arrows,chains,positioning,scopes}
+
+\pgfdeclarearrow{
+  name = pxto,
+  setup code = {
+    % The different end values:
+    \pgfarrowssettipend{1.5\pgflinewidth}
+    \pgfarrowssetbackend{-2.5508\pgflinewidth}
+    \pgfarrowssetlineend{-.25\pgflinewidth}
+    \pgfarrowssetvisualbackend{-0.021\pgflinewidth}
+    % The hull
+    \pgfarrowsupperhullpoint{1.5\pgflinewidth}{0\pgflinewidth}
+    \pgfarrowsupperhullpoint{-2.0085\pgflinewidth}{3.6525\pgflinewidth}
+    \pgfarrowsupperhullpoint{-2.5508\pgflinewidth}{3.0763\pgflinewidth}
+    % No saves
+  },
+  drawing code = {
+    \pgfsetdash{}{0pt}%
+    \pgfpathmoveto{\pgfpoint{1.5\pgflinewidth}{0.0254\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-2.0085\pgflinewidth}{3.6525\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-2.5508\pgflinewidth}{3.0763\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-0.4322\pgflinewidth}{0.5\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-0.4322\pgflinewidth}{-0.5\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-2.5508\pgflinewidth}{-3.0763\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-2.0085\pgflinewidth}{-3.6525\pgflinewidth}}%
+    \pgfpathclose%
+    \pgfusepathqfill
+  }
+}
+\pgfdeclarearrow{
+  name = pxbar,
+  setup code = {
+    \pgfarrowssettipend{0.5\pgflinewidth}
+    \pgfarrowssetbackend{-0.5\pgflinewidth}
+    \pgfarrowsupperhullpoint{0.5\pgflinewidth}{3.6525\pgflinewidth}
+    \pgfarrowsupperhullpoint{-0.5\pgflinewidth}{3.6525\pgflinewidth}
+  },
+  drawing code = {
+    \pgfsetdash{}{0pt}%
+    \pgfpathmoveto{\pgfpoint{0.5\pgflinewidth}{3.6525\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-0.5\pgflinewidth}{3.6525\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{-0.5\pgflinewidth}{-3.6525\pgflinewidth}}%
+    \pgfpathlineto{\pgfpoint{0.5\pgflinewidth}{-3.6525\pgflinewidth}}%
+    \pgfpathclose%
+    \pgfusepathqfill
+  }
+}
+
+\tikzset{every picture/.style={line width=0.59pt}}
+
+\tikzset{
+  shift left/.style={commutative diagrams/shift left={#1}},
+  shift right/.style={commutative diagrams/shift right={#1}},
+  cntdot/.style={fill,circle,inner sep=.4pt},
+  dot/.style={fill,circle,inner sep=1pt},
+  basedot/.style={fill,circle,inner sep=1.3pt},
+  double line with arrow/.style args={#1,#2}{decorate,decoration={markings,%
+    mark=at position 0 with {\coordinate (ta-base-1) at (0,1pt);%
+      \coordinate (ta-base-2) at (0,-1pt);},%
+    mark=at position 1 with {\draw[#1] (ta-base-1) -- (0,1pt);%
+      \draw[#2] (ta-base-2) -- (0,-1pt);}%
+  }},
+  double line with arrow left/.style args={#1,#2}{decorate,decoration={markings,%
+    mark=at position 0 with {\coordinate (ta-base-1) at (0,1pt);%
+      \coordinate (ta-base-2) at (0,-1pt);},%
+    mark=at position 0.3 with {\coordinate (ta-mid) at (0,4pt);},%
+    mark=at position 0.7 with {\draw[->] (ta-mid) -- (0,4pt);},%
+    mark=at position 1 with {\draw[#1] (ta-base-1) -- (0,1pt);%
+      \draw[#2] (ta-base-2) -- (0,-1pt);}%
+  }},
+  double line with arrow right/.style args={#1,#2}{decorate,decoration={markings,%
+    mark=at position 0 with {\coordinate (ta-base-1) at (0,1pt);%
+      \coordinate (ta-base-2) at (0,-1pt);},%
+    mark=at position 0.3 with {\coordinate (ta-mid) at (0,-4pt);},%
+    mark=at position 0.7 with {\draw[->] (ta-mid) -- (0,-4pt);},%
+    mark=at position 1 with {\draw[#1] (ta-base-1) -- (0,1pt);%
+      \draw[#2] (ta-base-2) -- (0,-1pt);}%
+  }},
+  equals right/.style={decorate,decoration={markings,%
+    mark=at position 0 with {\coordinate (ta-base) at (0,0);},%
+    mark=at position 0.5 with {\draw[line width=0.51pt,-] (-2pt,-3pt)--(2pt,-3pt);%
+      \draw[line width=0.51pt,-] (-2pt,-4.5pt)--(2pt,-4.5pt);},%
+    mark=at position 1 with {\draw[->] (ta-base) -- (0,0);}%
+  }},
+  equals left/.style={decorate,decoration={markings,%
+    mark=at position 0 with {\coordinate (ta-base) at (0,0);},%
+    mark=at position 0.5 with {\draw[line width=0.51pt,-] (-2pt,3pt)--(2pt,3pt);%
+      \draw[line width=0.51pt,-] (-2pt,4.5pt)--(2pt,4.5pt);},%
+    mark=at position 1 with {\draw[->] (ta-base) -- (0,0);}%
+  }},
+  equiv right/.style={decorate,decoration={markings,%
+    mark=at position 0 with {\coordinate (ta-base) at (0,0);},%
+    mark=at position 0.5 with {\draw[line width=0.51pt,-,line cap=round] (-2pt,-4pt)
+      .. controls (0pt,-2pt) and (0pt,-5.5pt) .. (2pt,-3.5pt);},%
+    mark=at position 1 with {\draw[->] (ta-base) -- (0,0);}%
+  }},
+  equiv left/.style={decorate,decoration={markings,%
+    mark=at position 0 with {\coordinate (ta-base) at (0,0);},%
+    mark=at position 0.5 with {\draw[line width=0.51pt,-,line cap=round] (-2pt,3.5pt)
+      .. controls (0pt,5.5pt) and (0pt,2pt) .. (2pt,4pt);},%
+    mark=at position 1 with {\draw[->] (ta-base) -- (0,0);}%
+  }},
+  eq/.style={-,double line with arrow={-,-},outer sep=2pt,},
+  eql/.style={-,equals left,},
+  eqr/.style={-,equals right,},
+  equivl/.style={-,equiv left,},
+  equivr/.style={-,equiv right,},
+  eqtol/.style={-,double line with arrow left={-,-},outer sep=2pt,},
+  eqtor/.style={-,double line with arrow right={-,-},outer sep=2pt,},
+}
+
+\tikzset{>=pxto,%
+  mapsto/.style={pxbar-pxto},%
+  vertex/.style={circle,fill=black,inner sep=0pt,minimum size=4pt},%
+  gen/.style={draw=black,-stealth,shorten <=1pt,shorten >=1pt},%
+  gena/.style={gen,draw=casred},%
+  genb/.style={gen,draw=casblue},%
+  genc/.style={gen,draw=casgreen},%
+  dblgena/.style={double line with arrow={casred,casred},outer sep=2pt},%
+  dblgenb/.style={double line with arrow={casblue,casblue},outer sep=2pt},%
+  dblgenc/.style={double line with arrow={casgreen,casgreen},outer sep=2pt},%
+  pics/tendril/.style n args={4}{%
+    % #1 = xscale, #2 = yscale, #3 = rotate, #4 = color
+    code={%
+      \begin{scope}[xscale=#1,yscale=#2,rotate=#3]
+        \fill[#4]
+        (.25,-.05) arc [start angle=0, end angle=90, radius=.2]
+        arc [start angle=90, end angle=180, radius=.15]
+        arc [start angle=180, end angle=330, radius=.10]
+        arc [start angle=150, end angle=0, radius=0.05]
+        .. controls ++(0,-.15) and ++(.15,0) .. (-.2,-.25)
+        arc [start angle=90, end angle=270, radius=.025]
+        .. controls ++(.2,0) and ++(0,-.2) .. (.25,-.05);
+      \end{scope}}}}
+
+\tikzcdset{arrow style=tikz,%
+  arrows={line width=0.59pt},%
+  invisible/.style={/tikz/draw=none},%
+  mapsto/.style={pxbar-pxto}
+}
+\tikzcdset{
+  equals/.add code={\PackageError{cas}{Please don't use the TikZ-cd equals style}{}}{}
+}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "book"
+%%% End:

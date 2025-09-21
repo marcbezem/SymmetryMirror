@@ -1,0 +1,355 @@
+\section{Choice for finite sets\titledagger}
+\label{sec:choicefin}
+
+This section is a short overview of how group theory is involved in
+relating different choice principles for families of finite sets.  A
+paradigmatic case is that if we have choice for all families of
+$2$-element sets, then we have choice for all families of $4$-element
+sets.%
+\footnote{This is due to Tarski,
+  see~\citeauthor{Jech-AC}\footnotemark{}, p.~107.}\footcitetext{Jech-AC}
+
+The axiom of choice is a principle that we may add to our type theory
+(it holds in the standard model), but there are many models where it doesn't hold.
+
+\begin{principle}[The Axiom of Choice]\label{pri:ac}
+  For every set $X$ and every family of \emph{non-empty} sets
+  $P : X \to \Set_{\ne\emptyset}$,
+  there exists an dependent function of type $\prod_{x:X}P(x)$.
+  In other terms, for any set $X$ and any family of sets $P:X\to\Set$,
+  we have
+  \begin{equation}\label{eq:ac-impl}
+    \prod_{x:X}\Trunc{P(x)} \to \Trunc[\bigg]{\prod_{x:X}P(x)}.\qedhere
+  \end{equation}
+\end{principle}
+
+\begin{remark}
+  We have an equivalence between the Pi-type $\prod_{x:X}P(x)$ and the
+  type of sections of the projection map $\prj_1 : \sum_{x:X}P(x) \to X$,
+  under which families of non-empty sets correspond to surjections between sets
+  (using that $X$ is a set).
+  Thus, the axiom of choice equivalently says that any surjection
+  between sets admits a section.
+
+  Because of this equivalence, we'll sometimes also call elements of the
+  Pi-type \emph{sections}.
+\end{remark}
+
+The following is usually called Diaconescu's theorem\footcite{Diaconescu} or the Goodman--Myhill theorem\footcite{Goodman-Myhill}, but it was first observed in a problem in Bishop's book on constructive analysis~\footcite{Bishop}.
+
+\begin{theorem}
+  The axiom of choice implies the law of the excluded middle, \cref{pri:lem}.
+\end{theorem}
+
+\begin{proof}
+  Let $P$ be a proposition, and consider the quotient map $q : \bn 2 \to \bn 2/\sim$,
+  where $\sim$ is the equivalence relation on $\bn 2$ satisfying $(0 \sim 1) = P$.
+  Like any quotient map, $q$ is surjective, so by the axiom of choice,
+  and because our goal is a proposition,
+  it has a section $s : \bn 2/\sim \to \bn 2$.
+  That is, we also have $q\circ s = \id$.
+
+  Using decidable equality in $\bn 2$, check whether $s([0])$ and $s([1])$ are equal
+  or not.
+
+  If they are, then we get the chain of identifications
+  $[0] = q(s([0])) = q(s([1])) = [1]$, so $P$ holds.
+
+  If they aren't, then assuming $P$ leads to a contradiction, meaning $\lnot P$ holds.
+\end{proof}
+
+We'll now define some restricted variants of the axiom of choice,
+that however are not always true,
+and our goal is to see how they relate to each other and to other principles.
+
+\begin{definition}
+  Let $\AC$ denote the full axiom of choice, as in~\cref{pri:ac}.
+  If we fix the set $X$, and consider \eqref{eq:ac-impl} for arbitrary families $P:X\to\Set$, we call this the \emph{$X$-local axiom of choice}, denoted $\lAC{X}$.
+
+  If we restrict $P$ to take values in $n$-element sets, for some $n:\NN$,
+  we denote the resulting principle $\AC(n)$.
+  (That is, here we consider families $P : X \to \BSG_n$.)
+
+  If we both fix $X$ and restrict to families of $n$-element sets,
+  we denote the resulting principle $\lAC{X}(n)$.
+\end{definition}
+
+\begin{xca}
+  Show that $\lAC{X}$ is always true whenever $X$ is a finite set.
+\end{xca}
+
+\begin{lemma}\label{lem:ac-impl-triv-coh-sets}
+  If $\lAC{X}$ holds for a set $X$,\marginnote{%
+    In fancier language, this says that the axiom of choice
+    implies that all cohomology sets $\constant{H}^1(X,G)$ are trivial.}
+  then $\Trunc{X \to \BG}_0$ is contractible for any group $G$.
+\end{lemma}
+
+\begin{proof}
+  Suppose we have a map $f : X \to \BG$.
+  We need to show that $f$ is merely equal to the constant map.
+  Consider the corresponding family of sets
+  consisting of the underlying sets of the $G$-torsors represented by
+  $f(x) : BG$, for $x:X$.
+  That is, define $P : X \to \Set$ by setting $P(x) \defeq (\shape_G = f(x))$.
+  Since $\BG$ is connected, this is a family of non-empty sets,
+  so by the axiom of choice for families over $X$,
+  there exists a section.
+  Since we're proving a proposition, let $s : \prod_{x:X}(\shape_G = f(x))$
+  be a section.
+  Then $s$ identifies $f$ with the constant map, as desired.
+\end{proof}
+
+We might wonder what happens if we consider general \inftygps $G$
+in~\cref{lem:ac-impl-triv-coh-sets}.
+Then the underlying type of a $G$-torsor is no longer a set, but can be any type.
+Correspondingly, we need an even stronger version of the axiom of choice,
+where the family $P$ is allowed to be arbitrary.
+Let $\AC_\infty$ denote this untruncated axiom of choice,
+and let $\lAC{X}_\infty$ denote the local version, fixing a set $X$.
+This is connected to another principle, which is much more constructive,
+yet still not true in all models.
+
+\begin{principle}[Sets Cover]\label{pri:sc}
+  For any type $A$, there exists a set $X$ together with a surjection $X \to A$.
+\end{principle}
+
+We abbreviate this as $\constant{SC}$.
+
+\begin{xca}
+  Prove that the untruncated axiom of choice, $\AC_\infty$,
+  is equivalent to the conjunction of the standard axiom of choice, $\AC$,
+  and the principle that sets cover, $\constant{SC}$.
+\end{xca}
+
+\begin{xca}
+  Prove that we cannot relax the requirement that $X$ is a set
+  in the axiom of choice.
+  Specifically, prove that $\lAC{\Sc}(2)$ is false
+\end{xca}
+
+We now come to the analogue of~\cref{lem:ac-impl-triv-coh-sets}
+for arbitrary \inftygps.
+
+\begin{xca}
+  Prove that if the untruncated $X$-local axiom of choice, $\lAC{X}_\infty$,
+  holds for a set $X$,
+  then $\Trunc{X \to \BG}_0$ is contractible for all \inftygps $G$.
+\end{xca}
+
+We now discuss two partial converses to~\cref{lem:ac-impl-triv-coh-sets},
+both due to \citeauthor{Blass-Finite-Choice}\footcite{Blass-Finite-Choice}.
+
+\begin{theorem}[Blass]\label{thm:Blass-1}
+  Let $X$ be a set such that $\Trunc{X \to \BG}_0$ is contractible
+  for all groups $G$.
+  Then every family of non-empty sets over $X$, $P : X \to \Set$,
+  that factors through a connected component of $\Set$,
+  merely admits a section.
+\end{theorem}
+
+\begin{proof}
+  We suppose $P : X \to \Set$ is such that all the sets $P(x)$
+  have the same size, \ie the function $P$ factors through
+  $\BAut(S)$ for some non-empty set $S$.
+  This in turn means that we have a function $h : X \to \BG$,
+  where $G \defeq \Aut(S)$, with $P = \prj_1 \circ h$,
+  where $\prj_1 : \BAut(S) = \sum_{A : \Set}\Trunc{S \simeq A} \to \Set$
+  is the projection.
+
+  By assumption, $h$ is merely equal to the constant family.
+  But since we are proving a proposition, we may assume that $h$
+  \emph{is} constant, so $P$ is the constant family at $S$.
+  And this has a section since $S$ is non-empty.
+\end{proof}
+
+Obviously, the same argument works if we consider all \inftygps $G$
+and families of types that are all equivalent.
+For the second partial converse, we look at decidable sets.
+
+\begin{theorem}[Blass]\label{thm:Blass-2}
+  Let $X$ be a decidable set such that $\Trunc{X \to \BG}_0$ is contractible
+  for all groups $G$.
+  Then every family of non-empty decidable sets over $X$
+  merely admits a section.\footnote{%
+    We might call this conclusion $\lAC{X}^{\mathrm{dec}}$.}
+\end{theorem}
+
+\begin{proof}
+  Equivalently, consider a surjection $p : Y \to X$,
+  where $X$ and $Y$ are decidable sets,
+  and let $C$ be the higher inductive type with constructors
+  $c : C$, $f : X \to C$, and $k : \prod_{y:Y}(c = f(p(y))$.\footnote{%
+    This kind of higher inductive type is also known as a pushout,
+    and its constructors fit together to give a commutative square:
+    \[
+      \begin{tikzcd}[ampersand replacement=\&]
+        Y \ar[d]\ar[r,"p"] \& X \ar[d,"f"] \\
+        \bn 1 \ar[r,"c"'] \& C
+      \end{tikzcd}
+    \]}
+  Using the same kind of argument as in~\cref{lem:wedgeofgpoidisgpoid}
+  and~\cref{thm:free-group-elements}, we can show,
+  using decidability of equality in $X$ and $Y$,
+  that the identity type $c =_C f(x)$ is equivalent to a type of reduced words
+  over $Y \coprod Y$.
+  In particular, $C$ is a groupoid, and it's easy to check that it's connected.
+  Hence we can form the group $G \defeq \mkgroup(C,c)$.
+
+  By assumption, the map $f$ is merely equal to the constant map,
+  so since we're proving a proposition,
+  we may assume we have a family of elements $h(x) : c = f(x)$, for $x:X$.
+  Taking for each $x$ the last $y$ in the corresponding reduced word,
+  we get a family of elements $s(x) : Y$
+  such that $p(s(x)) = x$,
+  but this is precisely the section we wanted.
+\end{proof}
+
+It seems to be an open problem, whether we can do without the decidability assumption,
+\ie whether the converse of~\cref{lem:ac-impl-triv-coh-sets} holds generally.
+
+Now we turn as promised to the connections between the various local choice principles
+$\lAC{X}(n)$.
+The simplest example is the following.
+
+\begin{theorem}\label{thm:lAC-2-3-4}
+  Let $X$ be any set. Then $\lAC{X}(4)$ follows from $\lAC{X}(2)$ and $\lAC{X}(3)$.
+\end{theorem}
+
+\begin{proof}
+  Let $P : X \to \BSG_4$ be a family of $4$-element sets over $X$.
+  Consider the map $\Bf : \BSG_4 \to \BSG_3$ that maps a $4$-element set
+  to the $3$-element set of its $2+2$ partitions.
+  Choose a section of $\Bf \circ P$ by $\lAC{X}(3)$.
+  Now use $\lAC{X}(2)$ twice to choose for each chosen partition
+  first one of the $2$-element parts, and secondly one of the $2$
+  elements in each chosen part.
+\end{proof}
+
+We now look a bit more closely at what happened in this proof,
+so as to better understand the general theorem.
+The key idea is the concept of ``reduction of the structure group''.
+
+[TODO, Elaborate: For a family of $n$-element sets over a base type $X$, $P : X
+\to \BSG_n$, there is a section if and only if there is a
+`` to a subgroup of $\SG_n$,
+whose action on the standard $n$-element set, $\bn n$, has a fixed point.]
+
+Now we return to the local case, and we give the general
+sufficient condition that ensures that $\lAC{X}(n)$ follows from $\lAC{X}(z)$ for each $z:Z$, where $Z$ is a finite subset of $\NN$.
+
+\begin{definition}
+  The condition $L(Z,n)$ is that for every finite subgroup $G$ of $\SG_n$
+  that acts on $\bn n$ without fixed points,
+  there exists finitely many proper, finite subgroups $K_1,\cdots,K_r$ of
+  $G$ such that the sum of the indices,
+  \[
+    |G \idxcolon H_1| + \cdots + |G \idxcolon H_r|,
+  \]
+  lies in $Z$.
+\end{definition}
+
+We now turn to the global case, where we can change the base set.
+Here the basic case is Tarski's result alluded to above,
+which shows that we don't need choice for $3$-element sets,
+in contrast to the local case, \cref{thm:lAC-2-3-4}.
+
+\begin{theorem}
+  $\AC(2)$ implies $\AC(4)$.
+\end{theorem}
+
+\begin{proof}
+  Let $P: X \to \BSG_4$ be a family of $4$-element sets indexed by a set $X$.
+  Consider the new set $Y$ consisting of all $2$-element subsets
+  of $P(x)$, as $x$ runs over $X$,
+  \[
+    Y \defeq \sum_{x:X}[P(x)]^2.
+  \]
+  The set $Y$ carries a canonical family of $2$-element sets,
+  so we may choose an element of each.
+  In other words, we have chosen an element of each of the $6$
+  different $2$-element subsets of each of the $4$-element sets
+  $P(x)$.
+
+  For every $a : P(x)$, let $q_x(a)$ be the number of $2$-element
+  subsets $\set{a,b}$ of $P(x)$ with $b\ne a$ for which $a$ is the
+  chosen element.
+
+  Define the sets $B(x) \defeq \setof{a:P(x)}{\text{$q_x(a)$ is a
+      minimum of $q_x$}}$, and remember that they are subsets of $P(x)$.
+  This determines a decomposition of $X$ into three parts $X = X_1 +
+  X_2 + X_3$, where
+  \[
+    X_i \defeq \sum_{x:X}(\text{$B(x)$ has cardinality $i$}),
+    \quad i = 1,2,3.
+  \]
+  Note that $B(x)$ can't be all of $P(x)$,
+  since that would mean that $q_x$ is constant,
+  and that is impossible, since the sum of $q_x$ over the $4$-element $P(x)$ is $6$.
+
+  Over $X_1$, we get a section of $P$ by picking the unique element
+  in $B(x)$.
+
+  Over $X_3$, we get a section of $P$ by picking the unique element
+  \emph{not} in $B(x)$.
+
+  Over $X_2$, we get a section of $P$ by picking the already chosen
+  element of the $2$-element set $B(x)$.
+\end{proof}
+
+The following appears as Theorem~6 in Blass\footcite{Blass-Finite-Choice}.
+\begin{theorem}
+  Assume $\Trunc{X \to \BCG_n}_0$ is contractible for all sets $X$ and
+  positive integers $n$. Then $\AC(n)$ holds for all $n$.
+\end{theorem}
+
+\begin{proof}
+  We use well-founded induction on $n$, the case $n\jdeq 1$ being trivial.
+
+  Let $P : X \to \BSG_n$ be a family of $n$-element sets,
+  and let $Y \defeq \sum_{x:X}P(x)$ be the domain set of this \covering.
+  Consider the family $Q : Y \to \BSG_{n-1}$ defined by
+  \[
+    Q((x,y)) \defeq \setof{y' : P(x)}{y \ne y'} = P(x) \setminus \set{y},
+  \]
+  where we use the fact that $P(x)$ is an $n$-element set
+  and thus has decidable equality,
+  so we can form the $(n-1)$-element complement $P(x) \setminus
+  \set{y}$.
+
+  By induction hypothesis, we get a section of $Q$, which we can
+  express as a family of functions
+  \[
+    f : \prod_{x:X}\bigl(P(x) \to P(x)\bigr)
+  \]
+  where $f_x(y) \ne y$ for all $x,y$.
+  Since $P(x)$ is an $n$-element set, we can decide whether $f_x$
+  is a permutation or not, and if so, whether it is a cyclic
+  permutation.
+  We have thus obtained a partition $X = X_1 + X_2 + X_3$,
+  where
+  \begin{align*}
+    X_1 &\defeq \setof{x:X}{\text{$f_x$ is not a permutation}}, \\
+    X_2 &\defeq \setof{x:X}{\text{$f_x$ is a non-cyclic permutation}}, \\
+    X_3 &\defeq \setof{x:X}{\text{$f_x$ is a cyclic permutation}}.
+  \end{align*}
+  We get a section of $P$ over $X_1$ by induction hypothesis
+  by considering the family of the images of $f_x$.
+
+  We get a section of $P$ over $X_2$ by first choosing a cycle of $f_x$
+  (there are fewer then $n$ cycles because there are no $1$-cycles),
+  and then choosing an element of the chosen cycle.
+
+  We get a section of $P$ over $X_3$ by the assumption applied
+  to the map $X_3 \to \BCG_n$ induced by equipping each $P(x)$ with
+  the cyclic order determined by the cyclic permutation $f_x$.
+\end{proof}
+
+[TODO: State the general positive result due to
+Mostowski\footcite{Mostowski-Finite-Choice}, maybe as an exercise
+and give references to the negative results, due to Gauntt (unpublished).]
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "book"
+%%% End:

@@ -1,0 +1,90 @@
+% \includeonly{}
+
+%%% Index and glossary
+\makeglossary
+\changeglossnum{\thepage}
+\changeglossnumformat{|hyperpage}
+\makeindex
+
+%%% Version file
+\input version
+
+%% speed up compilation by compiling tikz figure separately
+%% unless we say not to be defining \OPTnotikzexternal
+\ifthenelse{\isundefined{\OPTnotikzexternal}}{%
+  \usepackage{tikz-external-hash}
+  \usetikzlibrary{external}%
+  \tikzset{external/system call={pdflatex -fmt macros \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname "\image" "\texsource"}}
+  \tikzexternalize[prefix=figures/]%
+  \AtBeginEnvironment{tikzcd}{\tikzexternaldisable}
+  \AtEndEnvironment{tikzcd}{\tikzexternalenable}
+}{}
+
+%% If we're published on github do not include labels and WIPs
+\ifthenelse{\isundefined{\OPTgithub}}{%
+  \usepackage[notref,notcite]{showkeys}
+  \renewcommand*{\showkeyslabelformat}[1]{%
+    {\rotatebox[origin=cr]{60}{\normalfont\tiny\ttfamily#1}}}
+  \newcommand{\wip}[1]{{\color{magenta} #1}}
+  \newcommand{\MB}[1]{{\color{red} #1}}
+}{%
+  \newcommand{\wip}[1]{}
+  \newcommand{\MB}[1]{}
+}
+
+\begin{document}
+
+\frontmatter
+\thetitlepage
+\thecopyrightpage
+
+\renewcommand*{\contentsname}{Short contents}
+\setcounter{tocdepth}{0} % chapter
+\tableofcontents
+\clearpage
+\renewcommand*{\contentsname}{Contents}
+\setcounter{tocdepth}{1} % section
+\tableofcontents
+
+%\include{preface}
+
+\mainmatter
+
+\include{intro}
+\include{intro-uf}
+\include{circle}
+\include{group}
+\include{actions}
+\include{absgroup}
+\include{congp}
+\include{subgroups}
+\include{fingp}
+\include{fggroups}
+\include{abelian}
+\include{fields}
+\include{geometry}
+\include{galois}
+
+\appendix
+\crefalias{chapter}{appendix}
+\include{history}
+\include{metamath}
+
+\backmatter
+
+% No margin notes in the back matter
+\begin{fullwidth}
+\raggedright
+\printbibliography
+\printglossary
+\printindex
+\end{fullwidth}
+\end{document}
+
+% Local Variables:
+% fill-column: 144
+% latex-block-names: ("lemma" "theorem" "remark" "definition" "corollary" "fact" "properties" "conjecture" "proof" "question" "proposition" "exercise")
+% TeX-master: t
+% TeX-command-extra-options: "-fmt=macros"
+% compile-command: "make book.pdf"
+% End:

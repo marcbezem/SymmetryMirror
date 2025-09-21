@@ -1,0 +1,2395 @@
+\chapter{Groups, concretely}
+\label{ch:groups}
+
+
+An identity type is not just any type:  in the previous sections we have seen that the identity type $a\eqto_Aa$ reflects the ``symmetries'' of an element $a$ in a type $A$.\footnote{%
+  Since the symmetries $p : a\eqto_A a$ are paths that start and end
+  at the point $a:A$, we also call them \emph{loops} at $a$,
+  or \emph{automorphisms} of $a$.\par
+  \begin{tikzpicture}
+    \draw plot [smooth cycle] coordinates {(0,0) (2.3,0) (2,1.9) (0,2.1)};
+    \node[dot,label=left:$a$] (a) at (0.5,0.3) {};
+    \node (A) at (2.5,2.1) {$A$};
+    \draw[->] (a) .. controls ++(-10:3) and ++(100:2.5) .. node[auto,swap] {$p$} (a);
+  \end{tikzpicture}}
+Symmetries have special properties.  For instance, you can rotate a square by $90\mathdegree$, and you can reverse that motion by rotating it by $-90\mathdegree$.
+Symmetries can also be composed, and this composition respects certain rules that hold in all examples.  One way to study the concept of ``symmetries'' would be to isolate the common rules for all our examples, and to show, conversely, that anything satisfying these rules actually \emph{is} an example.
+
+
+
+With inspiration of geometric and algebraic origins, it became clear to mathematicians at the end of the 19\textsuperscript{th} century that the properties of such symmetries could be codified by saying that they form an abstract \emph{group}.
+In \cref{sec:identity-types} we saw that equality is ``reflexive, symmetric 
+and transitive'' -- implemented by operations $\refl{a}$, $\symm_{a,b}$ 
+and $\trans_{a,b,c}$, and an abstract group is just a set with such 
+operations satisfying appropriate rules.
+
+We attack the issue more concretely:
+instead of focusing on the abstract properties,
+we bring the type exhibiting the symmetries to the fore.
+This type is called the \emph{classifying type} of the group.
+The axioms for an abstract group follow from the rules for identity types,
+without us needing to impose them.
+We will show in~\cref{ch:absgroup} that the two approaches give the same end result.
+
+In this chapter we lay the foundations and provide some basic examples of groups.
+
+\section{Brief overview of the chapter}
+In \cref{sec:typegroup} we give the formal definition of a group 
+along with some basic examples.
+In \cref{sec:identity-type-as-abstract} we expand on the properties of a group
+and compare these with those of an abstract group.
+In \cref{sec:homomorphisms} we explain how groups map to each other through
+``homomorphisms'' (which to us are simply given by pointed maps),
+and what this entails for the identity types:
+the preservation of the abstract group properties.
+As an important example, we study the sign homomorphism
+in~\cref{sec:sign-homomorphism}, which also provides us with the
+alternating groups.
+
+In most of our exposition we make the blanket assumption that the identity type in question is a set, but in~\cref{sec:inftygps} we briefly discuss $\infty$-groups, where this assumption is dropped.
+
+%With all this in place, the structure of the type of groups is in many aspects similar to the universe, in the sense that many of the constructions on the universe that we're accustomed to have analogues for groups, namely:
+%functions are replaced by homomorphisms;
+%products stay ``the same,'' as we will see in \cref{ex:productofgroups}
+%(and more generally, product types over sets ``stay the same'');
+%and the sum of two groups has a simple implementation as the sum of the underlying types with the base points identified, as defined more precisely in \cref{def:wedge}.
+%In the usual treatment this is a somewhat more difficult subject involving ``words'' taken from the two groups.
+%This reappears in our setting when we show that homomorphisms
+%from a sum to another group
+%correspond to pairs of homomorphisms
+%(just as for sums of types and functions between types).
+%
+%A deeper study of subgroups is postponed to \cref{ch:subgroups},
+%where they take center stage.
+
+\section{The type of groups}
+\label{sec:typegroup}
+
+In order to motivate the formal definition of a group we
+revisit some types that we have seen in earlier chapters,
+paying special attention to the symmetries in these types.
+\begin{example}\label{ex:base=base}
+  We defined the circle $\Sc$ in \cref{def:circle} by declaring
+  that it has a point $\base$ and an identification (``symmetry'')
+  $\Sloop:\base\eqto\base$.
+  In \cref{cor:S1groupoid} we proved that $\base\eqto\base$ is equivalent
+  to the set $\zet$ (of integers),
+  where $n\in\zet$ corresponds to the $n$-fold composition of $\Sloop$ with itself
+  (which works for both positive and negative $n$).
+  We can think of this as describing the symmetries of $\base$ as follows.
+  We have one ``generating symmetry'' $\Sloop$,
+  and this symmetry can be composed with itself any number of times,
+  giving a symmetry for each integer.
+  Composition of symmetries here corresponds to addition of integers.
+
+  The circle is an efficient packaging of the ``{group}'' of integers, 
+  for the declaration of $\base$ and $\Sloop$ not only gives the \emph{set}
+  $\zet$ of integers, but also the addition operation.
+\end{example}
+\begin{example}
+  Recall the finite set $\bn{2}:\FinSet_2$ from \cref{def:finiteset},
+  containing two elements.
+  According to \cref{xca:C2}, the identity type $\bn{2} \eqto \bn{2}$ 
+  has exactly two distinct elements, $\refl{\bn{2}}$ and $\swap$,
+  and doing $\swap$ twice yields $\refl{\bn{2}}$.
+  We see that these are all the symmetries
+  of a two point set you'd expect to have:
+  you can let everything stay in place ($\refl{\bn{2}}$);
+  or you can swap the two elements ($\swap$).
+  If you swap twice, the result leaves everything in place.
+  The pointed type $\FinSet_2$ (of ``finite sets with two elements''),
+  with $\bn{2}$ as the base point, is our embodiment of these symmetries, 
+  \ie they are the elements of $\bn{2} \eqto \bn{2}$.
+
+  Observe that, by the induction principle of $\Sc$,
+  there is an interesting function $\Sc\to\FinSet_2$,
+  sending $\base:\Sc$ to $\bn{2} :\FinSet_2$ and $\Sloop$ to $\swap$.
+  We saw this already in~\cref{fig:covering}.
+\end{example}
+
+Note that the types $\Sc$ and $\FinSet_2$ in the examples above are groupoids.
+For an arbitrary type $A$ and an element $a:A$,
+the symmetries of $a$ in $A$ form an \inftygp, cf.~\cref{sec:inftygps} below.
+However, in elementary texts it is customary to restrict the notion 
+of a group to the case when $a\eqto_A a$ is a \emph{set}, 
+as we will do, starting in \cref{sec:identity-type-as-abstract}.
+This makes things considerably easier: if are we given two elements 
+$g,h:a\eqto_A a$, then the identity type $g\eqto h$ is a proposition
+(and we can simply write $g = h$). That is, $g$ can be equal to $h$ in 
+at most one way, and questions relating to uniqueness of
+identification will never present a problem.
+
+The examples of groups that Klein and Lie were interested in
+often had more structure on the set $a\eqto_A a$,
+for instance a topology or a smooth structure.
+For such a group it makes sense to look at smooth maps from the real numbers
+to $a\eqto_A a$, or to talk about a convergent sequence of symmetries of $a$.
+\footnote{%
+  Such groups give rise to \inftygps by converting
+  continuous (or smooth) symmetries of $a$ in $A$
+  parametrized by the continuous (or smooth) real interval,
+  into identifications,
+  as described already in \cref{ft:cohesive}
+  in \cref{ch:univalent-mathematics}.
+  Then also smooth or continuous paths in $a\eqto_A a$
+  turn into identifications of symmetries.
+  See also~\cref{sec:topology}.}
+See \cref{ch:grouphistory} for a brief summary of the history of groups.
+
+\begin{remark}\label{rem:heap-preview}
+  The reader may wonder about the status of the identity type 
+  $a\eqto_A a'$ where $a,a':A$ are different elements.
+  One problem is of course that if $p,q:a\eqto_A a'$,
+  there is no obvious way of composing $p$ and $q$
+  to get another element in $a\eqto_A a'$.
+  Another problem is that $a\eqto_A a'$ does not have a distinguished element,
+  such as $\refl{a}:a\eqto_A a$.\footnote{%
+    The type $a\eqto_A a'$ does have an interesting \emph{ternary}
+    composition, mapping $p,q,r$ to $p\inv{q}r$.
+    A set with this kind of operation is called a \emph{heap},
+    and we'll explore heaps further in \cref{sec:heaps}.}
+Given an $f:a\eqto_A a'$ we can use transport along $f$ to compare 
+$a\eqto_A a'$ with $a\eqto_A a$ (much as affine planes can be compared 
+with the standard plane or a finite dimensional real vector space is 
+isomorphic to some Euclidean space), but absent the existence and choice 
+of such an $f$ the identity types $a\eqto_Aa'$ and $a\eqto_Aa$ are 
+different animals.
+We will return to this example in \cref{sec:heaps}.
+\end{remark}
+
+
+\begin{remark}
+  \label{rem:whypointedconngpoid}
+  As a consequence of \cref{lem:subtype-eq-=},\marginnote{%
+    \begin{tikzpicture}
+      \draw plot [smooth cycle] coordinates {(0,0) (2.8,0) (2.5,1.9) (0,2.1)};
+      \draw[dashed] plot [smooth cycle] coordinates
+      {(.1,.1) (1.2,.1) (1,1.5) (.1,1.7)};
+      \node[dot,label=left:$a$] (a) at (0.5,.3) {};
+      \node[dot,label=right:$b$] (b) at (1.8,.3) {};
+      \node (cdots) at (1.8,1.4) {$\cdots$};
+      \node (A) at (2.6,2.1) {$A$};
+      \node (Aa) at (.7,1.9) {$A_{(a)}$};
+      \draw[->] (a) .. controls ++(-10:1) and ++(110:1.6) .. node[auto,swap]
+      {$p$} (a);
+      \draw[dashed] plot [smooth cycle] coordinates
+      {(1.5,.1) (2.5,.2) (2.6,.8) (1.5,.9)};
+      \draw[dashed] plot [smooth cycle] coordinates
+      {(1.5,1.1) (2.5,1.2) (2.4,1.8) (1.2,2)};
+    \end{tikzpicture}}
+  the inclusion of the component $\conncomp A a \defequi \sum_{x:A}
+  \Trunc{a\eqto x}$ into $A$ (\ie the first projection)
+  induces an equivalence of identity types
+  from $(a,!)\eqto_{A_{(a)}}(a,!)$ to $a\eqto_A a$. 
+  This means that, when considering the loop type $a\eqto_A a$,
+  ``only the elements $x:A$ with $x$ merely equal to $a$ are relevant''.
+  To avoid irrelevant extra components,
+  we should consider only \emph{connected} types $A$ (\cf \cref{def:connected}).
+
+  Also, our preference for $a\eqto_A a$ to be a \emph{set}
+  indicates that we should consider only the connected types $A$
+  that are \emph{groupoids}.
+\end{remark}
+
+\begin{definition}\label{def:pt-conn-groupoid}
+  The type of \emph{pointed, connected groupoids} is the type\marginnote{%
+    The meaning of the superscript ``${=1}$'' can be explained as follows:
+    We also define
+    \begin{align*}
+      \UU^{\le1}&\defeq\Groupoid\\
+      &\defeq
+        \sum_{A:\UU} \isgrpd(A)
+    \end{align*}
+    to emphasize that groupoids are $1$-types;
+    the type of connected types is defined as follows.
+    \[
+    \UU^{>0} \defeq \sum_{A:\UU} \isconn(A)
+    \]
+  Similar notations with a subscript ``$*$'' indicate pointed types.}%
+  \glossary(UU1){$\protect\UUscone$}{pointed, connected groupoids, \cref{def:pt-conn-groupoid}}
+  \[
+  \UUscone \defeq \sum_{A:\UU} ( A \times \isconn(A) \times \isgrpd(A) ).\qedhere
+  \]
+\end{definition}
+
+\begin{xca}\label{xca:defgroup}
+  Given a type $A$ and an element $a:A$, 
+  show that $A$ is connected if and only if the proposition 
+  $\prod_{x:A}\Trunc{a \eqto_A x}$ holds.
+  Show furthermore that $A$ is a groupoid if and only if the 
+  type $a\eqto_A a$ is a set.
+  Conclude by showing that the type $\UUscone$ is equivalent to the type
+  \[
+    \sum_{A:\UU} \sum_{a:A} \biggl( \Bigl( \prod_{x:A}\Trunc{a \eqto_A x} \Bigr)
+      \times \isset( a\eqto_A a ) \biggr).\qedhere
+  \]
+\end{xca}
+
+\begin{remark}
+  We shall refer to a pointed connected groupoid $(A,a,p,q)$ simply
+  by the pointed type $X \defeq (A,a)$.
+  There is no essential ambiguity in this, for
+  the types $\isconn(A)$ and $\isgrpd(A)$ are propositions 
+  (\cref{lem:prop-utils} and \cref{lem:isX-is-prop}),
+  and so the witnesses $p$ and $q$ are unique.
+\end{remark}
+
+We are now ready to define the type of groups.
+
+\begin{definition}\label{def:typegroup}
+  The \emph{type of groups} is a wrapped copy (see \cref{sec:unary-sum-types})
+  of the type of pointed connected groupoids $\UUscone$,
+  \[
+    \typegroup \defequi \Copy_{\mkgroup}(\UUscone),
+  \]
+  with constructor $\mkgroup : \UUscone \to \Group$.%
+  \index{type!of groups}
+  \glossary(Group){$\protect\typegroup$}{type of groups}
+  \glossary(924Omega_){$\protect\mkgroup$}{group constructor,
+  \cref{def:typegroup}}\index{group}%
+  \footnote{%
+  The reader may ask why we use $\mkgroup$, which only makes a wrapped
+  copy of each $(A,s,p,q): \UUscone$. The answer is that flatly defining
+  groups as their classifying types would be confusing.
+  Using $\mkgroup$ we avoid awkward terminology such as `
+  `the group of the integers is the circle''. 
+  The symbol $\mkgroup$ is inspired by $\loops$
+  in \cref{def:looptype}, which in \cref{sec:identity-type-as-abstract}
+  will be used to recover the traditional concept of a group.
+  Recall also the example of the negated natural numbers $\NNN$
+  from \cref{sec:unary-sum-types}:
+  Its elements are $-n$ for $n:\NN$ to remind us how to think about them.
+  And the same applies to $\Group$:
+  Its elements are $\mkgroup X$ for $X : \UUscone$
+  to remind us how to think about them.
+  }
+  A \emph{group} is an element of $\typegroup$.
+\end{definition}
+
+\begin{definition}\label{def:classifying-type}
+  We write $\B : \typegroup \to \UUscone$ for the
+  destructor associated with $\Copy_{\mkgroup}(\UUscone)$.
+  For $G : \typegroup$,
+  we call $\BG$ the \emph{classifying type}\index{classifying type}
+  of $G$.\footnote{%
+    As a notational convention we always write the ``$\B$''
+    so that it sits next to and matches the shape
+    of its operand.
+    You see immediately the typographical reason behind this convention:
+    The italic letters $B$, $G$ get along nicely,
+    while the roman $\B$ would clash with its italic friend $G$
+    if we wrote $\B G$ instead.}
+  Moreover, the elements of $\BG$ will be referred to as the \emph{shapes of $G$},
+  and we define the \emph{designated shape of $G$}\index{designated shape}\index{shape}
+  by setting
+  $\shape_G\defequi \pt_{\BG}$,
+  \ie the designated shape of $G$ is the base point of its
+  classifying type, see \cref{def:pointedtypes}.
+\end{definition}
+
+\begin{definition}\label{def:looptype}
+  Given a pointed type $X\jdeq(A,a)$, we define
+  $\loops X \defeq (a \eqto_A a)$, \ie the type of the symmetries
+  of $a:A$. %also called the \emph{symmetries in} $X$ / $G$ below?
+  The type $\loops X$ is pointed at $\refl{a}$.%
+  \index{loop type constructor}\index{symmetry type constructor}
+  \glossary(924Omega){$\protect\loops X$}%
+  {type of symmetries (loops) in pointed type, \cref{def:looptype}}
+\end{definition}
+
+
+\begin{definition}\label{def:group-symmetries}
+  Let $G$ be a group.
+  We regard every group as a group of symmetries,
+  and thus we refer to the elements of $\loops \BG$ as the
+  \emph{symmetries in $G$};\index{symmetries in a group $G$}
+  they are the symmetries of the designated shape $\shape_G$ of $G$.
+  We adopt the notation 
+  \[
+    \USymG \defeq \loops \BG
+  \]
+  for the type of symmetries in $G$; it is a set.\footnote{%
+    Taking the symmetries in a group
+    thus defines a map
+    $\USym : \Group \to \Set$,
+    with $\mkgroup X \mapsto \loops X$.
+    Just as with ``$\B$'', we write the ``$\USym$'' so that it matches
+    the shape of its operand.}
+  (Notice the careful distinction above between the phrases
+  ``\emph{symmetries in}'' and ``\emph{symmetries of}''.) 
+\end{definition}
+
+\begin{definition}\label{def:finite-group}
+A group $G$ is a \emph{finite group} if the set $\USymG$ is finite.
+\index{finite group}\index{group!finite}
+For any finite group $G$ we denote the number of symmetries
+in $G$ by $\Card(G)\defeq\Card(\USymG)$, also called the
+\emph{cardinality} of $G$.
+\index{cardinality!of finite group}
+\end{definition}
+
+\begin{remark}\label{rem:aut}
+  As noted in \cref{sec:unary-sum-types},
+  the constructor and destructor pair forms an equivalence $\Group \weq \UUscone$.
+  The type $\UUscone$ is a subtype of $\UUp$, so
+  once you know that a pointed type $X$ is a connected groupoid,
+  you also know that $X$ is the classifying type of a group,
+  namely $G\defeq\mkgroup X$.
+
+  Note that the equivalence also entails that identifications (of groups) of type $G \eqto H$ are equivalent to identifications (of pointed
+  types) of type $\BG \eqto \BH$.
+\end{remark}
+
+\begin{remark}\label{rem:BG-convention}
+  Defining a function $f : \prod_{G:\Group}T(G)$,
+  where $T(G)$ is a type parametrized by $G:\Group$,
+  amounts to defining $f(G)$ for $G\jdeq\mkgroup X$,
+  where $X$ is a pointed connected groupoid,
+  namely the classifying type $\BG$.\footnote{%
+    If you are bothered by the convention
+    to write the classifying type of $G$ in \emph{italic} like a variable,
+    you can either think of $\BG$ as a locally defined
+    variable denoting the classifying type that is
+    defined whenever a variable $G$ of type $\Group$ is introduced,
+    or you can imagine that whenever such a $G$ is introduced
+    (with the goal of making a construction or proving a proposition),
+    we silently apply the induction principle to
+    reveal a wrapped variable $\BG:\UUscone$.}
+\end{remark}
+
+Frequently we want to consider the symmetries $\loops(A,a)$ of some element $a$ in some groupoid $A$, so we introduce the following definition.
+
+\begin{definition}\label{def:automorphism-group}
+  For a groupoid $A$ with a specified point $a$,
+  we define the \emph{automorphism group} of $a:A$ by%
+  \glossary(Aut){$\protect\Aut_A(a)$}{automorphism group of the element $a$
+    in the type $A$, \cref{def:automorphism-group}}\index{automorphism group}%
+  \index{group!of automorphisms}
+  \[
+    \Aut_A(a) \defeq \mkgroup (A_{(a)},(a,!)),
+  \]
+  \ie $\Aut_A(a)$ is the group with classifying type
+  $\BAut_A(a) \jdeq (A_{(a)},(a,!))$,
+  the connected component of $A$ containing $a$, pointed at $a$.
+\end{definition}
+\begin{remark}
+  \label{rem:symmetriesofnonconnectedgroupoids}
+  If $A$ is connected, then $\fst: A_{(a)} \to A$ is an equivalence 
+  between the pointed types $(A_{(a)},(a,!))$ and $(A,a)$, pointed by $\refl{a}$.
+  Consequently, for any $G \jdeq \mkgroup(A,a) : \Group$, 
+  we have an identification of type $G \eqto \Aut_A(a)$.
+
+  In other words, for any $G \jdeq \mkgroup\BG$, we have
+  an identification $G \eqto \Aut_{\BG}(\shape_G)$, of $G$ with the automorphism
+  group of the designated shape $\shape_G : \BG$.
+\end{remark}
+
+\subsection{First examples}
+\label{sec:firstgroupexamples}
+\begin{example}\label{ex:circlegroup}
+  The circle $\Sc$, which we defined in \cref{def:circle},
+  is a connected groupoid (\cref{lem:circleisconnected}, \cref{cor:S1groupoid})
+  and is pointed at $\base$.
+  The identity type $\base\eqto_\Sc\base$ is equivalent to 
+  the set of integers $\zet$ and composition corresponds to addition.
+  This justifies our definition of the \emph{group of integers} as%
+  \glossary(ZZ){$\protect\ZZ$}{group of integers,
+      \cref{ex:circlegroup}}\index{group!of integers}
+  \[
+    \ZZ \defeq \mkgroup(\Sc,\base).
+  \]
+  In other words, the classifying type of $\ZZ$ is $\B\ZZ \defeq \Sc$, 
+  pointed at $\base$. 
+  Recall from~\cref{rem:symmetriesofnonconnectedgroupoids} that there is 
+  then a canonical identification of type $\ZZ \eqto \Aut_\Sc(\base)$.  
+  It is noteworthy that along the way we gave several
+  versions of the circle, each of which has its own merits.
+  For example, the type of infinite cycles in \cref{def:S1toC}
+  and \cref{thm:S1bysymmetries},
+  \[
+    \InfCyc\jdeq %\conncomp{\biggl(\sum_{X:\UU}(X\to X)\biggr)}{\zet,\zs}
+    \sum_{X:\UU} \sum_{t:X\to X} \Trunc{(\zet,\zs)\eqto(X,t)}.\qedhere
+  \]
+\end{example}
+\begin{xca}\label{xca:groups}
+Use various results from \cref{cha:circle} to construct two different
+identifications of type $\ZZ \eqto \Aut_\Cyc(\zet,\zs)$.
+\end{xca}
+
+\begin{example}\label{ex:groups}
+  Apart from the circle, there are some important groups that come 
+  almost for free: namely the automorphisms of specific elements
+  in the groupoid $\Set$, and even one in the groupoid $\Prop$.
+  \begin{enumerate}
+  \item\label{ex:trivgroup}
+  Recall that $\true$, and hence $\true \eqto \true$, is contractible.
+  Hence $\Aut_\Prop(\true)$ is a group called the 
+  \emph{trivial group}, denoted by $\TG$. \index{trivial group}
+  \glossary(1trivialgroup){$\protect\TG$}{trivial group,
+      \cref{ex:groups}\ref{ex:trivgroup}}
+  In fact, for any proposition $P$ we can also identify the trivial group 
+  with $\Aut_\Prop(P)$, see \cref{xca:group-example-details}. 
+  Unlike $\Prop$, the type $\true$ is connected,
+  so we can also identify the trivial group with
+  $\mkgroup (\true,\triv)$, or with $\mkgroup (C,c)$ for
+  any contractible type $C$ and element $c:C$, or
+  with $\Aut_{S}(x)$ for any set $S$ and element $x:S$.\footnote{%
+This note is for those who worry about size issues -- a
+theme we usually ignore in our exposition. 
+Recall from \cref{sec:universes} the chain of
+universes $\UU_0 : \UU_1 : \UU_2 : \dots$ such that for each $i$
+all types in $\UU_i$ are also in $\UU_j$ for all $j>i$.
+Let $\Prop_0 \defeq \sum_{P:\UU_0}\isprop(P)$ be the type of 
+propositions in $\UU_0$. Then $\true:\Prop_0$ 
+and $\Prop_0 : \UU_1$ (because the sum is taken over $\UU_0$).
+In order to accommodate the trivial group $\Aut_{\Prop_0}(\true)$, 
+the universe ``$\UU$'' appearing as a subscript of the first 
+$\Sigma$-type in \cref{def:pt-conn-groupoid}, reappearing later in 
+\cref{def:typegroup} of the type of groups,
+needs to be at least as big as $\UU_1$. 
+If $\UU$ is taken to be $\UU_1$, then the type $\typegroup$ of groups 
+will not be in $\UU_1$, but in the bigger universe $\UU_2$.
+\Cref{xca:typegroupisgroupoid} below asks you to verify that $\Group$
+is a (large) groupoid. If we then choose some group $G:\typegroup$
+and look at its group of automorphisms, $\Aut_\Group(G)$,
+this will be an element of $\typegroup$ only if the universe $\UU$ in the
+definition of $\typegroup$ is at least as big as $\UU_2$. Clearly, 
+this doesn't stop and so we also need an ascending chain of types of groups:
+  \[
+    \typegroup_i \defequi \Copy_{\mkgroup}\bigl( (\UU_i)_*^{=1} \bigr) : \UU_{i+1}.
+  \]
+Any group we encounter will be an element of $\typegroup_i$ for $i$
+large enough. As a matter of fact, the trivial group $\Aut_{\true}(\triv)$
+is an element of $\typegroup_0$. The Replacement~\cref{pri:replacement}
+often allows us to conclude that a group $G$ belongs to $\typegroup_0$.
+This is the case for $\SG_S$, for $S:\Set_0$, and for $\Aut_\Group(G)$,
+for $G:\Group_0$, as we invite the reader to check.
+(Hint: use \cref{xca:comp-loc-small-ess-small}.)
+However, even with this principle there are groups that only belong
+to $\typegroup_i$ for $i>0$ large enough.
+
+Issues concerning universes are nontrivial and important,
+but in this text we have chosen to focus on other matters.
+}
+ 
+  \item\label{ex:permgroup}
+    If $n:\NN$, then the \emph{permutation group of $n$ letters}
+    (also known as the \emph{symmetric group of degree $n$}) is%
+    \glossary(918Sigma2){$\protect\SG_n$}{symmetric group of degree $n$,
+      \cref{ex:groups}\ref{ex:permgroup}}\index{symmetric group}%
+    \index{group!symmetric group}
+    \[
+      \SG_n\defequi \Aut_{\Set}(\bn n). %\mkgroup(\FinSet_n,\bn{n}),
+    \]
+    The classifying type is thus $\BSG_n\jdeq (\FinSet_n,\bn{n})$,   
+    where $\FinSet_n \jdeq \Set_{(\bn{n})}$ is the groupoid of 
+    sets of cardinality $n$ (\cf \ref{def:groupoidFin}).
+    
+    Again, we can also identify the group $\SG_n$ with
+    $\Aut_\FinSet(\bn{n})$ (by \cref{xca:group-example-details}), with 
+    $\Aut_{\FinSet_n}(\bn n)$ (by \cref{rem:symmetriesofnonconnectedgroupoids}),
+    or even with $\Aut_{\UU}(\bn n)$ (by stretching the definition of $\Aut$,
+    using that $\UU_{(\bn n)}$ is a connected groupoid, see~\cref{rem:autinfgp}).
+
+
+
+  \item\label{ex:genpermgroup}
+    More generally, if $S$ is a set, is there a pointed connected groupoid $(A,a)$ so that $a\eqto_Aa$ models all the ``permutations'' $S\eqto_{\Set}S$ of $S$?
+    Again, the only thing wrong with the groupoid $\Set$ of sets
+    is that $\Set$ is not connected.
+%}!\footnote{it's so simple -- so very simple -- that only a child can do it!}  %
+    The \emph{group of permutations of $S$} is defined to be%
+    \glossary(918Sigma3){$\protect\SG_S$}{permutation group on a set $S$,
+      \cref{ex:groups}\ref{ex:genpermgroup}}\index{permutation group}%
+    \index{group!permutation group}
+    \[
+      \SG_S\defequi \Aut_{\Set}(S),
+    \]
+    with classifying type $\BSG_S\jdeq(\conncomp \Set S,S)$.\qedhere
+  \end{enumerate}
+\end{example}
+
+\begin{xca}
+  \label{xca:group-example-details}
+  Show that $\Aut_\Prop(P)$ is a trivial group for any proposition $P$.
+  Verify that $\SG_0$, $\SG_1$, and $\SG_\false$ are all trivial groups.
+  Using~\cref{def:finiteset}, give identifications of type 
+  $\Aut_\FinSet(\bn{n})\eqto\Sigma_{\bn{n}}$ for $n:\NN$.
+  Also, give an identification of type $\Aut_\Set(\NN)\eqto\Aut_\Set(\zet)$. 
+\end{xca}
+
+
+\begin{example}\label{ex:cyclicgroups}
+  In \cref{cor:id-m-cycle} we studied the symmetries of the 
+  standard $m$-cycle $(\bn m,\zs)$ for $m$ a positive integer, 
+  and showed that there were $m$ different such symmetries.
+  Moreover, we showed that these symmetries can be identified with the elements
+  $0,1,\dots,m-1$ of $\bn m$ (according to the image of $0$),
+  and under this correspondence composition of symmetries correspond to
+  addition modulo $m$, with $0$ the identity.
+  Note that all of these can be obtained from $1$ under addition.
+  With $\Cyc,\,\Cyc_m$ from \cref{def:Cyc}, \ref{def:Cyc-components},
+  the \emph{cyclic group of order $m$} is thus defined to be
+  \[
+    \CG_m \defeq \Aut_\Cyc(\bn m,\zs),
+  \]
+  with classifying type $\BCG_m \jdeq (\Cyc_m, (\bn m,\zs))$.\footnote{%
+    Note that the cyclic group of order $1$ is the trivial group,
+    the cyclic group of order $2$ is equivalent to the symmetric group $\SG_2$:
+    there is exactly one nontrivial symmetry $f$ and $f^2$ is the identity.
+    When $m>2$ the cyclic group of order $m$ is a group that does not appear
+    elsewhere in our current list.
+    In particular, the cyclic group of order $m$ has only $m$ different
+    symmetries, whereas we will see that the group of 
+    permutations $\SG_m$ has $m!=1\cdot 2\cdot\dots\cdot m$ symmetries.}
+
+  By using univalence on the equivalences of~\cref{thm:coveringsofS1perms}, we get a chain of identifications
+  \[
+    \begin{tikzcd}
+      \CG_m \rar[eqtol] & \Aut_{\sum_{X:\Set}(X\to X)}(\bn m,\zs) \dar[eqtol] &
+      \\
+      & \Aut_{\SetBundle(\Sc)}(\Sc,\dg{m}) \rar[eqtol] & \Aut_{\Sc\to\Set}(R_m),
+    \end{tikzcd}
+  \]
+  where $\dg{m} : \Sc \to \Sc$ is the degree $m$ map,
+  and $R_m : \Sc \to \Set$ is the $m$\th power bundle from~\cref{def:RmtoS1}.
+
+  For reasons that will become clear later (\cref{def:normalquotient}),
+  we introduce another name for the cyclic group of order $m$, corresponding
+  to the last step above, namely,
+  \[
+    \ZZ/m\ZZ \defeq \Aut_{\Sc\to\Set}(R_m).\qedhere
+  \]
+\end{example}
+
+\begin{example}
+\label{ex:Cm}
+There are other (beside the symmetries of the $m$-cycle and of the $m$-fold \covering) ways of obtaining the cyclic group of order $m$, which occasionally are more convenient.
+The prime other interpretation comes from thinking about the symmetries of the $m$-cycle in a slightly different way.
+We can picture the $m$-cycle as consisting of $m$ points on a circle,
+\eg as the set of $m$\th roots of unity in the complex plane, as shown in~\cref{fig:m-cycle-roots}.
+\begin{marginfigure}
+  \begin{tikzpicture}
+    \foreach \n/\deg in {0/0, 1/35, 2/70, m-1/325} {
+      \node[dot] (x\n) at (\deg:1) {};
+      \node (l\n) [at=(x\n.\deg), anchor=\deg+180, shift=(\deg:1pt)] {$\xi^{\n}$};
+      \draw[->,shorten <=1pt,shorten >=1pt] (x\n) arc (\deg:\deg+35:1);
+    }
+    \foreach \deg in {110, 115, 120, 275, 280, 285} {
+      \node[cntdot] at (\deg:1) {};
+    }
+    \draw[shorten <=1pt,shorten >=1pt] (125:1) arc (125:270:1);
+    \draw[->,shorten <=1pt,shorten >=1pt] (290:1) arc (290:325:1);
+    \draw (180:1.2) -- (360:1.2);
+    \draw[->] (1.6,0) -- (1.9,0);
+    \node at (2.1,0) {$x$};
+    \node at (0,1.7) {$y$};
+    \draw[->] (270:1.2) -- (90:1.5);
+  \end{tikzpicture}
+  \caption{The $m$-cycle as the $m$\th roots of unity.
+    (Here $\xi=\ee^{2\pi\ii/m}$ is a primitive $m$\th root.)}
+  \label{fig:m-cycle-roots}
+\end{marginfigure}
+Any cyclic permutation is in particular a permutation 
+of the $m$-element set underlying the cycle.
+This manifests itself as the projection map 
+$\prj : \Cyc_m \to \FinSet_m : ((X,t),!) \mapsto (X,!)$,\footnote{%
+  In the terminology of \cref{sec:stuff-struct-prop},
+  this map forgets the cycle structure on the underlying set.}
+equivalently, using the notation introduced above, $\prj : \BCG_m \to \BSG_m$,
+where the group $\SG_m\jdeq\Aut_\Set(\bn m)$ is that of
+\emph{all} permutations of the set $\bn m$.
+This projection map,
+whose fiber at $X : \BSG_m$ can be identified with
+the set $\sum_{t:X\to X}\Trunc{(X,t)\eqto(\bn m,\zs)}$,
+captures $\CG_m$ as a ``subgroup'' of the permutations, 
+namely the cyclic ones, corresponding to the fact that the 
+shapes of $\CG_m$ (\ie the elements of $\BCG_m$)
+are those of $\SG_m$ together with the extra structure of 
+the ``cyclic ordering'' determined by $t$.
+
+But how do we capture the other aspect of $\CG_m$,
+mentioned in~\cref{ex:cyclicgroups},
+that all the cyclic permutations can be obtained by a single generating one?
+When thinking of the $m$\th roots of unity as in~\cref{fig:m-cycle-roots},
+we can take complex multiplication by $\xi$ to be the generating symmetry.
+
+The key insight is provided by the function $R_m:S^1\to\FinSet_m$ from~\cref{def:RmtoS1},
+with $R_m(\base)\defequi\bn m$ and
+$R_m(\Sloop)\defis \zs$, picking out exactly the cyclic permutation
+$\zs:\bn m\eqto \bn m$ (and its iterates) among all permutations.
+Using our new notation, we can also write this as
+\[
+  R_m : \B\ZZ \to \BSG_m.
+\]
+Set truncation (\cref{def:set-truncation}) provides us with a tool for capturing only the symmetries in $\FinSet_m$ hit by $R_m$:\marginnote{%
+  $\begin{tikzcd}[column sep=tiny,ampersand replacement=\&]
+  \& \B\ZZ\ar[dl]\ar[rr,equivr,"c"] \& \& \Cyc_0 \ar[dr] \& \\
+  \BCG'_m \ar[rrrr,dashed,"g"']\ar[drr,"\prj"'] \& \& \& \&  \BCG_m\ar[dll,"\prj"] \\
+  \& \& \BSG_m\ar[from=uul,"R_m" near start,crossing over]
+  \ar[from=uur,"{\blank/m}"' near start,crossing over]\& \&
+  \end{tikzcd}$}
+the (in language to come) subgroup of the permutation group generated by the cyclic permutation $\zs$ is the group
+\[
+  \CG'_m\defequi\mkgroup(\BCG'_m,\sh_{\CG'_m}),
+\]
+where $\BCG'_m\defequi \sum_{X:\FinSet_m}\Trunc{\inv{R_m}(X)}_0$
+and $\sh_{\CG'_m}\defequi (\bn m,\trunc{(\base,\refl{\bn m})}_0)$.
+That is, $\BCG'_m$ is the $0$-image of $R_m$ in the sense 
+of~\cref{sec:higher-images},
+and is in particular a pointed connected groupoid.
+Since we have a factorization of $R_m$ as the equivalence $c:\Sc\equivto\Cyc_0$
+followed by the map $\blank/m:\Cyc_0 \to \BSG_m$,
+and since $\Cyc_m$ is the $0$-image of the latter by~\cref{thm:image-Z-to-Cm},
+we get a uniquely induced pointed equivalence $g : \BCG'_m \ptdweto \BCG_m$.\footnote{%
+  More precisely, but using language not yet established: $\CG_m$ is both isomorphic to $\ZZ/m\ZZ$, the ``quotient group'' (\cf \cref{def:normalquotient}) of $\ZZ$ by the ``kernel'' (\cf \cref{def:kernel}) induced by $R_m$, and to $\CG'_m$, which is the corresponding ``image'' (\cf \cref{sec:image}). This pattern will later be captured in~\cref{thm:fund-thm-homs}.}
+This identifies the set $\Trunc{\inv{R_m}(X)}_0$ with the set of 
+cycle structures on the $m$-element set $X$.
+\end{example}
+
+\begin{xca}\label{xca:CG2isSG2}
+Show that the set truncation of $\inv R_2(\bn 2)$ is contractible.
+This reflects that $\CG_2$ and $\SG_2$ can be identified.\footnote{%
+We will later see that $\CG_2\eqto_\typegroup\SG_2$ is contractible.}
+\end{xca}
+\begin{xca}\label{xca:RmloopCGm}
+Elaborate the symmetries of
+$\sh_{\CG'_m}\jdeq (\bn m,\trunc{(\base,\refl{\bn m})}_0)$
+in $\BCG'_m$ and show that they are indeed the permutations of $\bn m$
+than can be generated by $R_m(\Sloop)$, that is, by $s$. 
+\end{xca}
+
+\begin{example}\label{ex:productofgroups}
+  If you have two groups $G$ and $H$,
+  their \emph{product} $G\times H$ is given by taking
+  the product of their classifying types:\footnote{%
+    Note that $\B(G\times H)\jdeq \BG\times \BH$ is pointed at
+  $\shape_{G\times H}\jdeq(\shape_G,\shape_H)$.}\index{group!binary product}
+  \[
+    G\times H\defequi \mkgroup(\BG\times\BH)
+  \]
+  For instance, $\SG_2\times\SG_2$ is called the
+  \emph{Klein four-group}\index{Klein four-group}\index{group!Klein four-group} or \emph{Vierergruppe}\index{Vierergruppe}, because
+  it has four symmetries.
+  In general, \cref{lem:isEq-pair-bin=} gives an identification $\USym(G\times H) \eqto \USymG\times\USymH$.
+\end{example}
+
+\begin{xca}\label{xca:klein-not-cyclic}
+  Show that we cannot identify $\CG_4$ and $\SG_2\times\SG_2$,
+  \ie the Klein four-group is not a cyclic group.
+\end{xca}
+
+\begin{example}\label{ex:bigproductofgroups}
+  If $S$ is an $n$-element finite set, $n : \NN$,
+  and $G : S \to \Group$ is an $S$-indexed family of groups,
+  then we can likewise form the \emph{product} of the family,
+  by taking the product of the classifying types:
+  \[
+    \prod_{s:S}G(s) \defeq
+    \mkgroup\left(\prod_{s:S}\BG(s),s\mapsto \shape_{G(s)}\right)
+  \]
+  Function Extensionality,~\cref{def:funext}, says
+  that that the function $\ptw$ of~\cref{def:ptw}
+  gives an equivalence:
+  \[
+    \ptw : \USym\left(\prod_{s:S}G(s)\right)
+    \equivto
+    \prod_{s:S}\USymG(s)\qedhere
+  \]
+\end{example}
+
+\begin{xca}\label{xca:bigproductfunext}
+  \begin{enumerate}
+  \item\label{it:bigproductfunext-i}
+    Show that a finite product of connected groupoids
+    is again connected, so that the above definition makes sense.%
+    \footnote{For infinite products,
+      we can either use the Axiom of Choice, \cref{pri:ac},
+      or take the connected component of base point,
+      $s \mapsto \shape_{G(s)}$.}
+  \item
+    Show that when $S$ is identified with a standard $2$-element set
+    such as $\bool$, then the product of an $S$-indexed family
+    of groups reduces to the binary product of~\cref{ex:productofgroups}.\qedhere
+  \end{enumerate}
+\end{xca}
+
+\begin{remark}
+In \cref{lem:idtypesgiveabstractgroups} we will see that the identity type
+of a group satisfies a list of laws justifying the name ``group'' and
+we will later show in \cref{lem:Groupsareidentitytypes} that groups
+are uniquely characterized by these laws.
+\end{remark}
+Some groups have the property that the order you compose the 
+symmetries is immaterial.  The prime example is the group of 
+integers $\ZZ\jdeq\mkgroup(\Sc,\base)$.
+Any symmetry is of the form $\Sloop^n$ for some integer $n$, 
+and if $\Sloop^m$ is also a symmetry, 
+then $\Sloop^n\Sloop^m=\Sloop^{n+m}=\Sloop^{m+n}=\Sloop^m\Sloop^n$.
+
+ Such cases are important enough to have their own name:
+\begin{definition}\label{def:abgp}
+  A group $G$ is \emph{abelian} if all symmetries commute, in the sense that
+  the proposition
+  \[
+    \isAb(G)\defequi\prod_{g,h: \USymG}gh=hg
+  \]
+  is true.  In other words, the type of abelian groups is
+  \[
+    \AbGroup \defequi \sum_{G:\typegroup}\isAb(G).\qedhere
+  \]
+\end{definition}
+\begin{xca}\label{exer:first examples}
+  Show that symmetric group $\SG_2$ is abelian, but that $\SG_3$ is not.
+  Show that if $G$ and $H$ are abelian groups, then so is their product $G\times H$.
+\end{xca}
+We can visualize symmetries $g$ and $h$ commuting with each
+other in a group $A \jdeq\mkgroup(A,a)$ by the picture\marginnote{%
+  \begin{tikzcd}[ampersand replacement=\&]
+    a \ar[r,eqr,"g"]\ar[d,eql,"h"'] \& a\ar[d,eqr,"h"] \\
+    a \ar[r,eql,"g"'] \& a
+  \end{tikzcd}}
+in the margin;
+going from (upper left hand corner) $a$ to (lower right hand corner) 
+$a$ by either composition gives the same result.
+
+\begin{remark}
+  \label{rem:whatAREabeliangroups}
+
+  Abelian groups have the amazing property that their classifying types are themselves identity types (of certain $2$-types).
+  This can be used to give a very important characterization of what it means to be abelian.
+  We will return to this point in \cref{sec:abelian-groups}.
+
+  Alternatively, the reference to underlying symmetries in the definition of abelian groups is avoidable using the ``one point union'' of pointed types $X\vee Y$ of \cref{def:wedge}. (It is the sum of $X$ and $Y$ where the base points are identified.). \cref{xca:whatAREabeliangroups}
+  \marginnote{%
+    \begin{tikzcd}[ampersand replacement=\&]
+      \BG\vee\BG\ar[r,"\text{fold}"]\ar[d,"\text{inclusion}"'] \& \BG \\
+       \BG\times\BG\ar[ur,dashed]
+    \end{tikzcd}}
+offers the alternative definition that a group $G$ is abelian if and only if
+the ``fold'' map $\BG\vee \BG\ptdto \BG$ (where both summands are mapped by
+the identity) factors through the inclusion $\BG\vee\BG\ptdto\BG\times\BG$
+(where $\inl{x}$ is mapped to $(x,\sh_G)$ and $\inr{x}$ to $(\sh_G,x)$).
+The latter turns out to be a proposition equivalent to $\isAb(G)$.
+\end{remark}
+
+\begin{xca}
+  Let $\mkgroup(A,a):\typegroup$ and let $b$ be an arbitrary element of $A$.
+  Prove that the groups $\mkgroup(A,a)$ and $\mkgroup(A,b)$ are 
+  merely identical, in the sense that the proposition
+  $\Trunc{\mkgroup(A,a)\eqto\mkgroup(A,b)}$ is true.
+  Similarly for \inftygps in \cref{sec:inftygps} when you get that far.
+\end{xca}
+
+  \begin{xca}\label{xca:typegroupisgroupoid}
+    Given two groups $G$ and $H$.  Prove that $G\eqto H$ is a set.
+    Prove that the type of groups is a groupoid.
+    This means that, given a group $G$, the component of $\typegroup$,
+    containing (and pointed at) $G$, is again a group, $\Aut_\Group(G)$,
+    which we will call more simply the \emph{group $\Aut(G)$ of automorphisms}%
+    \index{group!of automorphisms} of $G$,
+    or the \emph{automorphism group}\index{automorphism group} of $G$.
+  \end{xca}
+
+We'll see more examples of groups in~\cref{sec:sign-homomorphism,sec:bicycles}
+and indeed throughout the rest of the book.
+
+\section{Abstract groups}
+\label{sec:identity-type-as-abstract}
+
+Studying the identity type leads one to the definition of what an 
+abstract group should be. We fix a type $A$ and an element $a:A$ for the rest
+of the section, and we focus on the identity type $a\eqto a$.
+We make the following observations about its elements and operations on them.
+
+\begin{enumerate}
+\item
+  There is an element $\refl a : a \eqto a$.
+  (See page \pageref{rules-for-equality}, rule \ref{E2}.)
+  We set $e \defeq \refl a$ as notation for the time being.
+\item
+  For $g : a \eqto a$, the inverse $g^{-1} : a \eqto a$ was defined in \cref{def:eq-symm}.
+  Because it was defined by path induction, this inverse operation satisfies $e^{-1} \jdeq e$.
+\item
+  For $g, h : a \eqto a$, the product $h \cdot g : a \eqto a$ was defined in \cref{def:eq-trans}.
+  Because it was defined by path induction, this product operation satisfies $e \cdot g \jdeq g$.
+\end{enumerate}
+
+For any elements $g,g_1,g_2,g_3:a\eqto a$, we consider the 
+following four identity types:
+\begin{enumerate}
+\item
+  \label{it:right-unit} \emph{the right unit law:} $g \eqto g\cdot e$,
+\item
+  \label{it:left-unit} \emph{the left unit law:} $g \eqto e\cdot g$,
+\item
+  \label{it:associativity} \emph{the associativity law:} $g_1\cdot(g_2\cdot g_3)
+  \eqto (g_1\cdot g_2)\cdot g_3$,
+\item
+  \label{it:inverse} \emph{the law of inverses:} $g\cdot \inv g \eqto e$.
+\end{enumerate}
+
+In \cref{xca:path-groupoid-laws}, the reader has constructed explicit
+elements of these identity types. 
+If $a\eqto a$ is a set, then the identity types
+above are all propositions. Then, in line with the convention adopted 
+in \cref{sec:props-sets-grpds}, we could simply say that
+\cref{xca:path-groupoid-laws} establishes that the equations hold.
+That motivates the following definition, 
+in which we introduce a new set $S$ to play the role of $a\eqto a$.
+We introduce a new element $e:S$ to play the role of $\refl a$, 
+a new multiplication operation, and a new inverse operation. 
+The original type $A$ and its element $a$ play no further role.\footnote{%
+In \cref{sec:inftygps} we will come back to $A$ and $a$ and
+consider the case in which $A$ is an arbitrary connected type
+and $a:A$. Then $a\eqto a$ need not be a set.}
+
+\begin{definition}\label{def:abstractgroup}
+  An \emph{abstract group}\index{abstract group}\index{group!abstract}
+  consists of the following data.
+  \begin{enumerate}
+  \item\label{struc:under-set} A set $S$, called the \emph{underlying set}.
+  \item\label{struc:unit} An element $e:S$, called the \emph{unit} or the \emph{neutral element}.\index{neutral element}
+  \item\label{struc:mult-op} A function $S\to S\to S$, called \emph{multiplication},
+    taking two elements $g_1,g_2:S$ to their \emph{product}, denoted by $g_1\cdot g_2:S$.
+    \par \noindent
+    Moreover, the following equations should hold, for all $g,g_1,g_2,g_3 : S$.
+    \begin{enumerate}[label=(\alph*),ref=\ref{struc:mult-op} (\alph*)]
+    \item\label{axiom:unit-laws} $g\cdot e=g$ and $e\cdot g=g$ (the \emph{unit laws})
+    \item\label{axiom:ass-law} $g_1\cdot(g_2\cdot g_3)=(g_1\cdot g_2)\cdot g_3$ (the \emph{associativity law})
+    \end{enumerate}
+  \item\label{struc:inv-op} A function $S\to S$, the \emph{inverse operation},
+    taking an element $g:S$ to its \emph{inverse} $g^{-1}$.
+    \par \noindent
+    Moreover, the following equation should hold, for all $g:S$.
+    \begin{enumerate}[label=(\alph*),ref=\ref{struc:inv-op} (\alph*),resume*]
+    \item\label{axiom:inv-law} $ g\cdot g^{-1} = e$ (the \emph{law of inverses})
+    \qedhere
+    \end{enumerate}
+  \end{enumerate}
+\end{definition}
+
+\begin{remark}
+  Strictly speaking, the proofs of the various equations are part of the data defining an abstract group, too.  But, since the equations are
+  propositions, the proofs are unique, and by the convention introduced in \cref{rem:subtype-convention}, we can afford to omit them, when no confusion can occur.  Moreover, one need not worry whether one gets a different group if the equations are given different proofs, because proofs of
+  propositions are unique.
+\end{remark}
+
+Taking into account the introductory comments we have made above, we may state the following lemma.
+
+\begin{lemma}\label{lem:idtypesgiveabstractgroups}
+  If $G$ is a group, then the set $\USymG \jdeq (\sh_G\eqto\sh_G)$
+  of symmetries in $G$ (see \cref{def:group-symmetries}),
+  together with $e\defequi\refl{\shape_G}{}$,
+  $g^{-1}\defequi\symm_{\shape_G,\shape_G}g$
+  and $h \cdot g \defequi \trans_{\shape_G,\shape_G,\shape_G}(g)(h)$, define an abstract group.
+\end{lemma}
+
+\begin{proof}
+  The type $\USymG$ is a set, because $\BG$ is a groupoid.
+  \cref{xca:path-groupoid-laws} shows that all the relevant equations hold, as required.
+\end{proof}
+
+\begin{definition}\label{def:abstrG}
+  Given a group $G$, the abstract group of~\cref{lem:idtypesgiveabstractgroups},
+  $\abstr(G)$, is called the \emph{abstract group associated to $G$}.%
+  \glossary(absG){$\protect\abstr(G)$}{the abstract group of symmetries in a group $G$,
+  \cref{def:abstrG}}
+\end{definition}
+
+\cref{lem:idtypesgiveabstractgroups} implies that all examples of
+groups, such as those in \cref{sec:firstgroupexamples}, can easily
+be turned into examples of abstract groups. The following exercise
+provides a different source of examples.
+
+\begin{xca}\label{xca:abstract-group-of-maps}
+Let $\agp G$ be an abstract group with underlying set $S$.
+Let $X$ be a set. Show that the set $X\to S$ of functions
+from $X$ to $S$, together with pointwise operations induced by
+$\agp G$, forms and abstract group which is abelian if and only
+if $\agp G$ is.
+\end{xca}
+
+
+We leave the study of abstract groups for now;
+in~\cref{ch:absgroup} we'll
+show that the $G \mapsto \abstr(G)$ construction
+furnishes an equivalence from the type of groups to the type of abstract groups,
+and we'll correlate concepts and constructions on groups
+to corresponding ones for abstract groups.
+
+\section{Homomorphisms}
+\label{sec:homomorphisms}
+
+\begin{remark}\label{rem:homom-eqs}
+Let $G$ and $H$ be groups, and suppose we have a pointed function $k : \BG \ptdto \BH$.
+Suppose also, for simplicity (and without loss of generality),
+that $\pt_\BH \jdeq k ( \pt_\BG ) $ and $k_\pt \jdeq \refl{\pt_\BH}$.
+Applying \cref{def:ap} yields a function $f \defeq \ap k : \USymG \to \USymH$, which satisfies the following identities:
+\begin{alignat*}2
+  f ( \refl {\pt_\BG} ) & = \refl{\pt_\BH},  &\qquad&                            \\
+  f (g ^ {-1})     & = (f (g))^{-1}         && \text {for any $g : \USymG$},    \\
+  f (g' \cdot g)   & =  f (g') \cdot  f (g) && \text {for any $g, g' : \USymG$}.
+\end{alignat*}
+The first one is true by definition, the others follow from~\cref{lem:apcomp}.
+These three identities assert that the function $\ap k$ \emph{preserves}, in a certain sense, the operations provided by \cref{lem:idtypesgiveabstractgroups} that
+make up the abstract groups $\abstr(G)$ and $\abstr(H)$.
+In the traditional study of abstract groups, these three identities play an important role and entitle one to call the function $f$ a
+\emph{homomorphism of abstract groups}.\index{homomorphism}
+\end{remark}
+
+A slight generalization of the discussion above will be to suppose that we have a general pointed map with an arbitrary pointing path
+$k_\pt : \pt_\BH \eqto k ( \pt_\BG ) $,
+not necessarily given by reflexivity.  Indeed, that works out, thereby motivating the following definition.
+
+\begin{definition}\label{def:grouphomomorphism}
+  The type of \emph{group homomorphisms}\index{homomorphism!of groups}
+  from $G:\typegroup$ to
+  $H:\typegroup$ is defined to be
+\[
+    \Hom(G,H)\defequi\Copy_{\mkgroup}(\BG\ptdto\BH),
+  \]
+  \ie it is a wrapped copy of the type of pointed maps of classifying spaces
+  with constructor
+  $\mkhom : (\BG \ptdto \BH) \to \Hom(G,H)$.%
+  \glossary(Hom){$\protect\Hom(G,H)$}{type of group homomorphisms}%
+  \glossary(924Omega__){$\protect\mkhom$}{homomorphism constructor,
+    \cref{def:grouphomomorphism}}
+  We again write $\B : \Hom(G,H) \to (\BG \ptdto \BH)$ for the destructor,
+  and we call $\Bf$ the \emph{classifying map}\index{classifying map}
+  of the homomorphism $f$.\footnote{%
+    When it is clear from context that a homomorphism is intended,
+    we may write $f : G \to H$.}
+\end{definition}
+
+We would like to understand explicitly the effect of a general homomorphism $f$ from $G$ to $H$
+on the underlying symmetries $\USymG$, $\USymH$,
+again without assuming that pointing path of $\Bf$ is given by
+reflexivity.
+So we should first study how pointed maps affect loops:\marginnote{%
+    \noindent\normalsize\begin{tikzpicture}
+      \node (Y) at (0,-1.5) {$Y$};
+      \draw (0,-1)
+      .. controls ++(170:-1) and ++(180:1) .. (2,-1.5)
+      .. controls ++(180:-1) and ++(270:1.5) .. (3.5,0.8)
+      .. controls ++(270:-1.5) and ++(80:1.4)  .. (-1,1)
+      .. controls ++(80:-1.4)  and ++(170:1) .. (0,-1);
+      \node[dot,label=left:$\pt_Y$] (a) at (0,0) {};
+      \node[dot,label=below:$k(\pt_X)$] (b) at (1.5,-.5) {};
+      \node (ct) at (2.6,1.1) {$\ap{k_\div}(p)$};
+      \draw[->] (a) .. controls ++(-20:1) and ++(170:1) .. node[auto,swap] {$k_\pt$} (b);
+      \draw[->] (b) .. controls ++(20:1) and ++(-40:1) ..
+      (2,1) .. controls ++(-40:-1) and ++(-80:-1) .. (b);
+    \end{tikzpicture}}
+
+\begin{definition}\label{def:loops-map}
+  Given pointed types $X$ and $Y$ and a pointed function $k : X\ptdto Y$ (as defined in \cref{def:pointedtypes}),
+  we define a function $\loops k : \loops X \to \loops Y$ by setting\footnote{%
+    Recall~\cref{def:ap} for $\ap{}$, and that we may abbreviate
+    $\ap{f}(p)$ by $f(p)$. Note also that $\loops k$ is pointed: 
+    we can identify $\loops k(\refl{\pt_X})$ with $\refl{\pt_Y}$.}
+  \[
+    \loops k(p) \defeq k_\pt^{-1} \cdot \ap{k_\div}(p) \cdot k_\pt
+    \text{,\quad for all $p: \pt_X \eqto \pt_X$.}\qedhere
+  \]
+  \glossary(924Omega){$\protect\loops k$}%
+  {loop map of pointed map, \cref{def:loops-map}}
+\end{definition}
+
+\begin{remark}\label{rem:loops-map}
+  If $k : X \ptdto Y$ has the reflexivity path $\refl{Y_\pt}$ as its
+  pointing path, then we have an identification $\loops k \eqto \ap{k_\div}$.
+\end{remark}
+
+\begin{definition}\label{def:USym-hom}
+  Given groups $G$ and $H$ and a homomorphism  $f$ from $G$ to $H$, 
+  we define the function $\USymf : \USymG \to \USymH$
+  by setting $\USymf \defeq \loops \Bf$.
+  In other words, the homomorphism $\mkhom\Bf$
+  induces $\loops\Bf$ as the map on underlying symmetries.
+\end{definition}
+
+\begin{lemma}\label{lem:grouphomomaxioms}
+  Given groups $G$ and $H$ and a homomorphism $f : \Hom(G,H)$, the function $\USymf : \USymG \to \USymH$ defined above satisfies
+  the following identities:
+  \begin{alignat}2
+    \label{gp-homo-unit} (\USymf) ( \refl {\pt_{\BG}} )
+    &= \refl{\pt_{\BH}},   &\qquad&                                        \\
+    \label{gp-homo-comp} (\USymf) (g ^ {-1})
+    &= ((\USymf) (g))^{-1}                   && \text{for any $g : \USymG$,} \\
+    \label{gp-homo-inv}  (\USymf) (g' \cdot g)
+    &=  (\USymf) (g') \cdot  (\USymf) (g) && \text{for any $g, g' : \USymG$.}
+  \end{alignat}
+\end{lemma}
+
+\begin{proof}
+  We write $f \jdeq (f_\div,p)$, where $p : \pt_{\BH} \eqto f_\div (\pt_{\BG})$.
+  By induction on $p$, which is allowed since $\pt_{\BH}$ is arbitrary,
+  we reduce to the case where $\pt_{\BH} \jdeq f_\div (\pt_{\BG})$
+  and $p\jdeq \refl{\pt_{\BH}}$.
+  We finish by applying \cref{rem:homom-eqs} and \ref{rem:loops-map}.
+\end{proof}
+
+\begin{definition}\label{def:groupisomorphism}
+  A homomorphism $f : G\to H$ is an \emph{isomorphism}\index{isomorphism!of groups} if its classifying map $\Bf$ is an equivalence.
+  We let $\Iso(G,H)$ be the subset of isomorphisms in $\Hom(G, H)$.\footnote{%
+    Both $\Iso(G,H)$ and $\Hom(G,H)$ are \emph{sets},
+    using~\cref{lem:hom-is-set} below.}
+\end{definition}
+
+\begin{definition}\label{def:identity-group-homomorphism}
+  If $G$ is a group, then we use \cref{def:pointedidentity} to define the \emph{identity homomorphism} $\id_G : G\to G$ by
+  setting $\id_G \defeq \mkhom (\id_\BG)$.  The
+  identity homomorphism is an isomorphism.
+\end{definition}
+
+\begin{remark}
+  \label{remark:groupsasunivalenttype} From~\cref{xca:pointedequiv},
+  we have an equivalence
+  \[
+    (G\eqto_\typegroup H)\equivto \Iso(G,H)
+  \]
+  between the identity type of the groups $G$ and $H$ and the 
+  set of isomorphisms. We use the convention introduced in
+  \cref{rem:univalence-transparent} also here. That is,
+  we allow ourselves to also write $p : \Iso(G,H)$ for the isomorphism
+  corresponding to an identification $p:G\eqto H$,
+  and $\Bp : \BG \ptdweto \BH$ for the corresponding pointed equivalence
+  of classifying types. Conversely, given an isomorphism
+  $f : \Iso(G,H)$, we may denote the corresponding path
+  also as $f:G\eqto H$.
+\end{remark}
+
+
+\begin{definition}\label{def:group-homomorphism-composition}
+  If $G$, $G'$, and $G''$ are groups, and $f : G\to G'$ and $f' : G'\to G''$ are homomorphisms, then we use
+  the definition of composition of pointed functions in \cref{def:pointedtypes} to define the \emph{composite homomorphism}\index{composition!of group homomorphisms}
+  $f' \circ f : G \to G''$ by setting $f' \circ f \defeq \mkhom (\Bf' \circ \Bf)$.
+\end{definition}
+
+Recall from \cref{sec:pointedtypes},
+that when there is little danger of confusion, we may drop the subscript
+``$\div$'' when talking about the unpointed structure.
+
+\begin{remark}\label{rem:Bf-convention}
+  To construct a function $\varphi : \prod_{f:\Hom(G,H)}T(f)$,
+  where $T(f)$ is a family of types parametrized by $f:\Hom(G,H)$,
+  it suffices to consider the case $f \jdeq \mkhom\Bf$.\footnote{%
+    We use the same notational convention regarding ``$\B$''
+    applied to homomorphisms as we do for groups.}
+\end{remark}
+
+Identifications of homomorphisms $f\eqto_{\Hom(G,H)}f'$
+are equivalent to identifications of pointed maps
+$\Bf \eqto_{\BG\ptdto\BH} \Bf'$;
+the latter are
+(by \cref{con:identity-ptd-maps} and the fact that $\BH$ is a groupoid)
+given by identifications of (unpointed) maps
+$h : \Bf_\div \eqto \Bf'_\div$ such that\marginnote{%
+  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
+    \& \shape_H\ar[dl,eql,"{\Bf_\pt}"'] \ar[dr,eqr,"\Bf'_\pt"] \& \\
+    \Bf_\div(\shape_G) \ar[rr,eql,"{h(\shape_G)}"'] \& \& Bf'_\div(\shape_G)
+  \end{tikzcd}}
+\[
+  h(\shape_G)\Bf_\pt = \Bf'_\pt.
+\]
+
+We will later show that if $G$ and $H$ are groups, then $\Hom(G,H)$
+is equivalent to the \emph{set} of ``abstract group homomorphisms''
+from $\abstr(G)$ to $\abstr(H)$ (see \cref{lem:homomabstrconcr}),
+but it is instructive to give a direct proof of the following.
+\begin{lemma}\label{lem:hom-is-set}
+  The type of homomorphisms $\Hom(G,H)$
+  is a set for all groups $G,H$.
+\end{lemma}
+\begin{proof}
+  Given homomorphisms $f,f':\Hom(G,H)$, we use the equivalence just
+  described,
+  \[
+    (f \eqto f') \equivto \sum_{h:\Bf_\div\eqto\Bf'_\div}
+    h(\shape_G)\Bf_\pt = \Bf'_\pt \,.
+  \]
+  Thus our goal is to prove that any two elements $(h,!),(j,!)$ 
+  of the right-hand side can be identified.
+  By function extensionality, the type $h\eqto j$ is equivalent to
+  the proposition $\prod_{t:\BG_\div} h(t) = j(t)$. So now we can use
+  connectedness of $\BG_\div$, and
+  only check the equality on the point $\shape_G$. By assumption,
+  \begin{displaymath}
+    h(\shape_G) = \Bf'_\pt \inv{\Bf_\pt} = j(\shape_G).
+  \end{displaymath}
+  This concludes the proof that $f\eqto f'$ is a proposition, or in other
+  words that $\Hom(G,H)$ is a set.\footnote{%
+    \label{ft:ptd-decr-h-lev}
+    The same argument shows that the type $X\ptdto Y$ is a set
+    whenever $X$ is connected and $Y$ is a groupoid.
+    A more general fact is that $X \ptdto Y$ is an $n$-type
+    whenever $X$ is $(k-1)$-connected and $Y$ is $(n+k)$-truncated,
+    for all $k\ge0$ and $n\ge-1$.}
+\end{proof}
+
+\begin{example}%
+  \label{ex:groups-morphisms}%
+  \leavevmode
+  \begin{enumerate}
+  \item Consider two sets $S$ and $T$.  Recall from \cref{ex:groups}
+    that $\conncomp \Set S \jdeq\sum_{X:\Set}\Trunc{S \eqto X}$ is the component
+    of the groupoid $\Set$ containing $S$, and when pointed at $S$
+    represents the permutation group $\SG_S$.  The map
+    $\blank\coprod T:\conncomp \Set S \to \conncomp \Set {S\coprod T}$ sending $X$ to $X\coprod T$
+    induces a group homomorphism $\SG_S\to\SG_{S\coprod T}$,
+    pointed by the path $\refl {S\coprod T}:S\coprod T \eqto (\blank\coprod T)(S)$.
+    Thought of as symmetries, this says that if you have a symmetry of
+    $S$, then we get a symmetry of $S\coprod T$ (which doesn't do
+    anything to $T$).
+
+    Likewise, we have a map
+    $\blank\times T:\conncomp \Set S \to \conncomp\Set {S\times T}$ sending $X$ to
+    $X\times T$, inducing a group homomorphism
+    $\SG_S\to\SG_{S\times T}$, pointed by the path
+    $\refl {S\times T}: {S\times T} \eqto (\blank \times T)(S)$.
+    Thought of as symmetries, this says that if you have a symmetry of
+    $S$, then we get a symmetry of $S\times T$ (which doesn't do
+    anything to the second component of pairs in $S\times T$).
+
+    In particular, we get homomorphisms of symmetric groups
+    $\SG_m\to\SG_{m+n}$ and $\SG_m\to\SG_{mn}$, induced by identifications
+    $\Fin(m+n) \eqto \Fin(m) \coprod \Fin(n)$ and
+    $\Fin(mn) \eqto \Fin(m) \times \Fin(n)$.\footnote{%
+      The latter identification is somewhat arbitrary, but
+      let's say it's defined using the lexicographic ordering
+      on the product.}
+\item Let $G$ be a group.  Since there is a unique map from $\BG$ to
+  $\bn{1} $ (uniquely pointed by the reflexivity path of the unique
+  element of $\bn 1$), we get a unique homomorphism from $G$ to the
+  trivial group.  Likewise, there is a unique morphism from the
+  trivial group to $G$, sending the unique element of $\bn 1$ to
+  $\shape_G$, and pointed by $\refl {\shape_G}$;
+  the uniqueness follows from~\cref{lem:contract-away},
+  cf.\ \cref{lem:univ-cover-of-groupoid}.
+\item If $G$ and $H$ are groups, the projections $\BG\gets \BG\times \BH\to \BH$ and inclusions $\BG\to\BG\times\BH\gets\BH$
+  (\eg the inclusion $\BG\to\BG\times\BH$ is given by $z\mapsto(z,\shape_H)$)
+  give rise to group homomorphisms between $G\times H$ and $G$ and $H$,
+  namely projections $G\gets G\times H\to H$ and inclusions
+  $G\to G\times H\gets H$.
+\item In \cref{ex:cyclicgroups} we gave an example of an isomorphism, 
+  namely one from the cyclic group $\CG_m$ to $\ZZ/m\ZZ$,
+  and in~\cref{ex:Cm} we looked at $R_m : \B\ZZ \ptdto \BSG_m$,
+  pointed by $\refl{\bn m}$,
+  which induces a homomorphism $(\blank\mod m) : \ZZ \to \SG_m$
+  factoring through $\ZZ/m\ZZ$ (and, equivalently, through $\CG_m$).\qedhere
+  \end{enumerate}
+\end{example}
+
+\begin{remark}
+  In the examples above, we insisted on writing the path pointing a group
+  homomorphism, even when this path was a reflexivity path. We now adopt
+  the convention that there is no need to specify the path in this case.\footnote{%
+    Or more generally, whenever the pointing path is clear from context.}
+  Thus, given a
+  map $f:A \to B$ between connected groupoids and $a:A$, the group
+  homomorphism $\Aut_A(a) \to \Aut_B(f(a))$ defined by
+  $(f,\refl{f(a)})$ will simply be referred to as $f$.
+
+  However, it is important to understand that different homomorphisms
+  can have the same underlying unpointed function.\footnote{%
+    Later, in~\cref{thm:hom-mod-conj}, we'll examine this phenomenon in more detail.}
+  Consider, for
+  example, the group $\SG_3$, whose classifying space is
+  $\BSG_3\defequi (\FinSet_3,\bn 3)$, and the symmetry
+  $\tau:\USG_3$ that is defined (through
+  univalence) by
+  \[
+    0\mapsto 1,\quad 1\mapsto 0,\quad 2 \mapsto 2, \qquad
+    \text{\ie $\tau$ is the transposition $(0\; 1)$.}
+  \]
+  Then the function $\id: \FinSet_3 \to \FinSet_3$ gives rise to two
+  elements of $\Hom(\permgrp 3,\permgrp 3)$: the first one is
+  $(\id,\refl{\bn 3})$, which is simply denoted $\id_{\SG_3}$;
+  the second one is $(\id,\tau)$, which we will denote $\tilde\tau$
+  temporarily. Let us prove $\id_{\SG_3} \neq \tilde \tau$, that
+  is, we suppose $\id_{\permgrp 3} = \tilde \tau$
+  and derive a
+  contradiction. By~\cref{def:loops-map} we get
+  $\sigma = \loops(\id_{\SG_3})(\sigma) = \loops(\tilde \tau)(\sigma) 
+          = \tau^{-1} \sigma \tau$ for all $\sigma : \USG_3$,
+  so $\tau$ commutes with every other element of
+  $\USG_3$. This fails for the transposition $\sigma \defeq (1\;2)$,
+  since $\sigma\tau(0) = 2$ while $\tau\sigma(0) = 1$. (See also
+  \cref{exer:first examples}.)
+\end{remark}
+
+\begin{construction}\label{def:loops-compose}
+  For pointed types $X,Y,Z$ and pointed maps $f : X \ptdto Y$
+  and $g : Y \ptdto Z$, we get an identification of type
+  \[
+    \loops(g \circ f) \eqto_{(\loops X \to \loops Z)}
+    \loops(g) \circ \loops(f).
+  \]
+\end{construction}
+
+\begin{implementation}{def:loops-compose}
+  Let $x$ denote the base point of $X$.
+  By induction on $f_\pt$ and on $g_\pt$, we reduce to the case where $f_\pt \jdeq \refl{f(x)}$
+  and $g_\pt \jdeq \refl{g(f(x))}$, and it suffices to identify $\ap{g \circ f}$ with $\ap g \circ \ap f$.
+  By \cref{def:funext}, it suffices to identify $\ap{g \circ f}(p)$ with $\ap g ( \ap f (p))$ for each $p : \loops X$.
+  For that purpose, it suffices to even identify $\ap{g \circ f}(p)$ with $\ap g ( \ap f (p))$ for any $x' : X$ and any $p : x \eqto x'$.
+  Then by induction on $p$, it suffices to give an identification
+  $\ap{g \circ f}(\refl x) \eqto \ap g ( \ap f (\refl x))$, and that can
+  be done by reflexivity,
+  by observing that both sides are equal, by definition, to $\refl{g(f(x))}$.
+\end{implementation}
+
+\begin{corollary}\label{cor:USym-compose}
+For composable group homomorphisms
+$\varphi : \Hom(G,H)$, $\psi:\Hom(H,K)$,
+we get an identification
+$\USym(\psi\circ\varphi) = \USym\psi \circ \USym\varphi$.
+\end{corollary}
+
+The following example expresses that $\ZZ$ is a ``free group with one generator''.
+
+\begin{example}
+  \label{ex:Zinitial}
+  \cref{cha:circle} was all about the circle $\Sc$ and its role as a
+  ``universal symmetry'' and how it related to the integers.  In our
+  current language, $\ZZ\jdeq\mkgroup(\Sc,\base)$ and much\footnote{%
+  Not all: $\BG$ is a groupoid and not an arbitrary type,
+  cf.~\cref{sec:inftygps}.} of the
+  universality of $\Sc$ is found in the following observation. If $G$ is a
+  group, then \cref{cor:circle-loopspace} yields an equivalence of sets
+  \[
+    \ev_{\BG}:\left((\Sc,\base)\ptdto \BG\right)\equivto \USymG,
+    \quad
+    \ev_{\BG}(f_\div,f_\pt)\defeq\loops(f_\div,f_\pt)(\Sloop).
+  \]
+  The domain of this equivalence is equivalent to $\Hom(\ZZ,G)$.
+  Hence, $\ev_{\BG}$ provides a way to
+  identify $\Hom(\ZZ,G)$ with the underlying set $\USymG$.
+  Like in \cref{lem:freeloopspace}, the inverse of $\ev_{\BG}$
+  is denoted $\ve_{\BG}$ and satisfies $\ve_{\BG}(g)(\base)\jdeq\shape_G$ and
+  $\ve_{\BG}(g)(\Sloop)= g$.
+  Moreover, $\ve_{\BG}(g)$ is pointed by $\refl{\shape_G}$.
+\end{example}
+
+The following lemma states the ``naturality'' of $\ev_{\BG}$ 
+in the previous example.
+\begin{lemma}\label{lem:Znatural}
+Let $G$ and $H$ be groups and $f: \Hom(G,H)$.
+Then the following diagram commutes,
+\[
+  \begin{tikzcd}
+    \Hom(\ZZ,G) \arrow[r, eqr, "\ev"] \arrow[d, "f\circ{\blank}"'] &
+    \USymG \arrow[d, "\USymf"]\\
+    \Hom(\ZZ,H) \arrow[r, eqr, "\ev"] & \USymH,
+  \end{tikzcd}
+\]
+where the horizontal maps evaluate
+the map on underlying symmetries at the loop
+$\Sloop : \USym\ZZ$.
+\end{lemma}
+
+\begin{proof}
+  Let $k:\Hom(\ZZ,G)$, giving $\USymk : \USym\ZZ \to \USymG$.
+  Going across horizontally and then down,
+  $k$ is mapped first to $\USymk(\Sloop)$,
+  and then to $\USymf(\USymk(\Sloop))$.
+  Going the other way takes $k$ to $\USym(f\circ k)(\Sloop)$,
+  which is equal to $\USymf(\USymk(\Sloop))$
+  by \cref{cor:USym-compose}.
+\end{proof}
+
+% \[
+% \begin{tikzcd}
+% (g,g_0) \arrow[r, mapsto, "\ev_{\BG}"] \arrow[d, mapsto, "{(f,f_0)\_}"] &
+% g_0^{-1} g(\Sloop) g_0 \arrow[d, mapsto, "{(f,f_0)(\_)}"]\\
+% (fg,f(g_0)f_0) \arrow[r, mapsto, "\ev_{\BH}"] & f_0^{-1} f(g_0)^{-1} f(g(\Sloop)) f(g_0) f_0 \\
+% \end{tikzcd}
+% \]
+
+
+\begin{xca}\label{xca:BGtotype}
+  Let $G$ be a group and $A$ a groupoid.  Use the definitions and
+  \cref{xca:freemaps} to construct equivalences between the types:%
+  \footnote{We'll return to these in more detail in~\cref{sec:actions}.}
+  \begin{enumerate}
+  \item $\BG_\div\to A$
+  \item $\sum_{a:A}\sum_{f:\BG_\div \to A}a \eqto f(\shape_G)$
+  \item $\sum_{a:A}(\BG\ptdto(A,a))$
+  \item $\sum_{a:A}\Hom(G,\Aut_A(a))$\qedhere
+  \end{enumerate}
+\end{xca}
+
+The definition of group homomorphism in \cref{def:grouphomomorphism} should be contrasted with the usual -- and somewhat more cumbersome -- notion of a group homomorphism
+$f: \mathcal G\to \mathcal H$ of abstract groups where we must ask of a function of the underlying sets that it in addition preserves the neutral element,
+multiplication, and inverse operation.
+In our setup this is simply true, as we saw in~\cref{lem:grouphomomaxioms}.
+In terms of the abstract groups determined by $G$ and $H$, we can write these equations
+as
+\begin{alignat*}2
+  \USymf ( e_G )
+  &= e_H
+  &\qquad& \\
+  \USymf (g \cdot_G g') &= \USymf(g) \cdot_H \USymf(g')
+  && \text{for all $g, g' : \USymG$,} \\
+  \USymf (g ^ {-1})
+  &= (\USymf (g))^{-1}
+  && \text{for all $g : \USymG$.}
+\end{alignat*}
+We come back to abstract homomorphisms in \cref{sec:abshom}.
+
+\begin{example}
+\label{exa:conj-concrete}
+ In this example we analyse what happens when we move
+ the shape of a group along a path in the classifying type. 
+ This path can in particular be a loop at the shape. More precisely,
+ let $G$ be a group, $y$ an element of $\BG$, and $p$ a path of 
+ type $\shape_G\eqto y$.
+ Then $(\id_\BG,\inv p)$ is a pointed equivalence of type 
+ $\BG \equivto_* (\BG_\div , y)$ and hence induces an isomorphism 
+ from $G$ to $\mkgroup(\BG_\div , y)$.\footnote{%
+ One may wonder why $\inv p$ in $(\id_\BG,\inv p)$.
+ The reason is our convention for the direction of the
+ pointing path of a pointed map.}
+ By \cref{remark:groupsasunivalenttype} we then get an 
+ identification of these groups.
+ Moreover, by path induction on $p$, the equivalence
+ $\USym(\mkgroup(\id_\BG,\inv p))\jdeq\loops(\id_\BG,\inv p)$ 
+ of type $(\sh_G\eqto\sh_G)\equivto(y\eqto y)$\footnote{%
+ Note that $\USym(\mkgroup(\BG_\div,y)) \jdeq 
+ \loops(BG_\div,y) \jdeq (y\eqto y)$.}
+ can be identified with the map $g \mapsto p g \inv p$.
+ This map is called \emph{conjugation}.\index{conjugation}%
+ \footnote{We have seen similar maps, \eg all the way back in 
+ \cref{xca:trp-in-a/x=b/x}\ref{trp-in-x=x}.}
+ In \cref{xca:conj} we come back to the special case in which $y\jdeq\sh_G$.
+\end{example}
+
+The above example motivates and justifies the following definition of
+a homomorphism from a group to its \emph{inner} automorphisms, that is, 
+automorphisms that come from conjugation.\index{automorphism!inner}
+Such automorphisms will further be discussed in \cref{sec:aut-group}.
+Recall that $\BAut(G)$ is the connected component of $G$ in the type 
+$\Group$, pointed at $G$.
+ 
+\begin{definition}\label{def:inner-autos}
+Let $G$ be a group. Define the homomorphism $\inn: G \to \Aut(G)$ by setting
+\glossary(inn){$\protect\inn$}{homomorphism from $G$ to its inner automorphisms,
+\cref{def:inner-autos}}
+\begin{displaymath}
+  \Binn : \BG \ptdto \BAut(G), \quad y \mapsto \mkgroup(\BG_\div , y),
+\end{displaymath}
+where the path pointing $\Binn$ is $p_{\inn} \defeq \refl{G} :  G \eqto \Binn (\shape_G)$.
+Note that $p_{\inn}$ is well defined since $\Binn (\shape_G) \jdeq G$.
+Notice furthermore that the codomain of $\Binn$ is correct: since $\BG$ is connected, 
+the proposition $\Trunc{G \eqto \mkgroup(\BG_\div , y)}$ holds for all $y:\BG$, 
+by the argument in \cref{exa:conj-concrete}.
+\end{definition}
+
+\section{The sign homomorphism}
+\label{sec:sign-homomorphism}
+
+In this section we're going to define the very important
+\emph{sign homomorphism} $\sgn : \SG_n \to \SG_2$, defined for $n \ge 2$.%
+\footnote{%
+  The approach we take here is similar to that
+  of~\citeauthor{MangelRijke2023}\footnotemark{}.}\footcitetext{MangelRijke2023}
+To do this, we need to assign to every $n$-element set $A$ a $2$-element set $\Bsgn(A)$.
+\begin{marginfigure}
+  \tikzset{->-/.style={
+      decoration={
+        markings,
+        mark=at position .66 with {\arrow[line width=1.18pt]{>}}},postaction={decorate}}}
+  \begin{tikzpicture}
+    \def\myzero{0}
+    \foreach \i in {0,1}
+    \foreach \j in {0,1}
+    \foreach \k in {0,1} {
+      \pgfmathtruncatemacro{\x}{\j}
+      \pgfmathtruncatemacro{\y}{mod(3 * \i + 2 * \j + 2 * \k,4)}
+      \begin{scope}[xshift=50*\x,yshift=-40*\y]
+        \node[dot] (n1\i\j\k) at (90:.5) {};
+        \node[dot] (n2\i\j\k) at (210:.5) {};
+        \node[dot] (n3\i\j\k) at (330:.5) {};
+        \ifx\i\myzero
+        \draw[->-] (n1\i\j\k)--(n2\i\j\k);
+        \else
+        \draw[->-] (n2\i\j\k)--(n1\i\j\k);
+        \fi
+        \ifx\j\myzero
+        \draw[->-] (n2\i\j\k)--(n3\i\j\k);
+        \else
+        \draw[->-] (n3\i\j\k)--(n2\i\j\k);
+        \fi
+        \ifx\k\myzero
+        \draw[->-] (n3\i\j\k)--(n1\i\j\k);
+        \else
+        \draw[->-] (n1\i\j\k)--(n3\i\j\k);
+        \fi
+      \end{scope}
+    }
+    \draw[dashed] (-.6,-2)--(2.4,-2);
+  \end{tikzpicture}
+  \caption{The two equivalence classes of directions of the complete graph
+    on a $3$-element set.}
+  \label{fig:sign-orderings-3}
+\end{marginfigure}
+
+We get this $2$-element set as a quotient of the set of all possible ways of
+choosing an element from each $2$-element subset of $A$, 
+where two different such
+choices are deemed the same if they differ in an \emph{even} number of pairs.
+Since choosing an element from a $2$-element set is equivalent to ordering it
+(\eg chosen element first),
+we can also talk about ways of ordering all possible $2$-element subsets of $A$,
+or equivalently, ways of directing the complete graph on $A$.
+\Cref{fig:sign-orderings-3} shows all $8$ ways of directing the complete graph on
+a $3$-element set divided into the $2$ resulting equivalence classes.
+
+To see that this really defines an equivalence relation, 
+it helps to generalize a bit.
+Thus, fix a finite set $E$, and let $P : E \to \BSG_2$ be a family 
+of $2$-element sets with parameter type $E$.
+\begin{definition}
+  The parity relation $\sim$ on $\prod_{e:E}P(e)$ relates functions that disagree in an even number of points. That is, $f\sim g$ holds if and only if the
+  subset $\setof{e:E}{f(e) \ne g(e)}$ has an even number of elements.\footnote{%
+    This makes sense because any $2$-element set is decidable,
+    and a subset of a finite set specified by a decidable predicate
+    is itself a finite set. We may apply the usual set-theoretic
+    operators, such as union and set difference, to these subsets.
+    Note also that the parity relation is itself decidable.}
+\end{definition}
+\begin{lemma}\label{lem:parityequiv}
+  The parity relation $\sim$ is an equivalence relation on the set $\prod_{e:E}P(e)$,
+  and the quotient is a $2$-element set if $E$ is nonempty, otherwise it is
+  a $1$-element set.
+\end{lemma}
+\begin{proof}
+  The $\sim$ relation is clearly symmetric, and it is reflexive, since the empty set
+  has an even number of elements.
+  To show transitivity, let $f_1,f_2,f_3:\prod_{e:E}P(e)$.
+  We can partition $E$ according to whether the $f_i$ agree or disagree:
+  \[
+    E_{ij} \defeq \setof{e:E}{f_i(e) = f_j(e)}, \quad
+    F_{ij} \defeq \setof{e:E}{f_i(e) \ne f_j(e)}.
+  \]
+  By transitivity of equality, $E_{ij} \cap E_{jk} \subseteq E_{ik}$, for all $i,j,k$.
+  Hence, the Venn diagram of these sets has the simplified form shown in the margin,\marginnote{%
+    \begin{tikzpicture}
+      \fill[opacity=0.6,casred] (330:.57735) arc(0:120:1) arc(180:330:1);
+      \fill[opacity=0.6,casblue] (90:.57735) arc(120:240:1) arc(-60:60:1);
+      \draw (330:.57735) arc(0:120:1);
+      \draw (330:.57735) arc(-60:-180:1);
+      \draw (90:.57735) arc(120:240:1);
+      \draw (90:.57735) arc(60:-60:1);
+      \draw (210:.57735) arc(180:60:1);
+      \draw (210:.57735) arc(-120:0:1);
+      \node at (0,0) {$D$};
+      \node at (30:.75) {$E'_{13}$};
+      \node at (150:.75) {$E'_{12}$};
+      \node at (-90:.75) {$E'_{23}$};
+      \node at (30:1.5) {$E_{13}$};
+      \node at (150:1.5) {$E_{12}$};
+      \node at (-90:1.5) {$E_{23}$};
+    \end{tikzpicture}}
+  where we set
+  \[
+    D \defeq \setof{e:E}{f_1(e)=f_2(e)=f_3(e)}, \quad
+    E_{ij}' \defeq E_{ij} \setminus D.
+  \]
+  Here we also use that $E_{12} \cup E_{23} \cup E_{13} = E$ (as subsets of $E$),
+  since of the three function values at any $e$ in $E$, two must agree.
+
+  We now find $F_{12} = E'_{13} \cup E'_{23}$ (disjoint union),
+  and similarly for $F_{13}$ and $F_{23}$.
+  Taking cardinalities, we get
+  \[
+    \Card(F_{12})+\Card(F_{13})+\Card(F_{23})
+    =2\bigl(\Card(E'_{12})+\Card(E'_{13})+\Card(E'_{23})\bigr),
+  \]
+  so if two of the $F_{ij}$'s have an even number of elements,
+  then so does the third.
+  We also see that at least one of the $F_{ij}$'s has even cardinality,
+  so the quotient has at most $2$ elements.
+
+  Clearly, if $E$ is empty, then $\prod_{e:E}P(e)$ is contractible,
+  so the quotient is contractible.
+  Assume now that $E$ is nonempty.
+  To show the proposition that the quotient is a $2$-element set,
+  we may assume that $E$ is the $n$-element set $\set{1,\dots,n}$ (since $n>0$),
+  and (by induction on $n$) that each set $P(e)$ is $\set{\pm 1}$
+  (our favorite $2$-element set for the moment).
+  Then any function is equivalent to either the all $+1$-function
+  or the function that is $-1$ at $1$ and $+1$ otherwise,
+  according to how many times it takes the value $-1$.
+\end{proof}
+
+Recall from~\cref{ex:bigproductofgroups} that we can form the
+product of any (finite) family of groups.
+In particular, if we take the constant family at $G$,
+indexed by a finite set $S$, we get a power $G^S$,
+with classifying type $\BG^S$ and underlying set of symmetries
+$\USymG^S$.\footnote{See \cref{xca:bigproductfunext}\ref{it:bigproductfunext-i}.}
+
+\begin{definition}\label{def:mu_E}
+  Given a finite set $E$, we define a homomorphism 
+  $\mu_E : \Hom(\SG_2^E,\SG_2)$ by deciding whether $E$
+  is nonempty, and proceeding accordingly:
+
+  If $E$ is nonempty, we use the construction
+  $P \mapsto \bigl(\prod_{e:E}P(e)\bigr)/\sim$ from above,
+  pointed by the identification indicated in the proof of~\cref{lem:parityequiv},
+  \ie identifying the class of the all $+1$-function with $+1$ in $\{\pm1\}$.
+
+  If $E$ is empty, then $\BSG_2^E$ is contractible, so $\SG_2^E$ is the trivial group
+  and we take the corresponding unique definition of $\mu_E$.
+  %The definition of $\mu_E$ is uniform in the finite set $E$,
+  %as we can decide whether $E$ is empty or not.
+\end{definition}
+
+\begin{xca}
+  From~\cref{xca:bigproductfunext}\ref{it:bigproductfunext-i}
+  we know that Function Extensionality identifies the set of 
+  symmetries in $\SG_2^E$ with $\set{\pm1}^E$.
+  Show that under this identification, $\USym\mu_E$
+  maps a function $s : E \to \set{\pm1}$
+  to the product of its values.\footnote{%
+    Note that this works even when $E$ is empty,
+    since the product of an empty collection of numbers is $+1$.}
+\end{xca}
+
+\begin{definition}\label{def:sign-ordering}
+  A \emph{local ordering}\index{ordering!local} of a finite set $A$
+  is an element of the set $\prod_{e:E(A)}P(e)$,
+  where $E(A)$ is the set of $2$-element subsets of $A$,
+  and $P : E(A) \to \BSG_2$ maps a $2$-element subset to the underlying $2$-element set.
+
+  A \emph{sign ordering}\index{sign ordering}\index{ordering!sign}%
+  \footnote{This term is used in analogy with total and cyclic orderings,
+    even though it's harder to visualize as an ordering.
+    It seems to have first been used
+    by~\citeauthor{Kuperberg1996}\footnotemark{}.}\footcitetext{Kuperberg1996}
+  of a finite set $A$ is an element of
+  $\bigl(\prod_{e:E(A)}P(e)\bigr)/\sim$,
+  \ie the quotient of the set of local orderings
+  modulo the parity relation.
+\end{definition}
+
+\begin{definition}\label{def:sgn}
+  The \emph{sign homomorphism} $\sgn : \Hom(\SG_n,\SG_2)$%
+  \glossary(sgn){$\protect\sgn$}{sign homomorphism, \cref{def:sgn}}
+  is defined via the pointed map $\Bsgn : \BSG_n \ptdto \BSG_2$,
+  where $\Bsgn(A) \defeq \B\mu_{E(A)}(P)$, with $P$ as in
+  \cref{def:sign-ordering} and $\mu_{E(A)}$ as in \cref{def:mu_E}.
+  We make $\Bsgn$ pointed using the total ordering 
+  $0 < 1 < \cdots < n-1$ on the standard $n$-element set, 
+  $\bn n \jdeq \sh_{\SG_n}$, to identify each $2$-element 
+  subset with the standard $2$-element set,
+  and using the pointedness of $\B\mu$.
+\end{definition}
+Not only does the notion of a sign ordering allow us to define the
+sign homomorphism, we also get a new family of examples of groups:\footnote{%
+  We'll study this construction more generally later in~\cref{subsec:ker}:
+  in these terms $\AG_n$ is the \emph{kernel} of the sign homomorphism.}
+\begin{definition}\label{def:alternating-groups}
+  For any $n:\NN$, we define the \emph{alternating group of degree $n$}
+  to be\index{alternating group}\index{group!alternating group}%
+  \glossary(An){$\protect\AG_n$}{alternating group of degree $n$,
+      \cref{def:alternating-groups}}
+  \[
+    \AG_n \defeq \mkgroup\Bigl(\sum_{A:\BSG_n}\Bsgn(A),
+      \bigl(\bn n, \Bsgn_\pt(\pt_{\bn 2})\bigr)\Bigr),
+  \]
+  \ie the shapes of $\AG_n$ are \emph{sign ordered $n$-element sets},
+  and the designated shape is $\bn n$ with the sign ordering coming
+  from the usual total ordering.
+
+  The symmetries in $\AG_n$ are called \emph{even permutations}.%
+  \index{permutation!even}
+\end{definition}
+
+\begin{xca}\label{xca:isos_A3_C3}
+  Give two isomorphisms from $\AG_3$ to $\CG_3$.
+\end{xca}
+
+Something interesting happens when we consider
+permutations on other shapes in $\BSG_n$,
+\ie arbitrary $n$-element sets $A$.
+The same map, $\Bsgn$, can be considered as a map $\BAut(A) \to \BSG_2$,
+but we can cannot make this pointed uniformly in $A$.\footnote{%
+  Why not? A construction $p : \prod_{A:\BSG_n}(\Bsgn_\div(A) \eqto \sh_{\SG_2})$
+  would amount to an identification of $\Bsgn$ with the constant map.}
+However, the self-identifications of a $2$-element set $T$, $(T \eqto T)$,
+\emph{can} be identified with $\set{\pm1}$,\footnote{%
+  See \cref{xca:2-element-sets}.
+  In this section, we identify $\USG_2$ with the set $\set{\pm1}$,
+  which has a compatible abstract group structure given by multiplication.}
+according to whether it transposes the elements of $T$, or not.
+Hence, we can define the sign of any permutation of a finite set:
+\begin{definition}\label{def:sgn-permutation}
+  Let $A$ be a finite set, and let $\sigma$ be a permutation of $A$.
+  If the cardinality of $A$ is $0$ or $1$,
+  then the \emph{sign}\index{sign} of $\sigma$ is $+1$.
+  Otherwise, the \emph{sign} of $\sigma$ is $\pm1$ according to whether
+  $\Bsgn_\div(\sigma)$ swaps the elements of the $2$-element 
+  set $\Bsgn_\div(A)$, or not.
+  We write $\sgn(\sigma):\set{\pm1}$ for the sign of $\sigma$,
+  and call $\sigma$ \emph{even}\index{even} if $\sgn(\sigma)=1$,
+  and \emph{odd}\index{odd} otherwise.
+\end{definition}
+For permutations of the standard $n$-element set, this is the same as the value
+$\Usgn(\sigma) : \USG_2$. Note that $\sgn$ defines an abstract homomorphism from
+$\Aut(A)$ to $\SG_2$ for each $A$, since it does so for $A \jdeq
+\sh_{\SG_n}$. Even better, this abstract homomorphism comes from a concrete one
+$\sgn^A : \Hom(\Aut(A),\SG_2)$ for each finite set $A$. Indeed, since
+$T \eqto U$ is a $2$-element set for any $2$-element sets $T$ and $U$, we can
+consider the map $\Bsgn^A_\div : \BAut(A) \to \BSG_2$ that maps
+$B : \BAut(A)$ to $(\Bsgn_\div(A) \eqto \Bsgn_\div(B))$. The identification of
+$\Bsgn^A_\div(A)$ with $\{\pm1\}$ mentioned above makes $\Bsgn^A_\div$ into a
+pointed map $\Bsgn^A : \BAut(A) \ptdto \BSG_2$, i.e., it defines an homomorphism
+$\sgn^A : \Hom(\Aut(A),\SG_2)$, as announced.%
+\footnote{This is an instance of a more general construction, called {\em
+    delooping} (see \cref{sec:delooping}). The formula for $\Bsgn^A_\div$ here is
+  very simple since $\SG_2$ is a fairly simple group.} %
+
+\begin{lemma}\label{lem:sign-properties}
+  \begin{enumerate}
+  \item\label{it:sign-transposition}
+    The sign of a transposition is $-1$.
+  \item\label{it:sign-cycle}
+    The sign of a $k$-cycle is $(-1)^{k-1}$.
+  \item\label{it:identity-even}
+    The identity permutation can only be expressed as a product
+    of an even number of transpositions.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  For \ref{it:sign-transposition},
+  it suffices to consider the transposition $(1\;2)$ of a 
+  standard $n$-element set $\set{1,2,\dots,n}$.
+  Relative to the standard local ordering 
+  ($1<2,1<3,\dots,1<n,2<3,\ldots,n-1<n$),
+  the transposition only changes the ordering $1<2$ to $2<1$,
+  thus differing at exactly one place.
+
+  Now \ref{it:sign-cycle} follows via~\cref{xca:perm-prod-transpositions}.
+
+  For \ref{it:identity-even}, assume $\id_A = (a_1\;b_1)\cdots(a_k\;b_k)$,
+  and take the sign of both sides. Since $\sgn$ is a homomorphism,
+  we get $+1 = (-1)^k$, so $k$ is even.
+\end{proof}
+
+\begin{corollary}\label{cor:sign-defined}
+  If a permutation $\sigma$ is expressed as a product of transpositions in two ways,
+  \[
+    \sigma = (a_1\;b_1)\cdots(a_m\;b_m)
+    = (c_1\;d_1)\cdots(c_n\;d_n),
+  \]
+  then the parity of $m$ equals that of $n$,
+  and we have $\sgn(\sigma)=(-1)^m=(-1)^n$.
+\end{corollary}
+
+\begin{marginfigure}
+  \begin{tikzpicture}
+    \foreach \n in {1,2,3,4,5} {
+      \node[dot,label=above:{$\n$}] (x\n) at (\n,1) {};
+      \node[dot,label=below:{$\n$}] (y\n) at (\n,0) {};
+    }
+    \draw[->] (x1) -- (y2);
+    \draw[->,commutative diagrams/crossing over] (x2) -- (y3);
+    \draw[->,commutative diagrams/crossing over] (x3) -- (y1);
+    \draw[->,commutative diagrams/crossing over] (x4) -- (y5);
+    \draw[->,commutative diagrams/crossing over] (x5) -- (y4);
+  \end{tikzpicture}
+  \caption{A different representation of the permutation $\sigma$
+    from~\cref{fig:cycle-decomposition}.}
+  \label{fig:permutation-crossings}
+\end{marginfigure}
+\begin{xca}\label{xca:sign-by-crossings}
+  Here's a different way of finding the sign of a permutation of the standard $n$-element set $\bn n$
+  (or of any totally ordered $n$-element set
+  -- but these are all uniquely identified with $\bn n$).
+
+  For $\sigma : \bn n \equivto \bn n$, we call an ordered pair of elements $i,j$
+  with $i<j$ but $\sigma(i)>\sigma(j)$ an \emph{inversion}.
+  If we represent $\sigma$ graphically as in~\cref{fig:permutation-crossings},
+  then inversions are crossings of the edges $(i,\sigma(i))$ and $(j,\sigma(j))$.
+  Show that $\sgn(\sigma) = (-1)^{\mathrm{inv}(\sigma)}$,
+  where $\mathrm{inv}(\sigma)$ is the number of inversions.
+\end{xca}
+\begin{remark}
+  The two graphical representations~\cref{fig:cycle-decomposition,fig:permutation-crossings}
+  each have their uses: In the former, the cycle decomposition is immediately
+  visible, while permutations are easily composed using the latter style.
+  Note that the number of inversions depend on the linear ordering,
+  whereas the sign itself does not.
+  \begin{marginfigure}
+    \begin{tikzpicture}[scale=0.8]
+      \foreach \x/\n in {0/1,1/2,2/1,3/2,4/1,5/2} {
+        \node[dot,label=above:{$\n$}] (x\x) at (\x,2) {};
+        \node[dot,label=below:{$\n$}] (y\x) at (\x,0) {};
+      }
+      \node at (1.5,1) {$\rightsquigarrow$};
+      \node at (3.5,1) {$\rightsquigarrow$};
+      \node[dot] (z0) at (0,1) {};
+      \node[dot] (z1) at (1,1) {};
+      \node[dot,gray!25] (z2) at (2,1) {};
+      \node[dot,gray!25] (z3) at (3,1) {};
+      \draw[gen] (x0) -- (z1);
+      \draw[gen] (z1) -- (y0);
+      \draw[gen,commutative diagrams/crossing over] (x1) -- (z0);
+      \draw[gen,commutative diagrams/crossing over] (z0) -- (y1);
+      \draw[gen] (x2) .. controls (3,1) and (3,1) .. (y2);
+      \draw[gen,commutative diagrams/crossing over] (x3) .. controls (2,1) and (2,1) .. (y3);
+      \draw[gen] (x4) -- (y4);
+      \draw[gen] (x5) -- (y5);
+    \end{tikzpicture}
+    \caption{The composition $(1\;2)(1\;2) = \id_{\bn 2}$ illustrated
+      in the style of~\cref{fig:permutation-crossings}, with first two, then no
+      crossings.}
+    \label{fig:permutation-crossings-isotopy}
+  \end{marginfigure}
+  We also remark that when we compose permutations in the latter style,
+  we don't immediately see the number of crossings/inversions, but we can imagine
+  ``pulling the strings taut'', whereby the parity of the number of crossings
+  (and thus the sign) is preserved, as seen in~\cref{fig:permutation-crossings-isotopy}.
+\end{remark}
+
+\begin{xca}
+  Recall from~\cref{xca:factorial} that there are $n!$
+  permutations in $\SG_n$.
+  Show that there are $n!/2$ even permutations for $n\ge 2$.
+\end{xca}
+
+\section{Bicycles}
+\label{sec:bicycles}
+
+In~\cref{def:Cyc} we introduced the type of cycles:
+pairs $(X,t)$ of a nonempty set $X$
+and a bijection $t : X \equivto X$
+such that any two elements $x,x':X$ can be connected
+in the sense that we have (under a propositional truncation)
+a way to get from $x$ to $x'$ by repeated application of $t$ and its inverse.
+These gave rise to the group of integers $\ZZ$
+via the infinite cycle $(\zet,\zs)$
+in~\cref{ex:circlegroup}
+and the cyclic groups of finite order $\CG_m$
+via the finite cycles $(\bn m,\zs)$
+in~\cref{ex:cyclicgroups}.
+
+\begin{marginfigure}
+  \begin{center}
+  \begin{tikzpicture}
+    \foreach \n in {1,...,6} {
+      \node[dot] (x\n) at (0,\n) {};
+      \node[dot] (y\n) at (1,\n) {};
+    }
+    \node[inner sep=0pt] (x0) at (0,0) {\tvdots};
+    \node[inner sep=0pt] (x7) at (0,7) {\tvdots};
+    \node[inner sep=0pt] (y0) at (1,0) {\tvdots};
+    \node[inner sep=0pt] (y7) at (1,7) {\tvdots};
+    \begin{scope}[gena]
+      \foreach \p/\n in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/7} {
+        \draw (x\p)--(x\n);
+        \draw (y\n)--(y\p);
+      }
+    \end{scope}
+    \begin{scope}[genb]
+      \foreach \n in {1,2,...,6} {
+        \draw (x\n) to[bend right] (y\n);
+        \draw (y\n) to[bend right] (x\n);
+      }
+    \end{scope}
+  \end{tikzpicture}
+  \end{center}
+  \caption{The infinite dihedral bicycle.}
+  \label{fig:infinite-bicycle}
+\end{marginfigure}
+\begin{marginfigure}
+  \begin{center}
+    \footnotesize
+  \begin{tikzpicture}[node distance=10pt]
+    \foreach \n in {0,1,...,7} {
+      \node[dot] (x\n) at (45*\n:50pt) {};
+    }
+    \foreach \p/\n in {0/1, 1/4, 2/3, 3/6, 4/5, 5/0, 6/7, 7/2} {
+      \draw[genb] (x\p)--(x\n);
+    }
+    \foreach \p/\n in {0/7, 1/6, 2/1, 3/0, 4/3, 5/2, 6/5, 7/4} {
+      \draw[gena] (x\p)--(x\n);
+    }
+  \end{tikzpicture}
+  \end{center}
+  \caption{The quaternion bicycle.}
+  \label{fig:quaternion-bicycle}
+\end{marginfigure}
+To give many more concrete examples of groups,
+we now focus on sets with \emph{two} bijections,
+$a$ and $b$, such that any two elements $x,x'$
+can be connected by repeated application
+of $a$ and $b$ and their inverses,
+such as the ones depicted
+in~\cref{fig:infinite-bicycle,fig:quaternion-bicycle},
+where we use the colors \casredname
+and \casbluename to indicate the actions
+of $a$ and $b$, respectively.
+We call these bicycles the \emph{infinite dihedral}
+and the \emph{quaternion} bicycle, respectively,
+for reasons that will become clear later.
+
+To capture the idea of ``connectedness'' for bicycles,
+we note that it may be necessary to alternate the
+application of the two equivalences
+(and their inverses) an arbitrary number of times.
+One convenient way of formalizing this is via
+lists of elements of $\zet\amalg\zet$,
+where the left/right elements indicate a power of $a$/$b$,
+respectively.
+Given a type $X$ with two self-equivalences $a,b:X\equivto X$,
+we define the \emph{meaning} $\sem\ell : X \equivto X$
+of such a list $\ell$ by induction, cf.~\cref{sec:lists}:
+\begin{align*}
+  \sem\varepsilon &\defeq \id_X \\
+  \sem{\inl n\ell} &\defeq a^n\circ \sem{\ell} \\
+  \sem{\inr n\ell} &\defeq b^n \circ \sem{\ell}
+\end{align*}
+For example, we have $\sem{\inl 3\inr{-2}\inl{-1}\inr 1} = a^3b^{-2}a^{-1}b$.
+With this in place, we can define the type of bicycles
+as follows:
+
+\begin{definition}\label{def:bicycle}
+  Let $\Bicyc$ be the subtype of $\sum_{X:\UU}(X\to X)\times(X\to X)$
+  of those pairs $(X,a,b)$ where $X$ is a \emph{\nonempty} set with two
+  \emph{self-equivalences} $a$ and $b$,
+  such that any $x,x':X$ are connected by $a$ and $b$.
+  Expressed in a formula:\glossary(Bicyc){$\protect\Bicyc$}%
+  {the type of bicycles, \cref{def:bicycle}}\index{bicycle}
+  \[
+    \Bicyc \defeq \sum_{X:\Set}\sum_{a:X\equivto X}\sum_{b:X\equivto X}
+    \bigl( {\Trunc X} \times
+    \prod_{x,x':X}\exists_{\ell:(\zet\amalg\zet)^*}(x'=\sem\ell(x))\bigr).
+  \]
+  Elements of $\Bicyc$ are called \emph{bicycles}.
+\end{definition}
+
+\begin{remark}
+  In~\cref{sec:freegroups} we shall see that
+  just like cycles are equivalently described as connected
+  \coverings over the circle $\Sc$,
+  the bicycles are the connected \coverings
+  over the type $\Sc\vee\Sc$: two circles with their base points
+  linked together.
+  This type can also be constructed in analogy with $\Sc$ as
+  a higher inductive type with three constructors:
+  a base point, $\base$, and \emph{two} loops, $\Sloop_1$ and $\Sloop_2$,
+  as depicted in~\cref{fig:first-view-BF2}.
+\begin{marginfigure}
+  \noindent\begin{tikzpicture}[scale=.1]
+    \coordinate (base)  at (0,0);
+
+    \pgfmathsetmacro\cc{.55228475}% = 4/3*tan(pi/8)
+    \pgfmathsetmacro\cy{2*\cc}%
+    \pgfmathsetmacro\cx{10*\cc}%
+
+    % base right
+    \draw (base) .. controls ++(0,\cy) and ++(-\cx,0)
+    .. (10,2) .. controls ++(\cx,0) and ++(0,\cy)
+    .. (20,0) .. controls ++(0,-\cy) and ++(\cx,0)
+    .. (10,-2) .. controls ++(-\cx,0) and ++(0,-\cy) .. (base);
+    % base left
+    \draw (base) .. controls ++(0,\cy) and ++(\cx,0)
+    .. (-10,2) .. controls ++(-\cx,0) and ++(0,+\cy)
+    .. (-20,0) .. controls ++(0,-\cy) and ++(-\cx,0)
+    .. (-10,-2) .. controls ++(\cx,0) and ++(0,-\cy) .. (base);
+
+    % draw dots last
+    \node[dot] (nbase)  at (base) {};
+    \node at (20,3) {$\Sloop_1$};
+    \node at (-20,3) {$\Sloop_2$};
+  \end{tikzpicture}
+  \caption{The type $\Sc\vee\Sc$ is a point
+    with two loops attached. }
+  \label{fig:first-view-BF2}
+\end{marginfigure}
+
+  We shall also generalize to an arbitrary set $S$ of
+  self-equivalences, and the ``$S$-fold cycles'' will be the connected
+  \coverings over the classifying type $\BFG_S$ of the ``free group''
+  on $S$ many generators. We postpone this, since it requires
+  some machinery to show that $\BFG_S$ is a groupoid.
+  All in good time; first
+  we need to learn to ride our bicycles!\footnote{%
+  Like ``cycle'', our use of ``bicycle'' is idiosyncratic.
+  But just like cycles give rise to cyclic groups,
+  bicycles give rise to a generalization of the notion of bicyclic groups,
+  see~\citeauthor{Douglas1951I}\footnotemark{}\footnotemark{}.}%
+\addtocounter{footnote}{-1}\footcitetext{Douglas1951I}%
+\stepcounter{footnote}\footcitetext{Douglas1961}
+\end{remark}
+
+With the definition of bicycles in place, we can
+define the infinite dihedral
+and quaternion groups
+as automorphism groups:
+\begin{definition}\label{def:Dinfty-Q}
+  Letting $(\zet\amalg\zet, a, b)$ be the \emph{standard infinite dihedral
+    bicycle}, with
+  \begin{alignat*}2
+    a(\inl n) &\defeq \inl{n+1},\qquad & a(\inr n) &\defeq \inr{n-1}, \\
+    b(\inl n) &\defeq \inr n,          & b(\inr n) &\defeq \inl n,
+  \end{alignat*}
+  we define the \emph{infinite dihedral group}
+  to be $\D_\infty \defeq \Aut_\Bicyc(\zet\amalg\zet,a,b)$.\footnote{%
+    We'll define more dihedral groups, and gain a new perspective
+    on $\D_\infty$, in~\cref{sec:Semidirect-products}.}%
+  \index{infinite dihedral group}\index{group!infinite dihedral group}%
+  \glossary(Doo){$\protect\D_\infty$}{infinite dihedral group,
+      \cref{def:Dinfty-Q}}
+
+  Similarly, letting $(\bn 8, a, b)$ be the \emph{standard quaternion
+    bicycle}, with
+  \begin{align*}
+    a(k) &\defeq
+           \begin{cases}
+             k+1, &\text{if $k$ is even},\\
+             k+3, &\text{if $k$ is odd}
+           \end{cases} \\
+    b(k) &\defeq
+           \begin{cases}
+             k-1, &\text{if $k$ is even},\\
+             k-3, &\text{if $k$ is odd}
+           \end{cases}
+  \end{align*}
+  (all operations modulo $8$),
+  we define the \emph{quaternion group}
+  to be $\Q_8\defeq\Aut_\Bicyc(\bn 8,a,b)$.%
+  \index{quaternion group}\index{group!quaternion group}%
+  \glossary(Q8){$\protect\Q_8$}{quaternion group,
+      \cref{def:Dinfty-Q}}
+\end{definition}
+
+Now let us investigate the identifications of bicycles:
+If $(X,a,b)$ and $(X',a',b')$ are elements of
+$\sum_{X:\UU}(X\to X)\times(X\to X)$, then univalence,
+together with \cref{def:pathover-trp,lem:isEq-pair=,lem:trp-in-function-type},
+gives an equivalence
+\[
+  \bigl( (X,a,b) \eqto (X',a',b') \bigr)
+  \equivto
+  \sum_{e:X\equivto X'}(ea \eqto a'e) \times (eb \eqto b'e),
+\]
+to a type whose three components we can visualize as:
+\[
+  \begin{tikzcd}[column sep=huge,ampersand replacement=\&]
+    X\ar[d,equivl,"e"'] \&[-25pt]
+    X \ar[r,"a"]\ar[d,equivl,"e"'] \& X \ar[d,equivr,"e"] \&[-25pt]
+    X \ar[r,"b"]\ar[d,equivl,"e"'] \& X \ar[d,equivr,"e"] \\
+    X'\&[-25pt]
+    X' \ar[r,"a'"'] \& X' \&[-25pt]
+    X' \ar[r,"b'"'] \& X'
+  \end{tikzcd}
+\]
+If $X$ and $X'$ are sets, then this is the subtype of $X \to X'$
+consisting of equivalences $e$ satisfying $ea=a'e$ and $eb=b'e$.
+This means that the symmetries of a bicycle $(X,a,b)$
+are given by those self-equivalences $e : X\equivto X$
+that \emph{commute} with both $a$ and $b$ in the sense that
+$ae=ae$ and $be=eb$.
+
+\begin{marginfigure}
+  \noindent\begin{tikzpicture}
+    \pgfmathsetmacro{\len}{1}
+    \node[dot] (n1) at (0:\len) {};
+    \node[dot] (n2) at (120:\len) {};
+    \node[dot] (n3) at (240:\len) {};
+    \begin{scope}[every to/.style={bend right=22}]
+      % generator a
+      \draw[gena] (n1) to (n2);
+      \draw[gena] (n2) to (n3);
+      \draw[gena] (n3) to (n1);
+    \end{scope}
+    % generator b
+    \draw[genb] (n1) to[out=-30,in=30,looseness=25] (n1);
+    \draw[genb,out=205,in=155] (n2) to (n3);
+    \draw[genb,out=45,in=-45] (n3) to (n2);
+  \end{tikzpicture}
+  \caption{An ``abnormal'' bicycle with only the identity symmetry.}
+  \label{fig:abnormal-bicycle}
+\end{marginfigure}
+We now see the added complexity of going from cycles to bicycles:
+For a (uni)cycle $(X,t)$, any power $t^n$ of $t$ will commute with $t$
+itself, but for a bicycle $(X,a,b)$, we need not have $ab=ba$.
+Indeed, neither of the bicycles
+in~\cref{fig:infinite-bicycle,fig:quaternion-bicycle} satisfies this.
+And there are many bicycles whose \emph{only} symmetry is
+the identity, \eg the one in~\cref{fig:abnormal-bicycle},
+or has fewer symmetries than desired, as in~\cref{fig:somewhat-abnormal-bicycle}.
+
+\begin{marginfigure}
+  \noindent\begin{tikzpicture}
+    \pgfmathsetmacro{\len}{1}
+    \foreach \n in {1,...,4} {
+      \node[dot] (n\n) at (90*\n:\len) {};
+    }
+    \foreach \p/\n in {1/2,2/3,3/4,4/1} {
+      \draw[gena] (n\p) to[bend right] (n\n);
+    }
+    % generator b
+    \draw[genb] (n4) to[out=-30,in=30,looseness=25] (n4);
+    \draw[genb] (n2) to[out=150,in=210,looseness=25] (n2);
+    \draw[genb] (n1) to[bend right] (n3);
+    \draw[genb] (n3) to[bend right] (n1);
+  \end{tikzpicture}
+  \caption{Another ``abnormal'' bicycle: It has four elements,
+  but only two symmetries.}
+  \label{fig:somewhat-abnormal-bicycle}
+\end{marginfigure}
+
+However, all is not lost! Since all elements are connected by two
+self-equivalences, we still have that any identification
+$(X,a,b) \eqto (X',a',b')$ is determined by the image of any given
+element $x:X$, giving a weakening of~\cref{cor:ConnCycles} for cycles.
+\begin{lemma}\label{lem:evisinj-bicycle}
+  Given bicycles $(X,a,b)$ and $(X',a',b')$,
+  for any $x_0:X$, we have that the evaluation map
+  \[
+    \ev_{x_0}: \bigl((X,a,b) \eqto (X',a',b')\bigr) \to X',
+    \qquad \ev_{x_0}(e)\defequi e(x_0)
+  \]
+  is injective.
+\end{lemma}
+\begin{proof}
+  Fix $x':X'$. It suffices to show that there is at most one equivalence
+  $e : X\equivto X'$ satisfying $ea=a'e$, $eb=b'e$, and $e(x_0) = x'$.
+  It follows by list induction on $\ell:(\zet\amalg\zet)^*$
+  that $e \sem\ell = \sem\ell' e$, where $\sem\blank$ and $\sem\blank'$
+  use the respective pairs of self-equivalences, $(a,b)$ and $(a',b')$.
+
+  Now by connectivity, for every $x:X$ there exists a list $\ell$
+  with $x = \sem\ell(x_0)$. Since we're proving a proposition
+  (the uniqueness of the value of $e(x)$), we may assume we have such a list.
+  But then $e(x) = e(\sem\ell(x_0)) = \sem\ell' e(x_0) = \sem\ell' x'$
+  is independent of $e$, as desired.
+\end{proof}
+This tells us what's special about the infinite dihedral
+and the quaternion bicycles: they are \emph{normal}.\footnote{%
+  What follows is a special case of a more general story
+  that resumes in~\cref{def:normal-action} (for actions)
+  and will be the focus of~\cref{ch:subgroups}
+  on normal subgroups.}
+\begin{definition}\label{def:normal-bicycle}
+  A bicycle $(X,a,b)$ is \emph{normal} if the evaluation
+  map
+  \[
+    \ev_x: \bigl((X,a,b) \eqto (X,a,b)\bigr) \to X,
+    \qquad \ev_{x}(e)\defequi e(x)
+  \]
+  is an equivalence for all $x:X$.
+\end{definition}
+In other words, a normal bicycle has the maximum possible
+amount of symmetry, in that any element is just like any other.
+\begin{xca}\label{xca:normal-bicycle-equiv}
+  Show that if the evaluation map is an equivalence for some $x:X$,
+  then its an equivalence for all $x:X$.
+\end{xca}
+In other words, for a normal bicycle $(X,a,b)$ there is a unique symmetry
+(\ie permutation of $X$ commuting with $a$ and $b$)
+mapping any $x$ to $x'$ for any $x,x':X$.
+\begin{definition}\label{def:cbid-bicycle}
+  Given a normal bicycle $(X,a,b)$ with elements $x,x':X$,
+  let $\cbid{x}{x'} : (X,a,b) \eqto (X,a,b)$ be the
+  symmetry that sends $x$ to $x'$.
+\end{definition}
+It follows that $\cbid xx = \id_X$ and $\cbid{x'}{x''} \circ \cbid{x}{x'}
+= \cbid x{x''}$.
+We also have that the inverse of $\ev_x: \bigl((X,a,b) \eqto (X,a,b)\bigr) \to X$
+maps $x'$ to $\cbid x{x'}$.
+
+In~\cref{sec:covS1} we used the subset $H_t \jdeq \setof{n:\zet}{t^n=\id}$
+of $\zet$ to study a cycle $(X,t)$. There, we get the equal subsets
+$\setof{n:\zet}{t^n(x)=x}$ no matter which $x:X$ we pick.\footnote{%
+  This is because all cycles $(X,t)$ are normal
+  in the general sense of~\cref{cor:ConnCycles}.}
+For a bicycle $(X,a,b)$, however, the relationship between
+the subsets
+\[
+  H_x \defeq \setof{\ell:(\zet\amalg\zet)^*}{\sem\ell(x)=x}
+\]
+for varying $x:X$ is exactly what determines normality.
+We leave this as an exercise now, as we'll return to normality
+in greater generality later, especially in~\cref{ch:subgroups}.
+\begin{xca}
+  Show that a bicycle $(X,a,b)$ is normal if and only if
+  $H_x = H_y$ for all $x,y:X$.
+\end{xca}
+\begin{xca}
+  Show that any \emph{commuting} bicycle $(X,a,b)$, \ie
+  one satisfying $ab=ba$, is normal.
+  Then show that the map
+  \[
+    \Cyc\times\Cyc\to\Bicyc,\qquad
+    ((X,t), (Y,u)) \mapsto (X\times Y, t\times\id_Y, \id_X\times u)
+  \]
+  induces an equivalence onto the subtype of commuting bicycles.\footnote{%
+    For example, the Klein four-group
+    from~\cref{ex:productofgroups}
+    is equivalent to the automorphism group
+    of the commuting bicycle:
+  \begin{center}
+    \noindent\begin{tikzpicture}
+      \foreach \x/\y in {0/0, 0/1, 1/0, 1/1} {
+        \node[dot] (n\x\y) at (\x,\y) {};
+      }
+      \foreach \x in {0, 1} {
+        \foreach \p/\n in {0/1, 1/0} {
+          \draw[gena] (n\x\p) to[bend right] (n\x\n);
+          \draw[genb] (n\p\x) to[bend right] (n\n\x);
+        }
+      }
+    \end{tikzpicture}
+  \end{center}}
+\end{xca}
+
+Assume now that we are given a normal bicycle $(X,a,b)$
+with a chosen element $x_0:X$.
+We get a surjective map $\sem\blank(x_0) : (\zet\amalg\zet)^* \to X$,
+which induces an equivalence relation on $(\zet\amalg\zet)^*$.
+\begin{xca}
+  Check that two lists $\ell,\ell' : (\zet\amalg\zet)^*$
+  are equivalent if and only if
+  $\sem{\ell} = \sem{\ell'}$.
+\end{xca}
+
+\begin{remark}\label{rem:bicycle-list-concat}
+Let us consider how list concatenation behaves with respect
+to the induced symmetries of $(X,a,b)$.
+Note that if a symmetry maps $x$ to $x'$,
+then it also maps $\sem\ell(x)$ to $\sem\ell(x')$,
+since symmetries commute with $a,b$, and hence with $\sem\ell$.
+That is, $\cbid x{x'} = \cbid{\sem\ell(x)}{\sem\ell(x')}$.
+Then we can use $\sem{\ell'}\sem{\ell} = \sem{\ell'\ell}$ to calculate:
+\begin{align*}
+  \cbid{x_0}{\sem\ell(x_0)} \circ \cbid{x_0}{\sem{\ell'}(x_0)}
+  &= \cbid{\sem{\ell'}(x_0)}{\sem{\ell'\ell}(x_0)} \circ \cbid{x_0}{\sem{\ell'}(x_0)}
+  = \cbid{x_0}{\sem{\ell'\ell}(x_0)} \\
+  \cbid{\sem\ell(x_0)}{x_0} \circ \cbid{\sem{\ell'}(x_0)}{x_0}
+  &= \cbid{\sem\ell(x_0)}{x_0} \circ \cbid{\sem{\ell\ell'}(x_0)}{\sem\ell(x_0)}
+  = \cbid{\sem{\ell\ell'}(x_0)}{x_0}
+\end{align*}
+This is the punchline: To get concatenation of lists
+to correspond to composition of symmetries, we need
+to go backwards to the symmetry that takes us to $x_0$
+from $\sem{\ell}(x_0)$, rather than the other way round.
+\end{remark}
+
+\begin{marginfigure}
+  \begin{tikzpicture}
+    \foreach \n in {1,...,6} {
+      \pic at (0,\n) {tendril={1.5}{1.5}{70}{black!20}};
+      \pic at (1,\n) {tendril={1.5}{1.5}{250}{black!20}};
+    }
+    \node[inner sep=0pt] (x0) at (0,0) {\tvdots};
+    \node[inner sep=0pt] (x7) at (0,7) {\tvdots};
+    \node[inner sep=0pt] (y0) at (1,0) {\tvdots};
+    \node[inner sep=0pt] (y7) at (1,7) {\tvdots};
+  \end{tikzpicture}
+  \caption{A frieze pattern with infinite dihedral symmetry.}
+  \label{fig:first-frieze}
+\end{marginfigure}
+
+\begin{marginfigure}
+  \begin{tikzpicture}
+    \foreach \n in {1,...,6} {
+      \pic at (0,\n) {tendril={1.5}{1.5}{70}{black!10}};
+      \pic at (1,\n) {tendril={1.5}{1.5}{250}{black!10}};
+      \node[dot] (x\n) at (0,\n) {};
+      \node[dot] (y\n) at (1,\n) {};
+    }
+    \node[circle,draw,inner sep=1pt] at (.5,3) {};
+    \node at (-.75,1) {$a^{-2}x_0$}; \node at (1.75,1) {$a^2bx_0$};
+    \node at (-.75,2) {$a^{-1}x_0$}; \node at (1.75,2) {$abx_0$};
+    \node at (-.75,3) {$x_0$}; \node at (1.75,3) {$bx_0$};
+    \node at (-.75,4) {$ax_0$}; \node at (1.75,4) {$a^{-1}bx_0$};
+    \node at (-.75,5) {$a^2x_0$}; \node at (1.75,5) {$a^{-2}bx_0$};
+    \node at (-.75,6) {$a^3x_0$}; \node at (1.75,6) {$a^{-3}bx_0$};
+    \draw[->] (-1.5,4) to node[left] {$T$} (-1.5,3);
+    \draw[->] (.75,3) arc[start angle=0, end angle=180, radius=.25];
+    \node at (.5,3.5) {$R$};
+    \node[inner sep=0pt] (x0) at (0,0) {\tvdots};
+    \node[inner sep=0pt] (x7) at (0,7) {\tvdots};
+    \node[inner sep=0pt] (y0) at (1,0) {\tvdots};
+    \node[inner sep=0pt] (y7) at (1,7) {\tvdots};
+    \begin{scope}[gena]
+      \foreach \p/\n in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/7} {
+        \draw (x\p)--(x\n);
+        \draw (y\n)--(y\p);
+      }
+    \end{scope}
+    \begin{scope}[genb]
+      \foreach \n in {1,2,...,6} {
+        \draw (x\n) to[bend right] (y\n);
+        \draw (y\n) to[bend right] (x\n);
+      }
+    \end{scope}
+  \end{tikzpicture}
+  \caption{The frieze in~\cref{fig:first-frieze} with
+    the infinite dihedral bicycle of~\cref{fig:infinite-bicycle}
+    superimposed.}
+  \label{fig:first-frieze-bicycle}
+\end{marginfigure}
+
+\begin{remark}\label{rem:inf-dihedral-frieze}
+  The reader may have noticed that the symmetries of the
+  infinite dihedral bicycle in~\cref{fig:infinite-bicycle}
+  can be realized as geometric symmetries of our picture of it,
+  namely vertical translations and $180$\textdegree\ rotations.
+  In fact, our figure has the same symmetries as the frieze pattern
+  of~\cref{fig:first-frieze}.
+  In~\cref{fig:first-frieze-bicycle} we superimpose the bicycle on
+  the frieze. We also fix an element $x_0$, which allows
+  us to name all the elements via applications of $a$ and $b$.
+  Finally, we indicate two generating geometric transformations:
+  $T$, a downwards translation, and $R$, a $180$\textdegree\ rotation
+  around the midpoint between $x_0$ and $bx_0$ (the white circle).
+  In other words, $T = \cbid{ax_0}{x_0} = \cbid{x_0}{\inv ax_0}$
+  and $R = \cbid{bx_0}{x_0} = \cbid{x_0}{\inv bx_0}$.
+  Notice that $R$ can map elements quite far geometrically,
+  for instance, $R(a^nx_0) = a^nbx_0$.
+  In general, we have
+  \begin{align*}
+    T(\sem\ell(x_0)) &= \cbid{\sem\ell(x_0)}{\sem\ell(\inv ax_0)}(\sem\ell(x_0))
+                       = \sem{\ell \inl{-1}}(x_0),\\
+    R(\sem\ell(x_0)) &= \cbid{\sem\ell(x_0)}{\sem\ell(\inv bx_0)}(\sem\ell(x_0))
+                       = \sem{\ell \inr{-1}}(x_0),
+  \end{align*}
+  so $T$/$R$ amounts to appending $\inl{-1}$/$\inr{-1}$ to the \emph{end} of the list,
+  respectively, that names a given point.
+  Conversely, if we named the points by applying $T$ and $R$ (and inverses)
+  to $x_0$, then it would be the geometrically local operations $a$ and $b$
+  that would correspond to inserting $\inv T$ and $\inv R$ at the end.
+  For example, $a(T^{-2}R(x_0)) = T^{-2}RT^{-1}(x_0)$.
+  In fact, see already saw one manifestation of this
+  in~\cref{fig:plus-minus-one} back in~\cref{sec:S1isC},
+  and we'll return to this phenomenon several times throughout the book.
+  We'll discuss friezes and other geometrical objects in
+  more detail in~\cref{ch:euclidean}.
+\end{remark}
+\begin{xca}
+  Construct an identification between the infinite dihedral bicycle
+  $(X,a,b)$ and its geometric cousin $(X,T,R)$, where
+  $T$ and $R$ are as in~\cref{fig:first-frieze-bicycle}.
+\end{xca}
+\begin{xca}
+  Two (normal) bicycles may represent the same group even though they belong to
+  two different components of $\Bicyc$:
+  Construct an isomorphism between the automorphism groups of the bicycles below:
+  \begin{center}
+    \begin{tikzpicture}[baseline=(n0.base)]
+      \foreach \n in {0,1,...,5} {
+        \node[dot] (n\n) at (\n*60:1.5) {};
+      }
+      \foreach \p/\n in {0/1,2/3,4/5} {
+        \draw[gena] (n\p) to[bend right] (n\n);
+        \draw[gena] (n\n) to[bend right] (n\p);
+      }
+      \foreach \p/\n in {1/2,3/4,5/0} {
+        \draw[genb] (n\p) to[bend right] (n\n);
+        \draw[genb] (n\n) to[bend right] (n\p);
+      }
+    \end{tikzpicture}
+    \hspace{1cm}
+    \begin{tikzpicture}[baseline=(x0.base)]
+      \foreach \n in {0,1,2} {
+        \node[dot] (x\n) at (\n*120:.6) {};
+        \node[dot] (y\n) at (\n*120:1.6) {};
+      }
+      \foreach \p/\n in {0/1,1/2,2/0} {
+        \draw[gena] (x\n) to[bend left=50] (x\p);
+        \draw[gena] (y\p) to[bend right=50] (y\n);
+      }
+      \foreach \n in {0,1,2} {
+        \draw[genb] (x\n) to[bend right] (y\n);
+        \draw[genb] (y\n) to[bend right] (x\n);
+      }
+    \end{tikzpicture}
+  \end{center}
+  Then construct an isomorphism between either of these automorphism groups
+  and the symmetric group $\SG_3$.
+\end{xca}
+
+\section{Infinity groups (\texorpdfstring{\inftygps}{∞-groups})}
+\label{sec:inftygps}
+
+Disregarding the requirement that the classifying type
+of a group $G$ is a groupoid (so that $\USymG$ is a set)
+we get the simpler notion of \inftygps:
+\begin{definition}\label{def:inftygps}
+  The type of $\infty$-groups is
+  \[
+    \typeinftygp\defequi \Copy(\UUpconn),
+    \quad\text{where}\quad
+    \UUpconn\defeq \sum_{A:\UU} A\times \isconn(A)
+  \]
+  is the type of pointed, connected types.
+
+  As for groups, we have the constructor 
+  $\mkgroup : \UUpconn \to \typeinftygp$
+  and the destructor $\clf : \typeinftygp \to \UUpconn$.
+\end{definition}
+
+\begin{remark}\label{rem:pointedtypes}
+  Just as ``group'' is a synonym for ``pointed, connected groupoid''
+  (wrapped with $\mkgroup$),
+  ``$\infty$-group'' is a synonym for ``pointed, connected type''
+  (wrapped with $\mkgroup$).
+  As for pointed, connected groupoids,
+  we suppress the propositional information from the notation,
+  and write $(A,a)$ instead of $(A,a,!)$ for an pointed, connected type.
+\end{remark}
+
+\begin{definition}\label{def:classifyingspace}
+  Given $G:\typeinftygp$,
+  the underlying pointed type $\BG : \UUp$
+  is called the  \emph{classifying type} of $G$ and $\shape_G\defequi \pt_{\BG}$
+  is called the \emph{designated shape}.
+\end{definition}
+
+\begin{definition}
+  For any type $A$ with a specified point $a$,
+  we define the \emph{automorphism $\infty$-group} of $a:A$ by
+  \[
+    \Aut_A(a) \defeq \mkgroup (A_{(a)},(a,!)),
+  \]
+  \ie $\Aut_A(a)$ is the $\infty$-group with classifying type
+  $\BAut_A(a) \jdeq (A_{(a)},(a,!))$,
+  the connected component of $A$ containing $a$, pointed at $a$.
+\end{definition}
+
+\begin{remark}\label{rem:autinfgp}
+  It can certainly happen that the connected component of $A$ containing $a$
+  is groupoid, even though $A$ itself is not a groupoid.
+  For example, consider a type universe $\UU$ and a \emph{set} $S:\UU$.
+  Then $\conncomp\UU S$ is a groupoid, and the automorphism $\infty$-group
+  $\Aut_\UU(S)$ is an ordinary group.
+
+  Because we have an inclusion $\UUp^{=1} \hookrightarrow \UUp^{>0}$,
+  we get a corresponding injection $\Group \hookrightarrow \typeinftygp$.
+\end{remark}
+
+\begin{definition}
+  A homomorphism of $\infty$-groups is a pointed function of classifying types, \ie
+  given two $\infty$-groups $G$ and $H$,we define
+  \[
+    \Hom(G,H)\defequi\Copy(\BG\ptdto\BH).
+  \]
+  Given $f \jdeq \mkhom\Bf: \Hom(G,H)$, we call
+  $\Bf : \BG\ptdto\BH$ the \emph{classifying map} of $f$.
+\end{definition}
+
+
+% Local Variables:
+% fill-column: 144
+% latex-block-names: ("lemma" "theorem" "remark" "definition" "corollary" "fact" "properties" "conjecture" "proof" "question" "proposition" "exercise")
+% TeX-master: "book"
+% End:

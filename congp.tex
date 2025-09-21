@@ -1,0 +1,902 @@
+\chapter{Constructing groups}
+\label{ch:congp}
+
+\section{Brief overview of the chapter}
+
+\section{Semidirect products}
+\label{sec:Semidirect-products}
+
+In this section we describe a generalization of the product of two groups,
+recall~\cref{ex:productofgroups},
+called the \emph{semidirect} product,
+which gives us a new way of building new groups.
+Like the product, both its classifying type and its set of symmetries
+consist of pairs.
+It takes as input the action of a group on a group.
+
+Recall from~\cref{def:action} that an action of a group $G$
+\emph{in} groups is a function $H : \BG \to \Group$.
+This acts \emph{on} the group $H(\sh_G)$.
+If the group being acted on is fixed, say $H : \Group$,
+then an action of $G$ on $H$ is given by
+a homomorphism from $G$ to $\Aut(H)$.
+
+\begin{definition}\label{def:semidirect-product}
+  Given a group $G$ and an action $H : \BG \to \Group$,
+  we define a group called the \emph{semidirect product} as follows:%
+  \index{semidirect product}\index{group!semidirect product}%
+  \glossary(2x){$G \ltimes H$}{semidirect product group,
+    \cref{def:semidirect-product}}
+  \[
+    G \ltimes H \defeq \mkgroup { \sum_{t:\BG} \BH(t) }
+  \]
+  Here the basepoint of the sum is taken to be the point $(\shape_G,\shape_H)$.%
+  \footnote{%
+    We deduce from \cref{lem:level-n-utils}\ref{level-n-utils-sum},
+    that $\sum_{t:\BG} \BH(t)$ is a groupoid.
+    See \cref{xca:connected-trivia-1} for a proof that
+    $\sum_{t:\BG} \BH(t)$ is connected.}
+\end{definition}
+
+Observe that if the action of $G$ is trivial, then $H(t) \jdeq H(\sh_G)$
+for all $t$, so $G \ltimes H \jdeq G \times H(\sh_G)$,
+reproducing the ordinary product of groups.
+
+Before we study the underlying symmetries in $G \ltimes H$,
+let us pause to look at some examples.
+In~\cref{ex:S2-acts-on-C3} we saw an action of $\SG_2$ on $\CG_3$.
+Let us generalize this by giving an action of $\SG_2$ on the cyclic group
+$\CG_n$ for any $n : \Order$.
+Recall from~\cref{def:standard-cycle}
+that we may represent $\CG_n$ as the automorphism group
+of the standard $n$-cycle $(\zet/\sim_n, \zs)$,
+where $z \sim_n z'$ if and only for $t^z = t^{z'}$ for any/all cycles $(T,t)$
+of order $n$.\footnote{%
+  Recall also~\cref{def:Order}.
+  If $n$ is principal, then either $n$ is infinite
+  and $(\zet, \zs) \to (\zet/\sim_n, \zs)$ is an equivalence,
+  or $n$ is finite, then this map factors through $\bn n$
+  to give an equivalence $(\bn n,\zs) \to (\zet/\sim_n, \zs)$.
+  If LPO (\cref{LPO}) holds, then every order is principal and
+  these are the only possibilities by~\cref{lem:componentsofcoversofS1}.}
+
+The idea is that a cycle has two ``directions'' and $\SG_2$ can act by
+swapping them.
+To implement this, let $S$ be a $2$-element set,
+and consider, as in~\cref{ex:S2-acts-on-C3},
+the type $\sum_{X:\Set}(S \to (X \to X))$.
+Let $X \defeq S\times\zet/\sim$ be the set quotient
+of $S\times\zet$ where $(s,z) \sim (s,z')$ if $z \sim_n z'$
+and $(s,z) \sim (s',z')$ if $s\ne s'$ and $z \sim_n -z'$,\footnote{%
+  Check that $\sim$ defines an equivalence relation.}
+Now we can define $f : S \to X \to X$ by setting:
+\[
+  f_s([(s,z)]) \defeq [(s,z+1)], \quad\text{and}\quad
+  f_s([(s',z)]) \defeq [(s',z-1)] \quad\text{for $s'\ne s$.}
+\]
+Note that we can construct the element $x_0\defeq [(s,0)]$
+of $X$ unambiguously, as we always have $0 \sim_n -0$.
+\begin{xca}
+  Check that $f$ is well defined, using the universal property of the set quotient,
+  \cref{thm:quotient-property}.
+
+  Give an identification of our $(X,f)$ with that of~\cref{ex:S2-acts-on-C3}
+  when $n$ is $3$.
+\end{xca}
+For any $s:S$, we can let $s$ be the ``forwards'' direction,
+and get an identification $(X,f_s) \eqto (\zet/\sim_n,\zs)$
+by sending $[(s,z)]$ to $[z]$ (and $[(s',z)]$ to $[-z]$ for $s'\ne s$).
+Thus, we've constructed an action of $\SG_2$ on $\CG_n$.
+\begin{definition}\label{def:gen-dihedral}
+  Given any order $n:\Order$, we define the corresponding
+  \emph{dihedral group of degree $n$} by $\D_n \defeq \SG_2 \ltimes \tilde\CG_n$,
+  where $\tilde\CG_n : \BSG_2 \to \Group$ is the above
+  action of $\SG_2$ on $\CG_n$.%
+  \index{dihedral group}\index{group!dihedral group}%
+  \glossary(Dn){$\protect\D_n$}{dihedral group of degree $n$}
+\end{definition}
+We shall later see that if $n$ is finite,
+then $\D_n$ is a finite group of cardinality $2n$.%
+\footnote{Since ``order'' is often used to denote the cardinality of a group,
+  it would be confusing to call $\D_n$ the dihedral group of \emph{order} $n$,
+  although it would match our notion of ``order''.}
+But first we need to remedy the potential clash with
+our previous definition of $\D_\infty$ from~\cref{def:Dinfty-Q}.%
+\index{infinite dihedral group}\index{group!infinite dihedral group}
+Rather than just construct a comparison for the infinite order,
+we'll do it for all orders, thus also constructing bicycles
+realizing all dihedral groups.
+\begin{construction}\label{con:bidirectional-bicycle}
+  For each order $n:\Order$, there is a pointed equivalence
+  \[
+    \varphi : \BD_n
+    \ptdweto \conncomp\Bicyc{(\zet/\sim_n \amalg \zet/\sim_n, a, b)},
+  \]
+  from the classifying type of the dihedral group of degree $n$
+  to the connected component of $\Bicyc$ at
+  the \emph{standard dihedral bicycle of degree $n$}, where:
+  \begin{alignat*}2
+    a(\inl{[z]}) &\defeq \inl{[z+1]}\quad & b(\inl{[z]}) &\defeq \inr{[z]} \\
+    a(\inr{[z]}) &\defeq \inr{[z-1]}\quad & b(\inr{[z]}) &\defeq \inl{[z]}
+  \end{alignat*}
+\end{construction}
+\begin{marginfigure}
+  \noindent\begin{tikzpicture}
+    \pgfmathsetmacro{\len}{1}
+    \foreach \n in {1,...,5} {
+      \node[dot] (n\n) at (72*\n:\len) {};
+    }
+    \foreach \p/\n in {1/2,2/3,3/4,4/5,5/1} {
+      \draw[gen,shift right] (n\p) to[bend right=25] (n\n);
+      \draw[gen,shift right] (n\n) to[bend left=25] (n\p);
+    }
+
+    \draw[<->] (0,-1.5) -- (0,-2);
+
+    \begin{scope}[yshift=-4cm]
+    \foreach \n in {1,...,5} {
+      \node[dot] (x\n) at (72*\n:.75*\len) {};
+      \node[dot] (y\n) at (72*\n:1.5*\len) {};
+      \draw[dblgenb] (x\n) -- (y\n);
+    }
+    \foreach \p/\n in {1/2,2/3,3/4,4/5,5/1} {
+      \draw[gena] (x\n) to[bend left=25] (x\p);
+      \draw[gena] (y\p) to[bend right=25] (y\n);
+    }
+    \end{scope}
+  \end{tikzpicture}
+  \caption{How a bidirectional $5$-cycle corresponds to a
+    dihedral bicycle of degree $5$. The doubled \casbluename
+    lines indicate that $b$ swaps the two endpoints.}
+  \label{fig:bidirectional-cycle}
+\end{marginfigure}
+\begin{implementation}{con:bidirectional-bicycle}
+  The idea is to think of an element of $\BD_n$,
+  which is a subtype of $\sum_{S:\BSG_2}\sum_{X:\Set}(S \to X \to X)$,
+  as a ``bidirectional cycle'', from which we can construct
+  a bicycle on two copies of $X$, more precisely on $S\times X$,
+  as depicted in~\cref{fig:bidirectional-cycle}.
+  That is, we let $\varphi(S,X,f) \defeq (S\times X,a,b)$,
+  where
+  \[
+    a(s,x) \defeq (s,f_s(x)), \quad b(s,x) \defeq (\swap(s), x).
+  \]
+  We identify the image of the base point of $\BD_n$, $(\set{\pm1}, \zet/\sim_n, f)$,
+  where $f_s([z]) = [z + s]$,
+  with the standard dihedral bicycle of degree $n$ by letting
+  $(+1,x) \mapsto \inl x$ and $(-1,x)\mapsto \inr x$.
+
+  To define the inverse, suppose we have a bicycle $(Y,a,b)$
+  in the component of the standard dihedral bicycle of degree $n$.
+  Then we set $S\defeq Y/a$, the set quotient of $Y$ where we equate
+  $y$ and $y'$ if $y'=a^z(y)$ for some $z:\zet$,
+  \ie if $y$ and $y'$ are connected by the $a$ equivalence.
+  Then $S$ is a $2$-element set, because it is so in the standard case.
+  Similarly, we set $X\defeq Y/b$, which is merely equivalent to
+  the underlying set of the standard $n$-cycle, $\zet/\sim_n$.
+
+  The key observation is now that any equivalence classes $[y]_a:Y/a$
+  and $[y']_b:Y/b$, thought of a subsets of $Y$,
+  intersect in unique element $y'':Y$. In the bottom of~\cref{fig:bidirectional-cycle},
+  the two classes in $Y/a$ are the inner and outer $5$-cycles, and
+  the $5$ classes in $Y/b$ are the $5$ pairs linked by doubled \casbluename
+  lines.
+  Thus, we can define the corresponding bidirectional cycle to be
+  $(S,X,f)$, where $f_{[y]_a}([y']_b) \defeq [a(y'')]$.
+  We leave it to the reader to verify that these two constructions are
+  indeed inverse.
+\end{implementation}
+\begin{xca}
+  Complete the verification that two maps in the implementation
+  of~\cref{con:bidirectional-bicycle} are inverse.
+\end{xca}
+Thus, since we easily verify that the standard dihedral bicycles are normal
+(\cref{def:normal-bicycle}), we see that if $n$ is finite,
+then $\D_n$ has the same cardinality as $\bn n \amalg\bn n$, \ie $2n$.
+\begin{xca}
+  Prove that the two $8$-element groups,
+  the quaternion group $\Q_8$ (\cref{def:Dinfty-Q})
+  and the dihedral group of degree $4$, $\D_4$, are not isomorphic.\footnote{%
+    Hint: Count elements of order $2$.}
+\end{xca}
+
+To better understand the underlying symmetries of a general
+semidirect product $G\ltimes H$, we note that~\cref{lem:isEq-pair=}
+(on paths in $\Sigma$-types)
+takes a simpler form when $y$ and $y'$ are values
+of a family $x \mapsto f(x)$ of elements
+of the family $x \mapsto Y(x)$, as the following lemma shows.
+
+\begin{lemma}\label{lem:pathpairsection}
+  Suppose we are given a type $X$ and a family of types $Y(x)$ parametrized by the elements $x$ of $X$.
+  Suppose we are also given a function $f : \prod_{x:X} Y(x)$.
+  For any elements $x$ and $x'$ of $X$,
+  there is an equivalence of type
+  $$\left ( (x,f(x)) = (x',f(x')) \right ) \weq (x=x') \times (f(x) = f(x)),$$
+  where the identity type on the left side is between elements of $\sum_{x:X} Y(x)$.
+\end{lemma}
+
+\begin{proof}
+  By \cref{lem:isEq-pair=} and by composition of equivalences, it suffices to establish an equivalence of type
+  $$\left( \sum_{p:x=x'} \pathover {f(x)} Y p {f(x')} \right) \weq (x=x') \times (f(x) = f(x)).$$
+  Rewriting the right hand side as a sum over a constant family, it suffices to find an equivalence of type
+  $$\left( \sum_{p:x=x'} \pathover {f(x)} Y p {f(x')} \right) \weq \sum_{p:x=x'} (f(x) = f(x)).$$
+  By \cref{lem:fiberwise} it suffices to establish an equivalence of type
+  $$ \left( \pathover {f(x)} Y p {f(x')} \right) \weq (f(x) = f(x))$$
+  for each $p:x=x'$.  By induction on $x'$ and $p$ we reduce to the case where $x'$ is $x$ and $p$ is $\refl x$, and it suffices to establish an
+  equivalence of type
+  $$ \left( \pathover {f(x)} Y {\refl x} {f(x)} \right) \weq (f(x) = f(x)).$$
+  Now the two sides are equal by definition, so the identity equivalence provides what we need.
+\end{proof}
+
+The lemma above shows how to rewrite certain paths between pairs as pairs of paths.  Now we wish to establish the formula for composition of
+paths, rewritten in terms of pairs of paths, but first we introduce a convenient definition for the transport of loops in $Y(x)$ along paths in
+$X$.
+
+\begin{definition}\label{def:pathsectionaction}
+  Suppose we are given a type $X$ and a family of types $Y(x)$ parametrized by the elements $x$ of $X$.
+  Suppose we are also given a function $f : \prod_{x:X} Y(x)$.
+  For any elements $x$ and $x'$ of $X$ and for any identity $p : x = x'$, define a function $(f(x') = f(x')) \to (f(x) = f(x))$, to be denoted
+  by $q' \mapsto {q'} ^ p$, by induction on $p$ and $x'$, reducing to the case where $x'$ is $x$ and $p$ is $\refl x$, allowing us to
+  set ${q'} ^{ \refl x } \defeq q'$.
+\end{definition}
+
+We turn now to associativity for the operation just defined.
+
+\begin{lemma}\label{def:pathsectionactionassoc}
+  Suppose we are given a type $X$ and a family of types $Y(x)$ parametrized by the elements $x$ of $X$.
+  Suppose we are also given a function $f : \prod_{x:X} Y(x)$.
+  For any elements $x$, $x'$, and $x''$ of $X$, for any identities $p : x = x'$ and $p' : x' = x''$,
+  and for any $q : f x'' = f x''$,
+  there is an identification of type $ ( q ^{ p' }) ^ p = q ^{( p' \cdot p )}$.
+\end{lemma}
+
+\begin{proof}
+  By induction on $p$ and $p'$, it suffices to show that $ ( q ^{ \refl y }) ^ { \refl y } = q ^{( \refl y \cdot \refl y )}$, in which both sides are
+  equal to $q$ by definition.
+\end{proof}
+
+Observe that the operation depends on $f$, but $f$ is not included as part of the notation.
+
+The next lemma contains the formula we are seeking.
+
+\begin{lemma}\label{lem:pathpairsectionmult}
+  Suppose we are given a type $X$ and a family of types $Y(x)$ parametrized by the elements $x$ of $X$.
+  Suppose we are also given a function $f : \prod_{x:X} Y(x)$.
+  For any elements $x$, $x'$, and $x''$ of $X$, and for any two identities $e : (x,f(x)) = (x',f(x'))$ and $e' : (x',f(x')) = (x'',f(x''))$,
+  if $e$ corresponds to the pair $(p,q)$ with $p : x = x'$ and $q : f x = f x$ under the equivalence of \cref{lem:pathpairsection},
+  and $e'$ corresponds to the pair $(p',q')$ with $p' : x' = x''$ and $q' : f x' = f x'$,
+  then $e' \cdot e$ corresponds to the pair $(p' \cdot p , ({q'} ^ p) \cdot q)$.
+\end{lemma}
+
+\begin{proof}
+  By induction on $p$ and $p'$ we reduce to the case where $x'$ and $x''$ are $x$ and $p$ and $p'$ are $\refl x$.
+  It now suffices to show that $e' \cdot e$ corresponds to the pair $(\refl x , q' \cdot q)$.
+  Applying the definition of the map $\Phi$ in the proof of \cref{lem:isEq-pair=} to our three pairs, we see that it suffices to show that
+  $\left( \apap g {\refl x} {q'} \right) \cdot \left( \apap g {\refl x} {q} \right) = \apap g {\refl x} {q' \cdot q}$, with $g$, as there, being the function $ g(x)(y) \defeq (x,y)$.
+  By \cref{def:applfun2comp} it suffices to show that $\left( \ap {g(x)} {q'} \right) \cdot \left( \ap {g(x)} {q} \right) = \ap {g(x)} {(q' \cdot q)}$, which follows from
+  compatibility of $\ap {g(x)}$ with composition, as in~\cref{lem:apcomp}.
+\end{proof}
+
+The lemma above will be applied mostly in the case where $x'$ and $x''$ are $x$, but if it had been stated only for that case, we would not have
+been able to argue by induction on $p$ and $p'$.
+
+Projection onto the first factor gives a homomorphism $p \defeq \mkgroup \fst : G \ltimes \tilde H \to G$.
+Moreover, there is a homomorphism $s : G \to G \ltimes \tilde H$ defined by
+$ s \defeq \mkgroup {\left( t \mapsto (t,\shape_{\tilde H(t)}) \right) }$, for $t : \B G$.
+The two maps are homomorphisms because they are made from basepoint-preserving maps.
+The map $s$ is a \emph{section} of $p$ in the sense the $p \circ s = \id_G$.
+There is also a homomorphism $j : H \to G \ltimes \tilde H$ defined by $j \defeq \mkgroup { \left( u \mapsto (\shape_G,u) \right) }$, for $u : \B H$.
+
+\begin{lemma}
+  The homomorphism $j$ above is a monomorphism, and it gives the same (normal) subgroup of $G \ltimes \tilde H$ as the kernel $\ker p$ of $p$.
+\end{lemma}
+\footnote{{\color{red}MUST BE MOVED TO THE SUBGROUP CHAPTER}}
+
+\begin{proof}
+  See \ref{def:kernel} for the definition of kernel.  According to \cref{lem:fst-fiber(a)=B(a)}, the map $\B H \to (\B p)^{-1}(\shape_G)$ defined by
+  $ u \mapsto ((\shape_G,u), \refl{\shape_G}) $ is an equivalence.  This establishes that the fiber $(\B p)^{-1}(\shape_G)$ is connected and thus serves as
+  the classifying type of $\ker p$.  Pointing out that the composite map $H \xrightarrow{\isom} \ker p \to G \ltimes \tilde H$ is $j$ and using
+  univalence to promote the equivalence to an identity gives the result.
+\end{proof}
+
+Our next goal is to present the explicit formula for the multiplication operation in $\USym { G \ltimes \tilde H }$.
+First we apply \cref{lem:pathpairsection} to get a bijection $\USym { G \ltimes \tilde H } \weq \USymG \times \USymH$.
+Now use that to transport the multiplication operation of the group $\USym { G \ltimes \tilde H }$ to the set $\USymG \times \USymH$.
+Now \cref{lem:pathpairsectionmult} tells us the formula for that transported operation is given as follows.
+$$ (p',q') \cdot (p,q) = (p' \cdot p , ({q'} ^ p) \cdot q) $$
+In a traditional algebra course dealing with abstract groups, this formula is used as the definition of the multiplication operation
+on the set $\USymG \times \USymH$, but then one must prove that the operation satisfies the properties of \cref{def:abstractgroup}.
+The advantage of our approach is that the formula emerges from the underlying logic that governs how composition of paths works.
+
+
+\section{Wreath products}
+\label{sec:wreath}
+
+A special class of semidirect products are prominent enough to be given special attention: These are the \emph{wreath products}.
+
+Let $G$ and $H$ be groups, and $X : \BG \to \Set$ a $G$-set.  Then $G$ acts on the power $H^{X(\sh_G)}$, i.e., the symmetries of the constant
+function $\blank \mapsto \sh_H$ in the function type $X(\sh_G) \to \BH$.
+Indeed, consider the map $H^X : \BG \to \Group$ with
+\[
+  H^X(z) \defeq \Aut_{X(z) \to \BH}(\blank \mapsto \sh_H).
+\]
+Recall that if the underlying set of $X$ is finite,
+then the classifying space of $H^X(z)$ can be identified with
+the whole function type $X(z) \to \BH$,
+see~\cref{xca:bigproductfunext}\ref{it:bigproductfunext-i}.
+\begin{definition}
+  With $G$, $H$, and $X$ as above, we define the \emph{wreath product of $H$ by $G$ via $X$} as the semidirect product
+  \[
+    H \wr_X G \defeq G \ltimes H^X.\qedhere
+  \]
+\end{definition}
+Note that when $X(\sh_G)$ is finite, then
+the classifying type of $H \wr_X G$ is the type
+\[
+  \B(H \wr_X G) \equivto \sum_{z:\BG}X(z) \to \BH.
+\]
+
+\begin{example}[The symmetry group of a hypercubes]
+  
+\end{example}
+
+\begin{example}[Sudoku]
+  
+\end{example}
+
+\begin{example}[Symmetry groups of trees]
+  
+\end{example}
+
+\section{The pullback}
+\label{sec:pullback}
+Given two functions $f:B\to D$ and $g:C\to D$ with common target, the ``pullback'' which we will now define should be thought about as the type of all pairs of elements $(b,c):B\times C$ so that $f(b)=g(c)$.  This construction is important in many situations also beyond group theory.
+
+\begin{definition}
+  \label{def:pullback}
+  Let $B, C, D$ be types and let $f:B\to D$ and $g:C\to D$ be two maps.
+The \emph{pullback}\index{pullback} of $f$ and $g$ is the type
+$$\prod(f,g)\defequi\sum_{(b,c):B\times C}(f(b)=_Dg(c))$$
+together with the two projections $\prj_B:\prod(f,g)\to B$ and $\prj_C:\prod(f,g)\to C$ sending $(b,c,p):\prod(f,g)$ to $b:B$ or $c:C$.  If $f$ and $g$ are clear from the context, we may write $B\times_DC$ instead of $\prod(f,g)$ and summarize the situation by the diagram
+$$\xymatrix{B\times_DC\ar[r]^{\prj_C}\ar[d]^{\prj_B}&C\ar[d]^g\\B\ar[r]^f&\,D.}$$
+\end{definition}
+\begin{xca}
+  \marginnote{Illustrating the exercise: if the solid diagram commutes there is a unique dotted arrow so that the resulting diagram commutes:
+    $$\xymatrix{A\ar@{.>}[dr]\ar[drr]\ar[ddr]&&\\
+    &B\times_DC\ar[r]\ar[d]&C\ar[d]\\&B\ar[r]&D}
+  $$}
+  \label{xca:univpropofpullback}
+  Let $f:B\to D$ and $g:C\to D$ be two maps with common target.  If $A$ is a type show that
+  \begin{align*}
+    (A\to B)\times_{(A\to D)}(A\to C)\to &(A\to B\times_DC)\\
+(\beta,\gamma,p:f\beta=g\gamma)\,\mapsto\,&(a\mapsto (f(a),g(a),p(a):f\beta(a)=g\gamma(a)))
+  \end{align*}
+ is an equivalence.
+\end{xca}
+In view of \cref{xca:univpropofpullback} we will say that we have a \emph{pullback diagram}\index{pullback diagram}
+$$\xymatrix{A\ar[d]^{g'}\ar[r]^{f'}&C\ar[d]^g\\B\ar[r]^f&D}$$
+to indicate that we have an element in $(A\to B)\times_{(A\to D)}(A\to C)$ such that the resulting map $A\to B\times_DC$ is an equivalence.
+
+\begin{example}
+  \marginnote{Preimage as a pullback: $$\xymatrix{f^{-1}(d)\ar[d]\ar[r]&\bn1\ar[d]^d\\B\ar[r]^f&D}$$}
+  If $g:\bn 1\to D$ has value $d:D$ and $f:B\to D$ is any map, then $\prod(f,g)\oldequiv B\times_D\bn 1$ is equivalent to the preimage $f^{-1}(d)\defequi\sum_{b:B}d=f(b)$.
+\end{example}
+\begin{example}
+  \label{ex:pullbackandgcd}
+  Much group theory is hidden in the pullback.  For instance, the greatest common divisor $\gcd(a,b)$ of $a,b:\NN$ is another name for the number of components you get if you pull back the $a$-fold and the $b$-fold \coverings of the circle: we % will see in \cref{lem:iso2} we
+  have a pullback
+$$\xymatrix{S^1\times\B C_{\gcd(a,b)}\ar[d]\ar[r]& S^1\ar[d]^{(-)^b}\\
+S^1\ar[r]^{(-)^a}&\,S^1}
+$$
+(where $C_n$ was the cyclic group of order $n$).
+To get a geometric idea, think of the circle as the unit circle in the complex numbers so that the $a$-fold \covering is simply taking the $a$-fold power.  With this setup, the pullback should consist of pairs $(z_1,z_2)$ of unit length complex numbers with the property that $z_1^a=z_2^b$.  Let $a=a'\gcd(a,b)$ and $b=b'\gcd(a,b)$. Taking an arbitrary unit length complex number $z$, then the pair $(z^{b'},z^{a'})$ is in the pull back (since $a'b=ab'$).  But so is $(\zeta z^{b'},z^{a'})$, where $\zeta$ is any $\gcd(a,b)$\th root of unity.  Each of the $\gcd(a,b)$-choices of $\zeta$ contributes in this way to a component of the pullback.  In more detail: identifying the cyclic group $C_{\gcd(a,b)}$ of order $\gcd(a,b)$ with the group of $g$\th roots of unity, the top horizontal map $S^1\times C_{\gcd(a,b)}\to S^1$ sends $(z,\zeta)$ to $z^{a'}$ and the left vertical map sends $(z,\zeta)$ to the product $\zeta z^{b'}$.
+
+Also the least common multiple $\lcm(a,b)=a'b$ is hidden in the pullback; in the present example it is demonstrated that the map(s) across the diagram makes each component of the pullback a copy of the $\lcm(a,b)$-fold \covering.
+\end{example}
+
+
+\begin{definition}
+  \label{def:intersectionand unionofsets}
+  Let $S$ be a set and consider two subsets $A$ and $B$ of $S$ given by two families of propositions (for $s:S$) $P(s)$ and $Q(s)$.  The \emph{intersection}\index{intersection! of sets} $A\cap B$ of the two subsets is given by the family of propositions $P(s)\times Q(s)$.  The \emph{union}\index{union of sets} $A\cup B$ is given by the set family of propositions $A(s)+B(s)$.
+\end{definition}
+\begin{xca}
+  \label{xca:intersectionpullbackofsets}
+  Given two subsets $A$, $B$ of a set $S$, prove that
+  \begin{enumerate}
+  \item The pullback $A\times_SB$ maps by an equivalence to the intersection $A\cap B$,
+  \item\label{xca:cardinalityintersectionunion}
+    If $S$ is finite, then the sum of the cardinalities of $A$ and $B$ is equal to the sum of the cardinalities of $A\cup B$ and $A\cap B$.\qedhere
+  \end{enumerate}
+\end{xca}
+
+\begin{definition}
+  \label{def:intersectionofgroups}
+  Let $f:\Hom(H,G)$ and $f':\Hom(H',G)$ be two homomorphisms with common target.  The \emph{pullback}\index{pullback!of groups} $H\times_GH'$ is the group obtained as the (pointed) component of
+$$\pt_{H\times_GH'}\defequi(\shape_H,\pt_{H'},p_{f'}p_f^{-1})$$ of the pullback $\BH\times_{\BG}\BH'$ (where $p_f:\shape_G=f(\shape_H)$ is the name we chose for the data displaying $f$ as a pointed map, so that $p_{f'}p_f^{-1}:f(\shape_H)=f'(\pt_{H'})$).
+
+If $(H,f,!)$ and $(H',f',!)$ are monomorphisms into $G$, then the pullback is called the \emph{intersection}\index{intersection! of monomorphisms} and if the context is clear denoted simply $H\cap H'$.
+\end{definition}
+\begin{example}
+  If $a,b:\NN$ are natural number with least common multiple $L$, then $L\ZZ$ is the intersection $a\ZZ\cap b\ZZ$ of the subgroups $a\ZZ$ and $b\ZZ$ of $\ZZ$.
+\end{example}
+% \begin{example}this came out wrong DELETE June
+%   If $H,K:\typemono_G$ with $X,Y:\BG\to\Set$ being the corresponding transitive $G$-sets under the equivalence $E$, then the intersection of $H$ and $K$ corresponds to the $G$-set $X\times Y:\BG\to\Set$ (with $(X\times Y)(x)\defequi X(x)\times Y(x)$).
+% \end{example}
+
+\begin{xca}
+  Prove that if $f:\Hom(H,G)$ and $f':\Hom(H',G)$ are homomorphisms,
+  then the pointed version of \cref{xca:univpropofpullback} induces an
+  equivalence
+  \[
+    \Hom(K,H)\times_{\Hom(K,G)}\Hom(K,H')\simeq \Hom(K,H\times_GH')
+  \]
+  for all groups $K$ and an equivalence%
+  \stepcounter{footnote}\footnotetext{%
+    Hint: set $A\defequi \Sc$, $B\defequi \BH$, $C\defequi \BH'$ and $D\defequi \BG$.}%
+  \addtocounter{footnote}{-1}
+  \[
+    \USymH \times_{\USymG} \USymH'
+    \simeq (\shape_{H\times_GH'}=\shape_{H\times_GH'}).\text{\footnotemark}
+  \]
+  Elevate the last equivalence to a statement about abstract groups.
+\end{xca}
+
+\begin{remark}
+  The pullback is an example of when a construction of types \emph{not} preserving connectivity can be used profitably also for groups.
+  We get the pullback of groups by restricting to a pointed component, but also the other components have group theoretic importance.
+  We will return to this when discussing subgroups.
+\end{remark}
+
+\section{Pushouts of types}
+\label{sec:pushouts}
+
+(TBW)
+
+\section{Sums of groups}
+\label{sec:coprod}
+We have seen how the group of integers $\ZZ=(S^1,\base)$ synthesizes the notion of one symmetry with no relations: every symmetry in the circle is of the form $\Sloop^n$ for some unique $n$.  Also, given any group $G=\Aut_A(a)$, the set $a=a$ of symmetries of $a$ corresponds to the set of homomorphisms $\ZZ\to G$, \ie to pointed functions $(S^1,\base)\to_*(A,a)$ by evaluation at $\Sloop$.  What happens if we want to study more than one symmetry at the time?
+
+For instance, is there a group $\ZZ\vee\ZZ$ so that for any group $G=\Aut_A(a)$ a homomorphism $\ZZ\vee\ZZ\to G$ corresponds to \emph{two} symmetries of $a$?
+At the very least, $\ZZ\vee\ZZ$ itself would have to have two symmetries and these two can't have any relation, since in a general group $G=\Aut_A(a)$ there is a priori no telling what the relation between the symmetries of $a$ might be.
+Now, \emph{one} symmetry is given by a pointed function $(S^1,\base)\to_*(A,a)$ and so a \emph{pair} of symmetries is given by a function $f:S^1+S^1\to A$ with the property that $f$ sends each of the base points of the circles to $a$.  But $S^1+S^1$ is not connected, and so not a group.  To fix this we take the clue from the requirement that both the base points were to be sent to a common base point and \emph{define} $S^1\vee S^1$ to be what we get from $S^1+S^1$ when we \emph{insert an identity} between the two basepoints.
+\marginnote{$S^1\vee S^1$ if formed from $S^1+S^1$ by inserting an identity$$\xymatrix{\base\ar@(ul,dl)[]|{\Sloop}\ar@{.>}[rr]^{\text{identify!}}&&\base\ar@(ur,dr)[]|{\Sloop}}
+  $$}
+
+The amazing thing is that this works -- an enormous simplification of the classical construction of the ``free products'' or ``amalgamated sum'' of groups.  We need to show that the ``wedge'' $S^1\vee S^1$ is indeed a group, and this proof simultaneously unpacks the classical description.
+
+We start by giving a definition of the wedge construction which is important for pointed types in general and then prove that the wedge of two groups is a group whose symmetries are arbitrary ``words'' in the original symmetries.
+
+\begin{definition}
+  \label{def:wedge}
+  Let $(A_1,a_1)$ and $(A_2,a_2)$ be pointed types.  The \emph{wedge}\index{wedge of pointed types} is the pointed type $(A_1\vee A_2,a_{12})$ given as a higher inductive type by
+  \begin{enumerate}
+  \item functions $i_1:A_1\to A_1\vee A_2$ and $i_2:A_2\to A_1\vee A_2$
+  \item an identity $g:i_1a_1=i_2a_2$.
+  \end{enumerate}
+We point this type at $a_{12}\defequi i_1a_1$.
+  The function
+$$i^g_2:(a_2=_{A_2}a_2)\to(a_{12}=_{A_1\vee A_2}a_{12})$$
+is defined by $i^g_2(p)\defequi g^{-1}i_2(p)g$, whereas (for notational consistency only) we set $i_1^g\defequi i_1:(a_1=_{A_1}a_1)\to(a_{12}=_{A_1\vee A_2}a_{12})$.
+Simplifying by writing $i:A_1+A_2\to A_1\vee A_2$ for the function given by $i_1$ and $i_2$ (with basepoints systematically left out of the notation),
+the induction principle is
+$$\prod_{C:(A_1\vee A_2)\to\UU}\sum_{s:\prod_{a:A_1+A_2}Ci(a)}
+((s(a_1)=C(g^{-1})s(a_2))\,\to\,\prod_{x:(A_1\vee A_2)}C(x)).$$
+\end{definition}
+
+Unraveling the induction principle we see that if $B$ is a pointed type, then a  pointed function $f:A_1\vee A_2\to_* B$ is given by providing pointed functions $f_1:A_1\to_* B$ and $f_2:A_2\to_* B$  -- the identity $f_1(a_1)=f_2(a_2)$ which seems to be missing is provided by the requirement of the functions being pointed.  For the record
+\begin{lemma}
+  \label{lem:univvee}
+  If $B$ is a pointed type, then the function
+  $$i^*:(A_1\vee A_2\to_*B)\to(A_1\to_*B)\times(A_2\to_*B),\qquad i^*(f)=(fi_1,fi_2)
+$$
+is an equivalence.
+\end{lemma}
+
+
+
+To the right you see a picture of $i_2^g(p)$: \marginnote{$$
+\xy (-20,20)*+{};(-20,20)*+{}
+**\crv{(15,20)&(18,20)&(-10,35)&(10,45)&(25,30)&(20,19)&(0,20)}
+%?>*\dir{>}
+?(0)*{} *!LD!/^-20pt/{i_1A_1}
+?(.45)*{} *!LD!/^2pt/{>}
+?(.95)*{} *!LD!/^-15pt/{g^{-1}}
+?(.03)*{} *!LD!/^-5pt/{g}
+?(.55)*{} *!LD!/^-7pt/{i_2p}
+?(.65)*{} *!LD!/^-30pt/{i_2A_2}
+?(.87)*{} *!LD!/^-12pt/{i_2a_2}
+?(.86)*{} *!LD!/^-2pt/{\bullet}
+?(1)*{} *!LD!/^-2pt/{\bullet}
+?(1)*{} *!LD!/^-12pt/{a_{12}}
+\endxy
+$$}it is the symmetry of the base point $a_{12}\defequi i_1a_1$ you get by \emph{first} moving to $i_2a_2$ with $g$, \emph{then} travel around with $p$ ($i_2p$, really) and finally go home to the basepoint with the inverse of $g$.
+
+\marginnote{The idea is that an identity in $a_{12}=x$ can be factored into a string of identities, each lying solely in $A_1$ or in $A_2$.  We define a family of sets consisting of exactly such strings of identities --  it is a set since $A_1$ and $A_2$ are groupoids -- and prove that it is equivalent to the family $P(x)\defequi(a_{12}=_{A_1\vee A_2}x)$ which consequently must be a family of sets.
+We need to be able to determine whether a symmetry is reflexivity or not, but once we know that, the symmetries of the base point in the wedge are then given by ``words $p_0p_1\dots p_n$'' where the $p_j$ alternate between being symmetries in the first or the second group, and none of the $p_j$ for positive $j$ are allowed to be reflexivity.  Note that there order of the $p_j$s is not negotiable: if I shuffle them I get a new symmetry.}
+
+
+\begin{definition}
+  \label{def:sumofgroup}
+  If $G_1=\Aut_{A_1}(a_1)$ and $G_2=\Aut_{A_2}(a_2)$ are groups, then their \emph{sum}\index{sum of groups} is defined as
+  $$G_1\vee G_2\defequi \Aut_{A_1\vee A_2}(a_{12}).$$
+  The homomorphisms $i_1:G_1\to G_1\vee G_2$ and $i_2:G_2\to G_1\vee G_2$ induced from the structure maps  $i_1:A_1\to A_1\vee A_2$ and  $i_2:A_2\to A_1\vee A_2$ are also referred to as \emph{structure maps}.
+\end{definition}
+\begin{lemma}
+  \label{lem:sumofgroupsISsum} If $G_1$, $G_2$ and $G$ are groups, then the function
+  $$\Hom(G_1\vee G_2,G)\to\Hom(G_1,G)\times\Hom(G_2,G)$$
+given by restriction along the structure maps is an equivalence.
+\end{lemma}
+\begin{proof}
+  This is a special case of \cref{lem:univvee}.
+\end{proof}
+Specializing further, we return to our initial motivation and see that mapping out of a wedge of two circles \emph{exactly} captures the information of two independent symmetries:
+\begin{corollary}
+  \label{cor:ZplusZuniv}
+  If $G$ is a group, then the functions
+  $$\Hom(\ZZ\vee\ZZ,G)\to \Hom(\ZZ,G)\times\Hom(\ZZ,G)\simeq \USymG\times \USymG$$
+  is an equivalence.
+\end{corollary}
+
+\begin{xca}\label{xca:whatAREabeliangroups}
+  This leads to the following characterization of abelian groups\marginnote{%
+    \wip{Do we know at this point that this extension problem is a proposition,
+      \ie that the wedge inclusion is an epimorphism?
+      Check re pointedness.}}
+  formulated purely in terms of pointed connected groupoids
+  (with no direct reference to identity types).
+  A group $G$ is abelian if and only if the canonical map\marginnote{%
+    \begin{tikzcd}[ampersand replacement=\&]
+      \BG\vee\BG\ar[r,"\fold"]\ar[d,"\text{inclusion}"'] \& \BG \\
+       \BG\times\BG\ar[ur,dashed]
+    \end{tikzcd}}
+  \[
+    \fold :\BG\vee \BG\ptdto \BG
+  \]
+  (given via \cref{lem:sumofgroupsISsum} by $\id_G:G\to G$)
+  extends over the inclusion
+  \[
+    i:\BG\vee \BG\ptdto \BG\times \BG
+  \]
+  (given by the inclusions $\incl_1,\incl_2:G\to G\times G$).
+
+  As a cute aside, one can see that the required map $\BG\times\BG\ptdto\BG$
+  actually doesn't need to be pointed:
+  factoring
+  $\fold:\BG\vee\BG\to\BG$ over $i:\BG\vee\BG\to\BG\times\BG$
+  -- even in an unpointed way -- kills all ``commutators''
+  $ghg^{-1}h^{-1}:\USym(G\vee G)$.
+  (\wip{is this still a proposition, or do we need to truncate?})
+\end{xca}
+
+We end the section by proving that wedges of decidable groups are decidable groups and that they can be given the classical description in terms of words.
+
+
+\begin{lemma}
+  \label{lem:wedgeofgpoidisgpoid}
+  Let $G_1\defequi\Aut_{A_1}(a_1)$ and $G_2\defequi\Aut_{A_2}(a_2)$ be decidable groups, then the wedge sum $G_1\vee G_2\defequi\Aut_{A_1\vee A_2}(a_{12})$ is a decidable group.
+
+Let $C_1$ be the set of strings $(p_0,n,p_1,\dots,p_n)$ with $n:\NN$ and, for $0\leq j\leq n$
+\begin{itemize}
+\item $p_{j}:\USymG_1%\defequi (a_1=a_1)
+  $  for even $j$
+\item $p_{j}:\USymG_2%\defequi (a_2=a_2)
+  $ for odd $j$ and
+\item $p_j$ is not reflexivity for $j$ positive
+\end{itemize}
+(the last requirement makes sense and is a proposition since our groups are decidable).
+
+  Then the function given by composition in $\USymG_{12}\defequi(a_{12}=a_{12})$
+  $$\beta:C_1\to\USymG_{12}%\defequi(a_{12}=a_{12})
+  ,\qquad\beta(p_0,n,p_1,\dots p_n)\defequi i_1^gp_0i_2^gp_1i_1^gp_2\dots i_?^gp_n$$
+(where $i_?^gp_n$  is $i_1^gp_n$ or $i_2^gp_n$ according to whether $n$ is even or odd) is an equivalence.
+\end{lemma}
+\begin{proof}
+  That the wedge is connected follows by transitivity of identifications,
+  if necessary passing through the identification $g:i_1a_1=i_2a_2$ in the wedge.
+
+We must prove that the wedge is a groupoid, \ie that all identity types are sets, which we do by giving an explicit description of the universal \covering.
+
+ We use the notation of \cref{def:wedge} freely, and for ease of notation, let $a_{2k+i}\defequi a_i$ and $i_{2k+i}^g\defequi i_i^g$ for $i=1,2$, $k:\NN$.
+Define families of sets
+$$C_i:A_i\to\Set,\qquad i=1,2$$
+by
+$$
+C_i(x)\defequi(a_i=_{A_i}x)\times
+\sum_{n:\NN}\prod_{1\leq k\leq n}\sum_{p_k:a_{i+k}= a_{i+k}}(p_k\neq\refl {a_{i+k}})
+$$
+when $x:A_i$.  Note that $p_k\neq\refl{a_{i+k}}$  is a proposition; we leave it out when naming elements. Hence, an element in $C_1(a)$ is a tuple
+$(p_0,n,p_1,\dots,p_n)$ where $p_0:a_1=_{A_1}a$, $p_1:a_2=_{A_2}a_2$, $p_2:a_1=_{A_1}a_1$, and so on -- alternating between symmetries of $a_1$ and $a_2$, and where $p_0$ is the only identity allowed to be $\refl{}$. Define $C_{12}:C_1(a_1)\to C_2(a_2)$ by
+$$C_{12}(p_0,n,p_1\dots,p_n)=
+\begin{cases}
+  (\refl{a_2}0,)&\text{ if }p_0=\refl{a_1}, n=0,\\
+  (p_1,n-1,p_2\dots,p_n)& \text{ if }p_0=\refl{a_1},n\neq0,\\
+  (\refl{a_2},n+1,p_0,\dots,p_n)& \text{ if }p_0\neq\refl{a_1}.
+\end{cases}
+$$
+It is perhaps instructive to see a table of the values $C_{12}(p_0,n,p_1,\dots,p_n)$ for $n<3$:
+\begin{center}
+  \begin{tabular}{r|c cc}
+    &$(p_0,0)$&$(p_0,1,p_1)$&$(p_0,2,p_1,p_2)$\\
+    \hline
+    $p_0=\refl{a_1}$&$(\refl{a_2},0)$&$(p_1,0)$&$(p_1,1,p_2)$\\
+    $p_0\neq\refl{a_1}$&$(\refl{a_2},1,p_0)$&$(\refl{a_2},2,p_0,p_1)$&$(\refl{a_2},3,p_0,p_1,p_2)$
+  \end{tabular}
+\end{center}
+Since $C_{12}$ is an equivalence, the triple $(C_1,C_2,C_{12})$ defines a family
+$$C:A_1\vee A_2\to\Set.$$
+In particular, $C(a_{12})\defequi C_1(a_1)$.
+For $x:A_1$ we let $i^C_1:C_1(x)\to C(i_1(x))$ be the induced equivalence, and likewise for $i^C_2$.
+We will show that $C$ is equivalent to $P\defequi \pathsp{a_{12}}$, where $P(x)\defequi(a_{12}=x)$, and so that the identity types in the wedge are equal to the sets provided by $C$.
+
+One direction is by transport in $C$; more precisely,
+$$\alpha:\prod_{x:A_1\vee A_2}(P(x)\to C(x))$$ is given by transport with $\alpha(a_{12})(\refl{a_{12}})\defequi(\refl{a_{1}},0):C(a_{12})$.
+The other way,
+$$\beta:\prod_{x:A_1\vee A_2}(C(x)\to P(x))$$ is given by composing identities, using the glue $g$ to make their ends meet:
+$$\beta(i_1a)(p_0,n,p_1,\dots,p_n)\defequi i_1(p_0)i_2^g(p_1)i_3^g(p_2) \dots i_{n+1}^g(p_n)$$
+(here the definition $\dots i_3^g\defequi i_1^g\defequi i_1$ proves handy since we don't need to distinguish the odd and even cases)
+and likewise
+$$\beta(i_2a)(p_0,n,p_1,\dots,p_n)\defequi i_2(p_0)g\,i_1^g(p_1)i_2^g(p_2) \dots i_{n}^g(p_n)$$ and compatibility with the glue $C_{12}$ is clear since the composite $\refl{x}p$ is equal to $p$.
+
+For notational convenience, we hide the $x$ in $\alpha(x)(p)$ and $\beta(x)(p)$ from now on.
+
+That $\beta\alpha(p)=p$ follows by path induction: it is enough to prove it for $x=a_{12}$ and
+$p\defequi\refl{a_{12}}$:
+$$\beta\alpha(\refl{a_{12}})=\beta(\refl{a_1},0)=i_1^g\refl{a_1}=\refl{a_{12}}.$$
+
+That $\alpha\beta(p_0,n,p_1\dots,p_n)=(p_0,n,p_1,\dots,p_n)$ follows by induction on $n$ and $p_0$.  For $n=0$ it is enough to consider  $x=a_{12}$ and $p_0=\refl{a_1}$, and then
+$\alpha\beta(\refl{a_1},0)\defequi\alpha(\refl{a_{12}})\defequi(\refl{a_1},0)$.  In general, (for $n>0$)
+\begin{align*}
+  \alpha\beta(p_0,n,p_1\dots,p_n)
+=&\trp[C]{i_1(p_0)i_2^g(p_1)i_1^g(p_2) \dots i_{n+1}^g(p_n)}(\refl{a_1,0})\\
+=&\trp[C]{i_1(p_0)}\dots\trp[C]{i_{n+1}^g(p_n)}(\refl{a_1,0}).
+\end{align*}
+  The induction step is as follows: let $0< k\leq n$, then
+\begin{align*}
+  &\trp[C]{i_k^gp_{k-1}}i^C_{k-1}(p_k,n-k-1,p_{k+1},\dots,p_n)\\
+  =&\trp[C]{i_k^gp_{k-1}}i^C_k(\refl{a_{k-1}},n-k,p_k,\dots,p_n)\\
+  =&i^C_k\trp[C_k]{p_{k-1}}(\refl{a_{k-1}},n-k,p_k,\dots,p_n)\\
+  =&(p_{k-1},n-k,p_k,\dots,p_n).
+\end{align*}
+%((please see whether this makes sense to anybody but yvt))
+\end{proof}
+
+\section{Free groups}
+\label{sec:freegroups}
+
+We have seen in~\cref{ex:Zinitial} that the group of integers $\ZZ$
+is the free group on one generator in the sense that the set of homomorphisms
+from $\ZZ$ to any group $G$ is equivalent (by evaluation at the loop)
+to the underlying set of symmetries in $G$, $\USymG$.
+This set is of course equivalent (by evaluation at the unique element)
+to the set of maps $(\bn 1 \to \USymG)$.
+
+Likewise, we have seen in~\cref{cor:ZplusZuniv} that the binary sum $\ZZ \vee \ZZ$
+is the free group on two generators, corresponding to the left and right summands.
+
+In general, a free group on a set of generators $S$ is a group $\FG_S$ with
+specified elements $\iota_s:\UFG_S$ labeled by $s:S$,
+such that evaluation gives an equivalence $\Hom(\FG_S,G) \equivto (S \to \USymG)$
+for each group $G$.
+
+We now give a definition of the classifying type of a free group
+as a higher inductive type that is very much like that of the circle,
+except that instead of having a single generating loop,
+it has a loop $\Sloop_s$ for each element $s:S$.
+\begin{definition}
+  \label{def:bfree}
+  Fix a set $S$.
+  The classifying type of the free group on $S$, $\BFG_S$,%
+  \index{free group}%
+  \glossary(FS){$\protect\FG_S$}{free group on a decidable set of generators}
+  is a type with a point $\base : \BFG_S$ and
+  a constructor ${\Sloop_\blank} : S \to \base\eqto\base$.
+
+  Let $A(x)$ be a type for every element $x:\BFG_S$.
+  The induction principle for $\BFG_S$ states that,
+  in order to define an element of $A(x)$ for every $x:\BFG_S$,
+  it suffices to give an element $a$ of $A(\base)$ together
+  with an identification $l_s:\pathover{a}{A}{\Sloop_s}{a}$
+  for every $s:S$.
+  The function $f$ thus defined satisfies $f(\base)\jdeq a$
+  and we are provided identifications $\apd{f}(\Sloop_s)\eqto l_s$ for each $s:S$.
+
+  We define the \emph{free group} on $S$ as $\FG_S \defeq \mkgroup(\BFG_S,\base)$.
+\end{definition}
+
+A priori, $\FG_S$ is only an \inftygp.
+Nevertheless, we get immediately from the induction principle
+that evaluation at the elements of $S$
+gives an equivalence $\Hom(\FG_S,G) \equivto (S \to \USymG)$ for each
+\inftygp $G$.
+
+In order to see that $\FG_S$ is a group,
+we need to know that $\BFG_S$ is a groupoid.
+This follows from a general theorem on identifications in pushouts due to~\textcite{Warn2023}.
+Here we restrict our discussion to decidable sets $S$,
+where we can give a more concrete proof.
+
+We can follow that same strategy as in~\cref{lem:univisexp}
+and~\cref{lem:wedgeofgpoidisgpoid}
+and show this by giving a description of $\FG_S$ as an \emph{abstract} group.
+To see what this should be, think about what symmetries of $\base$
+we can write using the constructors $\Sloop_s$ for $s:S$.
+We can compose these out of $\Sloop_s$ and $\Sloop_s^{-1}$
+with various generators $s$.
+However, if we at any point have $\Sloop_s\Sloop_s^{-1}$ or $\Sloop_s^{-1}\Sloop_s$,
+then these cancel.
+This motivates the following definitions.
+
+\begin{definition}
+  Fix a decidable set $S$. Let $\tilde S \defeq S + S$%
+  \index{signed set}%
+  \glossary(1tildeS){$\tilde S$}{signed version of the set $S$}
+  be the (decidable) set of \emph{signed} letters from $S$.
+  Also, let $\bar{\blank} : \tilde S \to \tilde S$
+  be the equivalence that swaps the two copies of $S$.
+  This map is an involution called \emph{complementation}.
+\end{definition}
+
+If $a:S$, we'll also write $a:\tilde S$ for the left inclusion,
+and we'll write $A\defeq\bar a:\tilde S$ for the right inclusion,
+so that $\bar a \jdeq A$ and $\bar A \jdeq a$, \ie $a$ and $A$ are complementary.
+
+Recall the definition of lists $T^*$ over a set $T$, \cref{def:lists},
+inductively generated by the empty list $\varepsilon$ and
+the recursive constructor
+that concatenates an element $t:T$ to a list $\ell$,
+forming a new list $t\ell$ with head $t$ and tail $\ell$.
+Instead of ``lists'' we shall often speak about ``words''
+formed from ``letters''
+taken from the set $T$, which is thus a kind of ``alphabet''.
+
+If we take $T \defeq \tilde S$ we get the set of words in the signed letters from $S$. If we have $a,b:S$, we find among the elements of $\tilde S^*$ the following:
+\[
+  \varepsilon,a,b,A,B,aa,ab,aA,aB,ba,bb,bA,bB,Aa,Ab,AA,AB,\ldots
+\]
+When we interpret these as symmetries in $\BFG_S$, \ie as elements in $\UFG_S$,
+the words $aA$ and $Bb$, etc., become trivial.
+\begin{definition}
+  A word $w : \tilde S^*$ is called \emph{reduced}
+  if it doesn't contain any consecutive pairs of complementary letters.
+  The map $\rho_S : \tilde S^* \to \tilde S^*$ maps a word to its \emph{reduction},
+  which is obtained by repeatedly deleting consecutive pairs of complementary
+  letters until none remain.
+\end{definition}
+
+\begin{xca}
+  Complete the definition of $\rho_S$ by nested induction on words.\footnote{%
+    Hint: This is precisely the point where we need $S$ to have decidable equality.}
+\end{xca}
+
+\begin{definition}
+  We define $\mathcal R_S$ to be the image of $\rho_S$ in $\tilde S^*$,
+  whose elements are the \emph{reduced words}.
+  We define $\mathcal D_S$ to be the fiber of $\rho_S$ at the empty word,
+  $\rho_S^{-1}(\varepsilon)$,
+  whose elements are called \emph{Dyck words}.\footnote{%
+    Considered as a set of words,
+    $\mathcal D_S$ is called the \emph{2-sided Dyck language}.
+    Perhaps the \emph{1-sided Dyck language} is more familiar
+    in language theory: Here, $S$ is considered as a set of
+    `opening parentheses', while the complementary elements
+    are `closing parentheses'.
+    For example, the 1-sided Dyck language for $\tilde S=\set{\textup{(},\textup{)}}$
+    consists of all \emph{balanced} words of opening and closing parentheses,
+    \eg (), (()), ()(), etc., while our $\mathcal D_S$ in this case
+    also has words like )( and ))(()(.}
+\end{definition}
+
+\begin{remark}
+  Like any map, $\rho_S$ induces an equivalence relation $\sim$
+  on the set $\tilde S^*$
+  where two words $u,v$ are related
+  if and only if they map to the same reduced word,
+  in other words,
+  $u \sim v$ if and only if $\rho_S(u) = \rho_S(v)$.
+  Thus, $\rho_S$ induces an equivalence $\tilde S^*/{\sim} \equivto \mathcal R_S$.
+\end{remark}
+
+We are now ready to prove that set $\mathcal R_S$ of reduced words
+is equivalent to $\UFG_S$.
+We'll do this be defining an interpretation function from words
+to elements of the free group.
+
+\begin{definition}
+  We define $\sem\blank : \tilde S^* \to \UFG_S$
+  by induction on words by setting
+  \begin{align*}
+    \sem\varepsilon             &\defeq \refl\base & & \\
+    \sem{aw}                    &\defeq \Sloop_a \cdot \sem w,
+                                &\text{for $a:S$,}& \\
+    \sem{\bar aw}\jdeq \sem{Aw} &\defeq \Sloop_a^{-1} \cdot \sem w,
+                                &\text{for $a:S$.}&\qedhere
+  \end{align*}
+\end{definition}
+
+\begin{theorem}\label{thm:free-group-elements}
+  Fix a decidable set $S$.
+  The interpretation map $\sem\blank$ restricts to
+  an equivalence, denoted the same way,
+  $\sem\blank : \mathcal R_S \to \UFG_S$.
+\end{theorem}
+
+\begin{proof}
+  We extend $\mathcal R_S$ to an $\FG_S$-set, $\mathcal R_S : \BFG_S \to \Set$,
+  where we define $\mathcal R_S(x)$ by induction on $x : \BFG_S$, with
+  \[
+    \mathcal R_S(\base) \defeq \mathcal R_S,\quad\text{and}\quad
+    \mathcal R_S(\Sloop_a) \defis \casoverline{\zs_a},\quad\text{for $a:S$.}
+  \]
+  Here $\zs_a : \mathcal R_S \equivto \mathcal R_S$ is the equivalence
+  sending a word $w$ to $\rho_S(aw)$, whose inverse sends
+  $w$ to $\rho_S(Aw)$. These operations are indeed mutual inverses,
+  since $aAw \sim w \sim Aaw$.\footnote{%
+    The set $\mathcal R_S$ is very much like $\zet$, but instead of having
+    only one successor equivalence $\zs$, it has one for each element of $S$.}
+
+  Our goal now is to extend the definition of $\sem\blank$ to
+  $\sem\blank_x : \mathcal R_S(x) \to \pathsp\base$,
+  where $\pathsp\base(x) \jdeq (\base \eqto x)$, for $x : \BFG_S$,
+  so that this is an inverse to the map given by transport of $\varepsilon$,
+  $\tau_x : (\base \eqto x) \to \mathcal R_S(x)$,
+  with $\tau_x(p) \defeq \trp[\mathcal R_S]{p}(\varepsilon)$.
+  Thinking back to~\cref{def:gRtoP},
+  we define $\sem\blank_x$ by induction on $x$ with
+  $\sem\blank_\base \defeq \sem\blank$ and using
+  $\sem{aw} \jdeq \Sloop_a \cdot \sem w$.\footnote{%
+    In a picture, the case for $\Sloop_a$ should prove that it does not matter what
+    path you take around the square
+    \[
+      \begin{tikzcd}[row sep=large,column sep=huge,ampersand replacement=\&]
+        \mathcal R_S\ar[r,"{\sem\blank}"]\ar[d,eqr,"\zs_a"] \&
+        (\base\eqto\base)\ar[d,eqr,"\Sloop_a\cdot\blank"] \\
+        \mathcal R_S\ar[r,"{\sem\blank}"] \& (\base\eqto\base).
+      \end{tikzcd}
+    \]}
+
+  We get an identification $\sem{\blank}_x \circ \tau_x \eqto \id$ by path induction,
+  since $\sem{\varepsilon} \jdeq \refl\base$.
+
+  To prove the proposition $\tau_x(\sem w_x) = w$ for all $x:\BFG_S$
+  and $w : \mathcal R_S(x)$,
+  it suffices to consider the case $x \jdeq \base$, since $\BFG_S$ is connected.
+  We prove that $\tau_\base(\sem w) \sim w$ holds for \emph{all} words
+  $w:\tilde S^*$ by induction on $w$,
+  because then it follows that $\tau_\base(\sem w) = w$ for \emph{reduced} words $w$.
+  The case $w \jdeq \varepsilon$ is trivial.
+  In the step case for adding $a:S$, we calculate,
+  \[
+    \tau_\base(\sem{aw}) \jdeq \trp[\mathcal R_S]{\Sloop_a \cdot \sem w}(\varepsilon)
+    = \trp[\mathcal R_S]{\Sloop_a}(\tau_\base(\sem w))
+    = \zs_a(w) = \rho_S(aw) \sim aw,
+  \]
+  as desired, the complementary case being similar.
+\end{proof}
+
+\begin{xca}
+  Construct an equivalence $\mathcal R_{\bn 1} \equivto \zet$
+  sending $\varepsilon$ to $0$ such that $\zs_*$ corresponds to $\zs$,
+  where $*:\bn 1$ is the unique element.
+  This gives us two more options to add to the list in~\cref{ft:many-integers}
+  on~\cpageref{ft:many-integers}: $\tilde{\bn 1}^*/{\sim}$ and $\mathcal R_{\bn 1}$!
+\end{xca}
+
+\begin{xca}
+  Construct an equivalence $\FG_{\bn n \amalg \true} \equivto \FG_{\bn n}
+  \vee \ZZ$ for each $n : \NN$ using the universal properties.
+  As a result, give identifications
+  \[
+    \FG_{\bn n} \eqto \bigl((\ZZ \vee \ZZ) \vee \cdots\bigr) \vee \ZZ,
+  \]
+  for $n:\NN$, where there are $n$ copies of $\ZZ$ on the right-hand side.
+\end{xca}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% fill-column: 144
+%%% latex-block-names: ("lemma" "theorem" "remark" "definition" "corollary" "fact" "properties" "conjecture" "proof" "question" "proposition" "exercise")
+%%% TeX-master: "book"
+%%% TeX-command-extra-options: "-fmt=macros"
+%%% compile-command: "make book.pdf"
+%%% End:

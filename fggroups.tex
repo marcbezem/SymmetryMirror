@@ -1,0 +1,966 @@
+\chapter{Group presentations}
+\label{ch:fggroups}
+
+\section{Brief overview of the chapter}
+\label{sec:fggroups-overview}
+
+TODO:
+\begin{itemize}
+\item Make a separate chapter on combinatorics? Actions and Burnside and counting colorings?
+\item Cayley actions: $G$ acts on $\Gamma(G,S)$: Action on vertices is the left action of $G$ on itself: $t \mapsto (t=_{\BG} \pt)$, on vertices, for $s : S$, have edge $t = \pt$ to $t = \pt$
+\item Recall universal property of free groups: If we have a map $\varphi : S \to H$, then we get a homomorphism $\bar\varphi : F(S) \to H$, represented by $BF(S) \to_\pt \BH$ defined by induction, sending $\pt$ to $\pt$ and $s$ to $\varphi(s)$.
+\item define different types of graphs ($S$-digraphs, $\tilde S$-graphs,
+  (partial) functional graphs, graph homomorphisms, quotients of graphs)
+\item define (left/right) Cayley graphs of f.g.~groups
+  -- $\Aut(\Gamma_G) = G$ (include $\alpha : F(S) \to G$ in notation?)
+  -- Cayley graphs are vertex transitive
+\item Cayley graphs and products, semi-direct products, homomorphisms
+\item Some isomorphisms involving semi-direct products
+  -- Exceptional automorphism of $\SG_6$:
+  -- Exotic map $\SG_5 \to \SG_6$.
+  (Conjugation action of $\SG_5$ on $6$ $5$-Sylow subgroups.)
+  A set bundle $X : \BSG_6 \to \BSG_6$.
+\item \url{https://math.ucr.edu/home/baez/six.html}
+  Relating $\SG_6$ to the icosahedron.
+  The icosahedron has $6$ axes. Two axes determines a golden rectangle (also known as a \emph{duad},\footnote{%
+    These names come from Sylvester.}
+  so there are $15$ such. A symmetry of the icosahedron can be described
+  by knowing where a fixed rectangle goes, and a symmetry of that rectangle.
+  Picking three rectangles not sharing a diagonal gives a \emph{syntheme}:
+  three golden rectangles whose vertices make up the icosahedron.
+  Some synthemes (known as \emph{true crosses}
+  have the rectangles orthogonal to each other, as in
+  \cref{fig:true-cross}.
+  Fact: The symmetries of the icosahedron form the alternating symmetries of the $5$ true crosses.
+  Of course, we get an action on the $6$ axes, thus a homomorphism $\AG_5 \to \SG_6$.
+  Every golden rectangle lies in one true cross and two skew crosses.
+  The combinatorics of duads, synthemes, and synthematic totals are illustrated
+  in the Cremona-Richardson configuration and the resulting Tutte-Coxeter graph.
+  The automorphism group of the latter is in fact $\Aut(\SG_6)$.
+  If we color the vertices according to duad/syntheme, we get $\SG_6$ itself.
+\begin{marginfigure}
+  \tdplotsetmaincoords{45}{135}
+  \begin{tikzpicture}[tdplot_main_coords,scale=1.1]
+    \begin{scope}[opacity=0.6]
+      \draw (-1.00000, -1.61803, 0.00000) -- (-0.00000, -1.00000, -1.61803);
+      \draw (-1.61803, 0.00000, -1.00000) -- (-0.00000, -1.00000, -1.61803);
+      \draw (-1.00000, -1.61803, 0.00000) -- (-1.61803, -0.00000, -1.00000);
+      \draw (1.00000, -1.61803, 0.00000) -- (-0.00000, -1.00000, -1.61803);
+      \draw (1.00000, -1.61803, 0.00000) -- (-1.00000, -1.61803, 0.00000);
+      \draw (-1.61803, 0.00000, 1.00000) -- (-1.00000, -1.61803, -0.00000);
+      \draw (-1.61803, 0.00000, -1.00000) -- (0.00000, 1.00000, -1.61803);
+      \draw (-1.61803, 0.00000, 1.00000) -- (-1.61803, 0.00000, -1.00000);
+      \draw (0.00000, 1.00000, -1.61803) -- (0.00000, -1.00000, -1.61803);
+      \fill[gray] (0.00000, 0.00000, 0.00000) -- (0.00000, -1.61803, 0.00000) -- (-1.00000, -1.61803, 0.00000) -- (-1.00000, 0.00000, 0.00000) -- cycle;
+      \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, -1.61803) -- (0.00000, -1.00000, -1.61803) -- (0.00000, -1.00000, 0.00000) -- cycle;
+      \fill[casred] (0.00000, 0.00000, 0.00000) -- (-1.61803, 0.00000, 0.00000) -- (-1.61803, 0.00000, -1.00000) -- (0.00000, 0.00000, -1.00000) -- cycle;
+      \draw (0.00000, -1.00000, 1.61803) -- (-1.00000, -1.61803, 0.00000);
+      \draw (1.61803, 0.00000, -1.00000) -- (0.00000, -1.00000, -1.61803);
+      \draw (-1.00000, 1.61803, 0.00000) -- (-1.61803, 0.00000, -1.00000);
+      \fill[casred] (0.00000, 0.00000, 0.00000) -- (-1.61803, 0.00000, 0.00000) -- (-1.61803, 0.00000, 1.00000) -- (0.00000, 0.00000, 1.00000) -- cycle;
+      \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, -1.61803) -- (0.00000, 1.00000, -1.61803) -- (0.00000, 1.00000, 0.00000) -- cycle;
+      \fill[gray] (0.00000, 0.00000, 0.00000) -- (0.00000, -1.61803, 0.00000) -- (1.00000, -1.61803, 0.00000) -- (1.00000, 0.00000, 0.00000) -- cycle;
+      \draw (0.00000, -1.00000, 1.61803) -- (1.00000, -1.61803, 0.00000);
+      \draw (0.00000, -1.00000, 1.61803) -- (-1.61803, 0.00000, 1.00000);
+      \draw (1.61803, 0.00000, -1.00000) -- (1.00000, -1.61803, 0.00000);
+      \draw (-1.61803, 0.00000, 1.00000) -- (-1.00000, 1.61803, 0.00000);
+      \draw (0.00000, 1.00000, -1.61803) -- (1.61803, 0.00000, -1.00000);
+      \draw (-1.00000, 1.61803, 0.00000) -- (0.00000, 1.00000, -1.61803);
+      \fill[casred] (0.00000, 0.00000, 0.00000) -- (1.61803, 0.00000, 0.00000) -- (1.61803, 0.00000, -1.00000) -- (0.00000, 0.00000, -1.00000) -- cycle;
+      \fill[gray] (0.00000, 0.00000, 0.00000) -- (0.00000, 1.61803, 0.00000) -- (-1.00000, 1.61803, 0.00000) -- (-1.00000, 0.00000, 0.00000) -- cycle;
+      \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, 1.61803) -- (0.00000, -1.00000, 1.61803) -- (0.00000, -1.00000, 0.00000) -- cycle;
+      \draw (0.00000, 1.00000, 1.61803) -- (-1.61803, 0.00000, 1.00000);
+      \draw (1.61803, 0.00000, 1.00000) -- (1.00000, -1.61803, 0.00000);
+      \draw (1.00000, 1.61803, 0.00000) -- (0.00000, 1.00000, -1.61803);
+      \fill[gray] (0.00000, 0.00000, 0.00000) -- (0.00000, 1.61803, 0.00000) -- (1.00000, 1.61803, 0.00000) -- (1.00000, 0.00000, 0.00000) -- cycle;
+      \fill[casblue] (0.00000, 0.00000, 0.00000) -- (0.00000, 0.00000, 1.61803) -- (0.00000, 1.00000, 1.61803) -- (0.00000, 1.00000, 0.00000) -- cycle;
+      \fill[casred] (0.00000, 0.00000, 0.00000) -- (1.61803, 0.00000, 0.00000) -- (1.61803, 0.00000, 1.00000) -- (0.00000, 0.00000, 1.00000) -- cycle;
+      \draw (0.00000, -1.00000, 1.61803) -- (1.61803, 0.00000, 1.00000);
+      \draw (0.00000, 1.00000, 1.61803) -- (0.00000, -1.00000, 1.61803);
+      \draw (1.61803, 0.00000, 1.00000) -- (1.61803, 0.00000, -1.00000);
+      \draw (1.00000, 1.61803, 0.00000) -- (1.61803, 0.00000, -1.00000);
+      \draw (0.00000, 1.00000, 1.61803) -- (-1.00000, 1.61803, 0.00000);
+      \draw (-1.00000, 1.61803, 0.00000) -- (1.00000, 1.61803, 0.00000);
+      \draw (0.00000, 1.00000, 1.61803) -- (1.61803, 0.00000, 1.00000);
+      \draw (0.00000, 1.00000, 1.61803) -- (1.00000, 1.61803, 0.00000);
+      \draw (1.61803, 0.00000, 1.00000) -- (1.00000, 1.61803, 0.00000);
+    \end{scope}
+  \end{tikzpicture}
+  \caption{Icosahedron with an inscribed true cross}
+  \label{fig:true-cross}
+\end{marginfigure}
+\item define (left/right) presentation complex of group presentation
+\item define Stallings folding
+\item deduce Nielsen--Schreier and Nielsen basis
+\item deduce algorithms for generalized word problem, conjugation, etc.
+\item deduce Howson's theorem
+\item think about 2-cell replacement for folding; better proofs in HoTT?
+\item move decidability results to main flow
+\item include undecidability of word problem in general
+  -- doesn't depend on presentation (for classes closed under inverse images of monoid homomorphisms)
+\item describe $F(S)/H$ in the case where $H$ has infinite index
+\item describe normal closure of $R$ in $F(S)$ -- still f.g.? -- get Cayley graph of $F(S)/\langle R\rangle$. -- Todd-Coxeter algorithm?
+\item in good cases we can recognize $\mathcal{S}(R)$ as a ``fundamental domain'' in Cayley graph of $\langle S\mid R\rangle$.
+\end{itemize}
+
+\begin{remark}
+  In this chapter, we use letters from the
+  beginning of the alphabet $a,b,c,\dots$
+  to denote generators,
+  and we use the corresponding capital letters
+  $A,B,C$ to denote their inverses,
+  so, e.g., $aA=Aa=1$.
+  This cleans up the notational clutter significantly.
+\end{remark}
+
+Do we fix $S$, a finite set $S=\{a,b,\ldots\}$?
+Mostly $F$ will denote the free group on $S$.
+And for almost all examples, we take $S = \{a,b\}$.
+
+\section{Graphs and Cayley graphs}
+\label{sec:cayley-graphs}
+
+We have seen in the previous chapter how cyclic groups
+(those generated by a single generator)
+have neatly described types of torsors.
+Indeed, $\BCG_n \jdeq \Cyc_n$, where $\Cyc_n$ is the type of $n$-cycles,
+and the classifying type of the integers, $\B\ZZ\jdeq\Sc$, \ie the circle,
+is equivalent to the type of infinite cycles, $\Cyc_0$.
+In \cref{cha:circle}, we defined the types of (finite or infinite)
+cycles as certain components of $\sum_{X:\UU}(X\eqto X)$,
+but we can equivalently consider components of $\sum_{X:\UU}(X\to X)$,
+since the former is a subtype of the latter.
+By thinking of functions in terms of their graphs,
+we might as well look at components of $\sum_{X:\UU}(X \to X \to \UU)$.
+
+In this section we shall generalize this story
+to groups $G$ generated by a
+(finite or just decidable)
+set of generators $S$.
+
+First recall from Cayley's \cref{lem:allgpsarepermutationgps}
+that any group $G$ can be realized as a subgroup of the permutation group
+on the underlying set of symmetries in $G$, $\USymG$.
+In this description, a $G$-shape is a set $X$ equipped
+a $G$-action that defines a $G$-torsor,
+which in turn can be expressed as the structure of a map $\alpha:\USymG \to X \to X$
+satisfying certain properties.
+
+It may happen that already $\alpha$ restricted to a subset $S$ of $\USymG$
+suffices to specify the action.
+In that case we say that $S$ generates $G$, though we'll take the following
+as the official definition.
+\begin{definition}\label{def:gens-gp}
+  Let $G$ be a group and $S$ be a subset of $\USymG$, given by an inclusion
+  $\iota : S \to \USymG$. We say that \emph{$S$ generates $G$} if the induced
+  homomorphism from the free group on $S$,
+  \[
+    \FG_S \to G,
+  \]
+  is an epimorphism.
+\end{definition}
+\begin{lemma}\label{lem:gens-gp-iff}
+  Let $G$ be a group
+  and $\iota : S \to \USymG$ an inclusion of a subset of the elements of $G$.
+  Then $S$ generates $G$ if and only if the map
+  \[
+    \rho_S : \BG \to \sum_{X:\UU}(S \to X \to X) ,
+    \quad
+    \rho_S(t) \defeq \bigl(t \eqto \sh_G, s \mapsto \iota(s) \cdot \blank\bigr)
+  \]
+  is an embedding.\footnote{We use $t \eqto \sh_G$ rather than the equivalent
+    $\sh_G \eqto t$ in order to conform to the representation from Cayley's theorem.}
+\end{lemma}
+In this case, then, $G$ can be identified with the automorphism group of $\rho_S(\sh_G)$
+in the type $\sum_{X:\UU}(S \to X \to X)$, or even in the larger type (of which it's a subtype), $\sum_{X:\UU}(S \to X \to X \to \UU)$.
+
+\begin{figure}
+  \begin{sidecaption}%
+    {Cayley graph for {$\protect\SG_3$} with respect to $S = \{(1\;2),(2\;3)\}$.}[fig:cayley-s3]
+  \centering
+  \begin{tikzpicture}
+    \pgfmathsetmacro{\len}{2}
+    \node[vertex,label=30:$(1\;3)$]   (n13)  at (30:\len)  {};
+    \node[vertex,label=90:$(1\;3\;2)$]  (n132) at (90:\len)  {};
+    \node[vertex,label=150:$(1\;2)$]  (n12)  at (150:\len) {};
+    \node[vertex,label=210:$e$]     (ne)   at (210:\len) {};
+    \node[vertex,label=270:$(2\;3)$]  (n23)  at (270:\len) {};
+    \node[vertex,label=330:$(1\;2\;3)$] (n123) at (330:\len) {};
+    \begin{scope}[every to/.style={bend right=22}]
+      % generator a is (12)
+      \draw[gena] (ne)   to (n12);
+      \draw[gena] (n12)  to (ne);
+      \draw[gena] (n13)  to (n132);
+      \draw[gena] (n132) to (n13);
+      \draw[gena] (n123) to (n23);
+      \draw[gena] (n23)  to (n123);
+      % generator b is (23)
+      \draw[genb] (ne)   to (n23);
+      \draw[genb] (n23)  to (ne);
+      \draw[genb] (n13)  to (n123);
+      \draw[genb] (n123) to (n13);
+      \draw[genb] (n12)  to (n132);
+      \draw[genb] (n132) to (n12);
+    \end{scope}
+  \end{tikzpicture}
+  \end{sidecaption}
+\end{figure}
+
+Also note that $S$ generates $G$ if and only if the map on elements
+$\UFG_S \to \USymG$ is surjective, meaning every element of $G$ can be expressed
+as a product of the letters in a (reduced) word from $\mathcal R_S$, interpreted
+according to the inclusion of $S$ into $\USymG$.
+This is the case for example for $S$ consisting of the transpositions
+$(1\;2)$, $(2\;3)$ in $\SG_3$, as illustrated in~\cref{fig:cayley-s3},
+where the \textcolor{casblue}{blue} color represents $(1\;2)$
+and the \textcolor{casred}{red} color represents $(2\;3)$.
+
+Before we give the proof of~\cref{lem:gens-gp-iff}, let us study these types more closely.
+\begin{definition}
+  An $S$-labeled graph is an element $(V,E)$ of the type
+  $\sum_{V:\UU}(S \to V \to V \to \UU)$.%
+  \index{graph!labeled}
+  The first component $V$ is called the type of \emph{vertices} of the graph,
+  and the type $E(s,x,y)$ is called the type of $s$-colored \emph{edges}
+  from $x$ (the source) to $y$ (the target).
+\end{definition}
+If for every vertex $x:V$ and every color $s:S$ there is unique $s$-colored edge out of $x$, \ie the type $\sum_{y:V}E(s,x,y)$ is contractible, then we say that the graph
+is \emph{functional}. This means that the graph lives in the subtype $\sum_{V:\UU}(S \to V \to V)$,
+as is the case for the graph $\rho_S(\sh_G)$ for a group $G$.
+This graph is called the Cayley graph of $G$ with respect to the set $S$:
+\begin{definition}\label{def:cayley-graph}
+  The \emph{Cayley graph}\index{graph!Cayley graph}
+  of a group $G$ with respect to a generating subset $S$
+  is the graph $\Cay(G;S)$\glossary(Cay){$\protect\Cay(G;S)$}{Cayley graph of a group $G$
+  with respect to $S$}
+  is the $S$-colored graph with vertices $\USymG$
+  and edges $S \times \USymG$ where the edge $(s,g)$ has source $g$, target $sg$,
+  and color $s$.
+\end{definition}
+Convince yourself that this is really an equivalent description of $\rho_S(\sh_G)$
+considered as an $S$-colored graph.
+
+If $S$ is contractible (so there's only one color), then we just say \emph{graph},
+and then we simplify the type of edges to $V \to V \to \UU$.
+Of course, every $S$-labeled graph $(V,E)$ gives rise to such an unlabeled label
+by summing over the colors, \ie the type of edges from $x$ to $y$ in this graph
+is $\sum_{s:S}E(s,x,y)$.
+
+Another way to represent a graph is to sum over all the sources and targets (and colors),
+via~\cref{lem:typefamiliesandfibrations},
+\ie as a tuple $(V,E,s,t,c)$, where $V:\UU$ is the type of vertices,
+$E$ is the (total) type of edges,
+$s,t : E \to V$ give the source and target of an edge,
+while $c: E \to S$ gives the color (if we're talking about $S$-colored graphs).
+In this description, to get the unlabeled graph we simply drop the last component.
+
+Every graph $(V,E)$ (and thus every labeled graph) gives rise to a type
+by ``gluing the edges to the vertices'' defined as follows.
+\begin{definition}
+  Fix an unlabeled graph $(V,E)$. The \emph{graph quotient}\footnote{%
+    If the graph is represented by source and target maps
+    $s,t: E \rightrightarrows V$, then the graph quotient is
+  also called the \emph{coequalizer} of $s$ and $t$.} $V/E$ is
+  the higher inductive type with constructors:
+  \begin{enumerate}
+  \item For every vertex $x : V$ a point $[x] : V/E$.
+  \item For every edge $e : E(x,y)$ an identification $\qedge_e : [x] \eqto [y]$.
+  \end{enumerate}
+
+  Let $A(z)$ be a type for every element $z:V/E$. The induction principle
+  for $V/E$ states that, in order to define an element of $A(z)$ for every $z:V/E$,
+  it suffices to give elements $a_x : A([x])$ for every vertex $x:V$
+  together with
+  identifications $q_e : \pathover{a_x}{A}{\qedge_e}{a_y}$
+  for every $e:E(x,y)$.
+  The function $f$ thus defined satisfies $f([x])\jdeq a_x$ for $x:V$
+  and we are provided identifications $\apd{f}(\qedge_e)\eqto q_e$ for each $e:E(x,y)$.
+\end{definition}
+\begin{remark}
+  Note the similarity with the classifying type of a free group,
+  \cf~\cref{def:bfree}. Indeed, if we form the (unlabeled!)
+  graph $(\bn 1,S)$
+  on one vertex with $S$ edges, then $\bn 1/S$ is essentially the same as $\BFG_S$.
+\end{remark}
+\begin{xca}
+  An equivalence relation $R : A \to A \to \Prop$ on a set $A$
+  can be regarded as a graph $(A,R)$.
+  Construct an equivalence between set truncation of the graph quotient $\Trunc{A/R}_0$
+  and the set quotient $A/R$ from~\cref{def:quotient-set} in this case.
+  (So in the world of sets, the two notations agree.)
+\end{xca}
+While we're building up to the proof of~\cref{lem:gens-gp-iff} we need
+a description of a sum type over a graph quotient.
+By the above remark, this applies also to sum types over $\BFG_S$.
+\begin{construction}\label{def:graph-quotient-flattening}
+  Given a graph $(V,E)$ and a family of types $X : V/E \to \UU$.
+  Define $V' \defeq \sum_{v:V}X([v])$ and
+  $E'((v,x),(w,y)) \defeq \sum_{e:E(v,w)}\pathover{x}{X}{\qedge_e}{y}$.
+  Then we have an equivalence\index{flattening construction}\footnote{%
+    This is often called the \emph{flattening construction} (or flattening lemma),
+    as it ``flattens'' a sum over a graph quotient into a single graph quotient.}
+  \[
+    \flt : \Bigl(\sum_{z:V/E}X(z)\Bigr) \equivto V'/E'
+  \]
+\end{construction}
+\begin{implementation}{def:graph-quotient-flattening}
+  We define functions $\varphi : V'/E' \to \sum_{z:V/E}X(z)$
+  and $\psi : \prod_{z:V/E}\bigl(X(z) \to V'/E'\bigr)$
+  using the induction principles:
+  \begin{alignat*}2
+    \varphi([(v,x)]) &\defeq ([v],x) &\quad
+    \tilde\psi([v]) &\defeq (x \mapsto [(v,x)]) \\
+    \ap\varphi(\qedge_{(e,q)}) &\defis \pathpair{\qedge_e}{q} &\quad
+    \apd{\tilde\psi}(\qedge_e) &\defis h,
+  \end{alignat*}
+  where we need to construct\marginnote{%
+    \begin{tikzcd}[column sep=small,ampersand replacement=\&]
+      X([v]) \ar[rr,"{\trp[X]{\qedge_e}}","\simeq"']\ar[dr,"{\psi([v])}"']
+      \& \& X([w]) \ar[dl,"{\psi([w])}"] \\
+      \& V'/E' \&
+    \end{tikzcd}}
+  $h : \pathover{(x \mapsto [(v,x)])}{z \mapsto X(z) \to V'/E'}{\qedge_e}
+  {(y \mapsto [(w,y)])}$ for all $e : E(v,w)$.
+  By transporting in families of functions,
+  it suffices to give an identification
+  $[(v,x)] \eqto [(w,\trp[X]{\qedge_e}(x))]$ for all $x : X([v])$.
+  We get this as the identification constructor $\qedge_{(e,q)}$ for $V'/E'$,
+  where $q: \pathover{x}{X}{\qedge_e}{\trp[X]{\qedge_e}(x)}$
+  is the identification over $\qedge_e$ corresponding
+  to the reflexivity identification at
+  $\trp[X]{\qedge_e}(x)$ via~\cref{def:pathover-trp}.
+\end{implementation}
+\begin{xca}
+  Complete the implementation by giving identifications $\psi\circ\phi\eqto\id$
+  and $\phi\circ\psi\eqto\id$, where $\psi : \bigl(\sum_{z:V/E}X(z)\bigr) \to V'/E'$
+  is defined by $\psi((z,x)) \defeq \tilde\psi(z)(x)$.
+\end{xca}
+
+Later on we'll need also need the following results about graph quotients.
+\begin{xca}\label{xca:graph-quotient-in-steps}
+  Suppose the edges $E$ of a graph $(V,E)$ are expressed as a binary sum $E_0 \amalg E_1$.
+  (Here, it doesn't matter whether $E$ is expressed as a type family $E : V \to V \to \UU$,
+  in which case we have a family of equivalences $E(v,w) \equivto E_0(v,w) \amalg E_1(v,w)$,
+  or $E$ is the total type of edges.)
+
+  Then we can obtain the graph quotient $V/E$ by first gluing in the edges from $E_0$,
+  and then gluing in the edges from $E_1$ to the resulting type $V/E_0$.
+  Using the description of graphs with a total type of edges $E \equivto E_0 \amalg E_1$,
+  we have corresponding source and target maps expressed as compositions:
+  \[
+    E_1 \hookrightarrow E_0\amalg E_1 \equivto E \rightrightarrows V \to V/E_0.
+  \]
+  Construct an equivalence $V/E \equivto V/(E_0 \amalg E_1) \equivto (V/E_0)/E_1$.
+\end{xca}
+
+\begin{xca}\label{xca:graph-quotient-whisker}
+  Suppose we have any type $X$ with an element $x:X$.
+  We can form a graph $(X\amalg\bn 1,\bn 1)$ with vertex type $X\amalg\bn 1$
+  and a single edge from $\inl x$ to $\inr 0$.
+  Construct an equivalence $X \equivto (X\amalg\bn 1)/\bn 1$.\footnote{%
+    This equivalence can be visualized as follows, where $X$ ``grows a whisker''
+    along the single edge.\\
+    \begin{tikzpicture}
+      \draw (0,0) ellipse (1 and 1.2);
+      \node (X) at (0,1.5) {$X$};
+      \node (t) at (1.7,0.6) {$\bn 1$};
+      \node[dot,label=below:$x$] (x) at (.6,0.3) {};
+      \node[dot] (pt) at (1.5,.4) {};
+      \draw[->,bend left] (x) -- (pt) {};
+    \end{tikzpicture}}
+\end{xca}
+\section{Examples}
+\label{sec:fg-examples}
+
+
+
+\begin{proof}[Proof of~\cref{lem:gens-gp-iff}]
+  TBD (perhaps put in graph quotients first)
+\end{proof}
+
+
+\begin{figure}
+  \begin{sidecaption}%
+    {Cayley graph for $A_5$ with respect to $S = \{a,b\}$,
+      where $a$ is a $1/5$-rotation about a vertex and
+      $b$ is a $1/2$-rotation about an edge in an icosahedron.}[fig:cayley-a5]
+  \centering
+\tdplotsetmaincoords{45}{135}
+\begin{tikzpicture}[tdplot_main_coords,scale=2]
+  % cayley icosahedron
+  \begin{scope}[fill=casblue,opacity=.2]
+\fill (0.00000, 1.00000, 1.61803) -- (0.00000, -1.00000, 1.61803) -- (-1.61803, 0.00000, 1.00000) -- cycle;
+\fill (-0.00000, 1.00000, 1.61803) -- (1.61803, 0.00000, 1.00000) -- (-0.00000, -1.00000, 1.61803) -- cycle;
+\fill (0.00000, 1.00000, 1.61803) -- (-1.61803, 0.00000, 1.00000) -- (-1.00000, 1.61803, 0.00000) -- cycle;
+\fill (-0.00000, 1.00000, 1.61803) -- (1.00000, 1.61803, 0.00000) -- (1.61803, 0.00000, 1.00000) -- cycle;
+\fill (-0.00000, -1.00000, 1.61803) -- (1.61803, -0.00000, 1.00000) -- (1.00000, -1.61803, 0.00000) -- cycle;
+\fill (0.00000, 1.00000, 1.61803) -- (-1.00000, 1.61803, 0.00000) -- (1.00000, 1.61803, 0.00000) -- cycle;
+\fill (-0.00000, -1.00000, 1.61803) -- (-1.00000, -1.61803, 0.00000) -- (-1.61803, 0.00000, 1.00000) -- cycle;
+\fill (1.61803, -0.00000, 1.00000) -- (1.00000, 1.61803, -0.00000) -- (1.61803, -0.00000, -1.00000) -- cycle;
+\fill (-0.00000, -1.00000, 1.61803) -- (1.00000, -1.61803, 0.00000) -- (-1.00000, -1.61803, 0.00000) -- cycle;
+\fill (-1.61803, 0.00000, 1.00000) -- (-1.61803, 0.00000, -1.00000) -- (-1.00000, 1.61803, 0.00000) -- cycle;
+\fill (1.00000, 1.61803, 0.00000) -- (-1.00000, 1.61803, -0.00000) -- (0.00000, 1.00000, -1.61803) -- cycle;
+\fill (-1.61803, 0.00000, 1.00000) -- (-1.00000, -1.61803, -0.00000) -- (-1.61803, 0.00000, -1.00000) -- cycle;
+\fill (1.61803, 0.00000, 1.00000) -- (1.61803, -0.00000, -1.00000) -- (1.00000, -1.61803, 0.00000) -- cycle;
+\fill (-1.00000, -1.61803, 0.00000) -- (1.00000, -1.61803, -0.00000) -- (-0.00000, -1.00000, -1.61803) -- cycle;
+\fill (-1.00000, 1.61803, 0.00000) -- (-1.61803, 0.00000, -1.00000) -- (0.00000, 1.00000, -1.61803) -- cycle;
+\fill (1.00000, 1.61803, 0.00000) -- (0.00000, 1.00000, -1.61803) -- (1.61803, 0.00000, -1.00000) -- cycle;
+\fill (1.00000, -1.61803, 0.00000) -- (1.61803, -0.00000, -1.00000) -- (-0.00000, -1.00000, -1.61803) -- cycle;
+\fill (-1.61803, 0.00000, -1.00000) -- (-1.00000, -1.61803, -0.00000) -- (-0.00000, -1.00000, -1.61803) -- cycle;
+\fill (1.61803, 0.00000, -1.00000) -- (0.00000, 1.00000, -1.61803) -- (0.00000, -1.00000, -1.61803) -- cycle;
+\fill (0.00000, 1.00000, -1.61803) -- (-1.61803, 0.00000, -1.00000) -- (0.00000, -1.00000, -1.61803) -- cycle;
+\end{scope}
+\node[vertex] (n) at (0.00000, 0.50000, 1.61803) {};
+\node[vertex] (na) at (0.40451, 0.75000, 1.46353) {};
+\node[vertex] (nb) at (-0.00000, -0.50000, 1.61803) {};
+\node[vertex] (nA) at (-0.40451, 0.75000, 1.46353) {};
+\node[vertex] (naa) at (0.25000, 1.15451, 1.21353) {};
+\node[vertex] (nba) at (-0.40451, -0.75000, 1.46353) {};
+\node[vertex] (nab) at (1.21353, 0.25000, 1.15451) {};
+\node[vertex] (nAb) at (-1.21353, 0.25000, 1.15451) {};
+\node[vertex] (nbA) at (0.40451, -0.75000, 1.46353) {};
+\node[vertex] (nAA) at (-0.25000, 1.15451, 1.21353) {};
+\node[vertex] (nbaa) at (-0.25000, -1.15451, 1.21353) {};
+\node[vertex] (naba) at (1.21353, -0.25000, 1.15451) {};
+\node[vertex] (nAba) at (-1.46353, 0.40451, 0.75000) {};
+\node[vertex] (naab) at (0.75000, 1.46353, 0.40451) {};
+\node[vertex] (nbab) at (-1.21353, -0.25000, 1.15451) {};
+\node[vertex] (nAAb) at (-0.75000, 1.46353, 0.40451) {};
+\node[vertex] (nabA) at (1.46353, 0.40451, 0.75000) {};
+\node[vertex] (nbAA) at (0.25000, -1.15451, 1.21353) {};
+\node[vertex] (nabaa) at (1.46353, -0.40451, 0.75000) {};
+\node[vertex] (nAbaa) at (-1.61803, 0.00000, 0.50000) {};
+\node[vertex] (naaba) at (1.15451, 1.21353, 0.25000) {};
+\node[vertex] (nAAba) at (-0.50000, 1.61803, 0.00000) {};
+\node[vertex] (nbaab) at (-0.75000, -1.46353, 0.40451) {};
+\node[vertex] (nAbab) at (-1.15451, 1.21353, 0.25000) {};
+\node[vertex] (nbAAb) at (0.75000, -1.46353, 0.40451) {};
+\node[vertex] (naabA) at (0.50000, 1.61803, 0.00000) {};
+\node[vertex] (nbabA) at (-1.46353, -0.40451, 0.75000) {};
+\node[vertex] (nabAA) at (1.61803, -0.00000, 0.50000) {};
+\node[vertex] (naabaa) at (1.15451, 1.21353, -0.25000) {};
+\node[vertex] (nAAbaa) at (-0.75000, 1.46353, -0.40451) {};
+\node[vertex] (nbaaba) at (-1.15451, -1.21353, 0.25000) {};
+\node[vertex] (nbAAba) at (0.50000, -1.61803, 0.00000) {};
+\node[vertex] (nabaab) at (1.15451, -1.21353, 0.25000) {};
+\node[vertex] (nAbaab) at (-1.61803, 0.00000, -0.50000) {};
+\node[vertex] (nabAAb) at (1.61803, -0.00000, -0.50000) {};
+\node[vertex] (nbaabA) at (-0.50000, -1.61803, 0.00000) {};
+\node[vertex] (nAbabA) at (-1.15451, 1.21353, -0.25000) {};
+\node[vertex] (naabAA) at (0.75000, 1.46353, -0.40451) {};
+\node[vertex] (nbaabaa) at (-1.15451, -1.21353, -0.25000) {};
+\node[vertex] (nbAAbaa) at (0.75000, -1.46353, -0.40451) {};
+\node[vertex] (nAbaaba) at (-1.46353, 0.40451, -0.75000) {};
+\node[vertex] (nabAAba) at (1.46353, -0.40451, -0.75000) {};
+\node[vertex] (naabaab) at (1.46353, 0.40451, -0.75000) {};
+\node[vertex] (nAAbaab) at (-0.25000, 1.15451, -1.21353) {};
+\node[vertex] (naabAAb) at (0.25000, 1.15451, -1.21353) {};
+\node[vertex] (nabaabA) at (1.15451, -1.21353, -0.25000) {};
+\node[vertex] (nAbaabA) at (-1.46353, -0.40451, -0.75000) {};
+\node[vertex] (nbaabAA) at (-0.75000, -1.46353, -0.40451) {};
+\node[vertex] (nAbaabaa) at (-1.21353, 0.25000, -1.15451) {};
+\node[vertex] (nabAAbaa) at (1.21353, -0.25000, -1.15451) {};
+\node[vertex] (naabAAba) at (0.40451, 0.75000, -1.46353) {};
+\node[vertex] (nbAAbaab) at (0.25000, -1.15451, -1.21353) {};
+\node[vertex] (nbaabAAb) at (-0.25000, -1.15451, -1.21353) {};
+\node[vertex] (naabaabA) at (1.21353, 0.25000, -1.15451) {};
+\node[vertex] (nAAbaabA) at (-0.40451, 0.75000, -1.46353) {};
+\node[vertex] (nAbaabAA) at (-1.21353, -0.25000, -1.15451) {};
+\node[vertex] (naabAAbaa) at (0.00000, 0.50000, -1.61803) {};
+\node[vertex] (nbaabAAba) at (-0.40451, -0.75000, -1.46353) {};
+\node[vertex] (nabAAbaab) at (0.40451, -0.75000, -1.46353) {};
+\node[vertex] (nbaabAAbaa) at (-0.00000, -0.50000, -1.61803) {};
+\draw[gena] (n) -- (nA);
+\draw[genb] (n) -- (nb);
+\draw[gena] (na) -- (n);
+\draw[genb] (na) -- (nab);
+\draw[gena] (nb) -- (nbA);
+\draw[genb] (nb) -- (n);
+\draw[gena] (nA) -- (nAA);
+\draw[genb] (nA) -- (nAb);
+\draw[gena] (naa) -- (na);
+\draw[genb] (naa) -- (naab);
+\draw[gena] (nba) -- (nb);
+\draw[genb] (nba) -- (nbab);
+\draw[gena] (nab) -- (nabA);
+\draw[genb] (nab) -- (na);
+\draw[gena] (nAb) -- (nbab);
+\draw[genb] (nAb) -- (nA);
+\draw[gena] (nbA) -- (nbAA);
+\draw[genb] (nbA) -- (naba);
+\draw[gena] (nAA) -- (naa);
+\draw[genb] (nAA) -- (nAAb);
+\draw[gena] (nbaa) -- (nba);
+\draw[genb] (nbaa) -- (nbaab);
+\draw[gena] (naba) -- (nab);
+\draw[genb] (naba) -- (nbA);
+\draw[gena] (nAba) -- (nAb);
+\draw[genb] (nAba) -- (nAbab);
+\draw[gena] (naab) -- (naabA);
+\draw[genb] (naab) -- (naa);
+\draw[gena] (nbab) -- (nbabA);
+\draw[genb] (nbab) -- (nba);
+\draw[gena] (nAAb) -- (nAbab);
+\draw[genb] (nAAb) -- (nAA);
+\draw[gena] (nabA) -- (nabAA);
+\draw[genb] (nabA) -- (naaba);
+\draw[gena] (nbAA) -- (nbaa);
+\draw[genb] (nbAA) -- (nbAAb);
+\draw[gena] (nabaa) -- (naba);
+\draw[genb] (nabaa) -- (nabaab);
+\draw[gena] (nAbaa) -- (nAba);
+\draw[genb] (nAbaa) -- (nAbaab);
+\draw[gena] (naaba) -- (naab);
+\draw[genb] (naaba) -- (nabA);
+\draw[gena] (nAAba) -- (nAAb);
+\draw[genb] (nAAba) -- (naabA);
+\draw[gena] (nbaab) -- (nbaabA);
+\draw[genb] (nbaab) -- (nbaa);
+\draw[gena] (nAbab) -- (nAbabA);
+\draw[genb] (nAbab) -- (nAba);
+\draw[gena] (nbAAb) -- (nabaab);
+\draw[genb] (nbAAb) -- (nbAA);
+\draw[gena] (naabA) -- (naabAA);
+\draw[genb] (naabA) -- (nAAba);
+\draw[gena] (nbabA) -- (nAbaa);
+\draw[genb] (nbabA) -- (nbaaba);
+\draw[gena] (nabAA) -- (nabaa);
+\draw[genb] (nabAA) -- (nabAAb);
+\draw[gena] (naabaa) -- (naaba);
+\draw[genb] (naabaa) -- (naabaab);
+\draw[gena] (nAAbaa) -- (nAAba);
+\draw[genb] (nAAbaa) -- (nAAbaab);
+\draw[gena] (nbaaba) -- (nbaab);
+\draw[genb] (nbaaba) -- (nbabA);
+\draw[gena] (nbAAba) -- (nbAAb);
+\draw[genb] (nbAAba) -- (nbaabA);
+\draw[gena] (nabaab) -- (nabaabA);
+\draw[genb] (nabaab) -- (nabaa);
+\draw[gena] (nAbaab) -- (nAbaabA);
+\draw[genb] (nAbaab) -- (nAbaa);
+\draw[gena] (nabAAb) -- (naabaab);
+\draw[genb] (nabAAb) -- (nabAA);
+\draw[gena] (nbaabA) -- (nbaabAA);
+\draw[genb] (nbaabA) -- (nbAAba);
+\draw[gena] (nAbabA) -- (nAAbaa);
+\draw[genb] (nAbabA) -- (nAbaaba);
+\draw[gena] (naabAA) -- (naabaa);
+\draw[genb] (naabAA) -- (naabAAb);
+\draw[gena] (nbaabaa) -- (nbaaba);
+\draw[genb] (nbaabaa) -- (nAbaabA);
+\draw[gena] (nbAAbaa) -- (nbAAba);
+\draw[genb] (nbAAbaa) -- (nbAAbaab);
+\draw[gena] (nAbaaba) -- (nAbaab);
+\draw[genb] (nAbaaba) -- (nAbabA);
+\draw[gena] (nabAAba) -- (nabAAb);
+\draw[genb] (nabAAba) -- (nabaabA);
+\draw[gena] (naabaab) -- (naabaabA);
+\draw[genb] (naabaab) -- (naabaa);
+\draw[gena] (nAAbaab) -- (nAAbaabA);
+\draw[genb] (nAAbaab) -- (nAAbaa);
+\draw[gena] (naabAAb) -- (nAAbaab);
+\draw[genb] (naabAAb) -- (naabAA);
+\draw[gena] (nabaabA) -- (nbAAbaa);
+\draw[genb] (nabaabA) -- (nabAAba);
+\draw[gena] (nAbaabA) -- (nAbaabAA);
+\draw[genb] (nAbaabA) -- (nbaabaa);
+\draw[gena] (nbaabAA) -- (nbaabaa);
+\draw[genb] (nbaabAA) -- (nbaabAAb);
+\draw[gena] (nAbaabaa) -- (nAbaaba);
+\draw[genb] (nAbaabaa) -- (nAAbaabA);
+\draw[gena] (nabAAbaa) -- (nabAAba);
+\draw[genb] (nabAAbaa) -- (nabAAbaab);
+\draw[gena] (naabAAba) -- (naabAAb);
+\draw[genb] (naabAAba) -- (naabaabA);
+\draw[gena] (nbAAbaab) -- (nabAAbaab);
+\draw[genb] (nbAAbaab) -- (nbAAbaa);
+\draw[gena] (nbaabAAb) -- (nbAAbaab);
+\draw[genb] (nbaabAAb) -- (nbaabAA);
+\draw[gena] (naabaabA) -- (nabAAbaa);
+\draw[genb] (naabaabA) -- (naabAAba);
+\draw[gena] (nAAbaabA) -- (naabAAbaa);
+\draw[genb] (nAAbaabA) -- (nAbaabaa);
+\draw[gena] (nAbaabAA) -- (nAbaabaa);
+\draw[genb] (nAbaabAA) -- (nbaabAAba);
+\draw[gena] (naabAAbaa) -- (naabAAba);
+\draw[genb] (naabAAbaa) -- (nbaabAAbaa);
+\draw[gena] (nbaabAAba) -- (nbaabAAb);
+\draw[genb] (nbaabAAba) -- (nAbaabAA);
+\draw[gena] (nabAAbaab) -- (nbaabAAbaa);
+\draw[genb] (nabAAbaab) -- (nabAAbaa);
+\draw[gena] (nbaabAAbaa) -- (nbaabAAba);
+\draw[genb] (nbaabAAbaa) -- (naabAAbaa);
+\end{tikzpicture}
+  \end{sidecaption}
+\end{figure}
+
+\section{Subgroups of free groups}
+\label{sec:subgroups-free}
+
+We now study subgroups of free groups.\marginnote{%
+  Our discussion follows the work of
+  \citeauthor{Swan2022}\footnotemark{}.}\footcitetext{Swan2022}
+We'll eventually prove the Nielsen--Schreier theorem,
+which states that a finite index subgroup $H$ of a free group $\FG_S$ is itself a free group.
+Furthermore, when $S$ is finite, the set of free generators of $H$ is itself finite.
+
+Recall from~\cref{def:set-of-subgroups} that a subgroup is (or can be represented by)
+a transitive $G$-set $X : \BG \to \Set$ along with an element of $X(\sh_G)$.
+\begin{definition}\label{def:finite-index}
+  A subgroup of a group $G$ has \emph{finite index} $m$ if the underlying
+  transitive $G$-set, $X : \BG \to \Set$ is a family of finite sets of cardinality $m$.
+\end{definition}
+The is the case, of course, if and only if the set acted on, $X(\sh_G)$, is finite
+of cardinality $m$.
+Notice that the definition doesn't depend on the chosen element of $X(\sh_G)$,
+so applies equally to all conjugacy classes of the subgroup.
+
+Recall also that the classifying type of the subgroup is the total type $\sum_{t:\BG}X(t)$ (which is pointed via the chosen point of $X(\sh_G)$).
+We'll use the Flattening~\cref{def:graph-quotient-flattening} to analyze
+this in case where $G$ is the free group on a set $S$, $\FG_S$,
+so we need to show that the quotient of the resulting graph
+is equivalent to $\bn 1/T$ for some set $T$.
+
+We do this by finding a ``spanning tree'' in the graph.
+
+\begin{definition}
+  A graph $(V,E)$ is \emph{connected}\index{connected!graph} if $V/E$ is a connected type
+  and it's a \emph{tree} if $V/E$ is contractible.
+\end{definition}
+
+\begin{definition}
+  A \emph{subgraph} of a graph $(V,E)$ consists of a subtype $h : U \hookrightarrow V$
+  of the vertices along with, for every pair of vertices $v,w$ in $U$,
+  a subtype $D(v,w)$ of the edges $E(v,w)$.
+\end{definition}
+If we represent graphs by source and target maps, then this amounts to embeddings
+$h : U \hookrightarrow V$ and $k : D \hookrightarrow E$ along with witnesses that the
+following squares commute:
+\[
+  \begin{tikzcd}
+    D \ar[r,hook,"k"]\ar[d,"s"'] & E \ar[d,"s"] \\
+    U \ar[r,hook,"h"'] & V
+  \end{tikzcd}\quad
+  \begin{tikzcd}
+    D \ar[r,hook,"k"]\ar[d,"t"'] & E \ar[d,"t"] \\
+    U \ar[r,hook,"h"'] & V
+  \end{tikzcd}
+\]
+\begin{definition}
+  A \emph{spanning tree} in a graph $(V,E)$ is a subgraph $(U,D)$
+  such that $(U,D)$ is a tree, and the embedding of the vertices
+  $U \hookrightarrow V$ is an equivalence.
+\end{definition}
+Equivalently, it's given by subtypes of the edges (leaving the vertices alone)
+such that the underlying graph is a tree.
+Very often we'll require that the edge embeddings are decidable,
+\ie we can decide whether a given edge $e : E(v,w)$ is part of the tree.
+
+\begin{marginfigure}
+  \begin{tikzpicture}
+    \draw (-.25,0.9) ellipse (.55 and 1.2);
+    \node (X) at (0,2.4) {$V_0$};
+    \draw (1.2,1.1) ellipse (.7 and 1);
+    \node (Y) at (1,2.3) {$V_1$};
+    \node[dot,label=below:$v_0$] (x) at (-.1,0.4) {};
+    \node[dot,label=above:$v_1$] (y) at (1.6,1.3) {};
+    \node[dot,label=below:$u_0$] (s) at (-.1,1.4) {};
+    \node[dot,label=below:$u_1$] (t) at (1.0,1.3) {};
+    \draw[casblue,dotted,<->] (s) -- (t) node[midway,label=above:$e$] {};
+    \draw[dashed] (0.5,1.1) ellipse (1.5 and 1.9);
+    \node (XY) at (-0.75,3.05) {$V_0 \amalg V_1$};
+  \end{tikzpicture}
+  \caption{A connected graph with a crossing edge}
+  \label{fig:crossing-edge}
+\end{marginfigure}
+\begin{lemma}\label{lem:crossing-edge}
+  Suppose we have a connected graph $(V,E)$ whose type of vertices
+  decomposes as a binary sum $V \equivto V_0 \amalg V_1$
+  and we have $v_0:V_0$ and $v_1:V_1$.
+  Then there merely exists an edge $e$ either with source in $V_0$ and target in $V_1$
+  or the other way round.
+\end{lemma}
+The situation is illustrated in~\cref{fig:crossing-edge}, where we assume
+there is an edge relation on the binary sum that gives a connected graph,
+and hence there must be a ``crossing edge'' $e$, going either from $V_0$ to $V_1$
+or the other way.
+\begin{proof}
+  We may assume $V \jdeq V_0 \amalg V_1$ by path induction.
+  The idea is then to define a family of propositions $P : V/E \to \Prop$
+  that, on one hand is trivially true over $V_0$, and on the other hand
+  expresses our desired goal, the existence of a ``crossing edge'', over $V_1$.
+
+  We now define $P(z)$, for $z:V/E$,
+  by the induction principle for the graph quotient $V/E$.
+  We set $P([\inl v]) \defeq \true$ for $v : V_0$ and
+  \[
+    P([\inr v]) \defeq \Trunc*{\sum_{u_0:V_0}\sum_{u_1:V_1}
+      \bigl(E(u_0,u_1) \amalg E(u_1,u_0)\bigr)}
+  \]
+  for $v : V_1$.
+  We must then prove that the propositions $P([v])$ and $P([v'])$ are equivalent
+  whenever there's an edge from $v$ to $v'$.
+  This is the case by definition when $v,v'$ lie in the same summand,
+  and it's also the case when they lie in different summands, since then
+  we get a witness for the truth over $V_1$.
+
+  Since $V/E$ is connected, $P$ must have a constant truth value,
+  and since $P([\inl{v_0}])\jdeq\true$, every $P(z)$ is true.
+  Hence also $P([\inr{v_1}])$ is true, which is exactly what we wanted.
+\end{proof}
+
+\begin{lemma}\label{lem:spanning-tree-step}
+  Fix a connected graph $(V,E)$ where $V$ has decidable equality and $E$ is a family of sets.
+  For any subgraph $(U,D)$, where the embedding $U\hookrightarrow V$ is decidable,
+  and with vertices $u \in U$ and $v \in V \setminus U$,
+  there merely exists\footnote{%
+    Keep in mind that subgraphs consist not only of the vertices and edges,
+    but also of the corresponding embeddings into the supergraph.
+    It's for the sake of these that we only prove mere existence.\\
+    \begin{tikzcd}[sep=small,ampersand replacement=\&]
+      D \ar[r,hook]\ar[d,shift left]\ar[d,shift right] \&
+      D\amalg\bn 1 \ar[r,hook]\ar[d,shift left]\ar[d,shift right] \&
+      E\ar[d,shift left]\ar[d,shift right] \\
+      U \ar[r,hook]\ar[d] \&
+      U\amalg\bn 1 \ar[r,hook]\ar[d] \&
+      V \ar[d] \\
+      U/D \ar[r,"\equiv"] \&
+      (U\amalg\bn 1)/(D\amalg\bn 1)\ar[r] \&
+      V/E
+    \end{tikzcd}}
+  a larger subgraph with exactly one more vertex and one more edge,
+  $(U\amalg\bn 1, D\amalg\bn 1)$ such that the induced map on graph quotients
+  $U/D \to (U\amalg\bn 1)/(D\amalg\bn 1)$ is an equivalence.
+\end{lemma}
+\begin{proof}
+  Since the embedding $U\hookrightarrow V$ is decidable,
+  we can write $V$ as the binary sum $U \amalg (V\setminus U)$.
+  Apply~\cref{lem:crossing-edge} to find a ``crossing edge'' $e$,
+  and form the new subgraph $(U\amalg\bn 1, D\amalg\bn 1)$ by adding
+  the incident vertex not in $U$ as well as the edge $e$ itself.
+  The embedding $U\amalg\bn 1 \to V$ is still decidable, since $V$ has decidable equality.
+  Finally, we have
+  \[
+    (U\amalg\bn 1) / (D\amalg\bn 1) \equivto \bigl((U\amalg\bn 1)/\bn 1\bigr)/D
+    \equivto U/D,
+  \]
+  using~\cref{xca:graph-quotient-in-steps,xca:graph-quotient-whisker}, as desired.
+\end{proof}
+
+\begin{lemma}\label{lem:spanning-tree}
+  Let $(V,E)$ be a connected graph where $V$ is an $n$-element set,
+  and $E$ is a family of decidable sets. Then the graph merely has a spanning tree
+  with exactly $n-1$ edges.
+\end{lemma}
+
+\begin{marginfigure}
+  \begin{tikzpicture}
+    \node[dot] (v1) at (0,0) {};
+    \node[dot] (v2) at (1,0) {};
+    \node[dot] (v3) at (-.4,1) {};
+    \node[dot] (v4) at (.7,.9) {};
+    \node[dot] (v5) at (.5,1.8) {};
+    \node[dot] (v6) at (1.5,1.6) {};
+    \draw[->,casred] (v1) -- (v2);
+    \draw[->,casred] (v1) to[out=135,in=270] (v3);
+    \draw[->,casred] (v3) -- (v4);
+    \draw[->] (v4) -- (v2);
+    \draw[->,casred] (v6) to[out=200,in=80] (v3);
+    \draw[->] (v2) to[out=45,in=270] (v6);
+    \draw[->] (v6) -- (v4);
+    \draw[->,casred] (v6) to[out=90,in=45] (v5);
+  \end{tikzpicture}
+  \caption{A connected graph on $6$ vertices with a spanning tree indicated
+    in~\textcolor{casred}{red}.}
+  \label{fig:spanning-tree-example}
+\end{marginfigure}
+
+\begin{proof}
+  We show by induction on $k$, with $1\le k\le n$, that there merely exists
+  a subgraph $(U,D)$ with $k$ vertices, $k-1$ edges, and $U/D$ contractible,
+  \ie the graph $(U,D)$ is a tree.
+
+  For $k\jdeq 1$, we use that $V/E$ is connected to get that $V$ merely has a vertex $v$.
+  This then defines the desired subgraph on one vertex with no edges,
+  and this is clearly a tree.
+
+  Suppose we have such a desired subgraph $(U,D)$
+  with $k$ vertices and $k-1$ edges and $k<n$.
+  Since $V$ is finite, there exists vertices $u \in U$ and $v \in V \setminus U$.
+  Now apply~\cref{lem:spanning-tree-step} to get the next subgraph.
+
+  Finally, the subgraph $(U,D)$ with $n$ vertices and $n-1$ edges gives
+  the desired spanning tree, and any embedding of an $n$-element set
+  in another $n$-element set is an equivalence.\footnote{%
+    Assuming the Axiom of Choice, we can show the mere existence of a spanning tree
+    in any graph $(V,E)$ with a sets of vertices and edges.
+    See the above work by~\citeauthor{Swan2022}.}
+\end{proof}
+
+\begin{theorem}[Nielsen--Schreier Theorem]
+  Suppose that $S$ is a set with decidable equality and
+  $X : \BFG_S \to \Set$ defines a (conjugacy class of a)
+  finite index subgroup of $\FG_S$.
+  Then $\sum_{z:\BFG_S}X(z)$ is merely equivalent to $\BFG_T$ for some set $T$.
+
+  Moreover, if $S$ is a finite set of cardinality $n$ and the subgroup has index $m$,
+  then $T$ can be taken to be a finite set of cardinality $m(n-1)+1$.
+\end{theorem}
+\begin{proof}
+  By the Flattening~\cref{def:graph-quotient-flattening},
+  we have an equivalence $\flt:\bigl(\sum_{z:\BFG_S}X(z)\bigr) \equivto V/E$,
+  with $V\defeq X(\base)$ and $E(x,y) \defeq \sum_{s:S}(\pathover{x}{X}{\Sloop_s}{y})$.
+  By the finite index assumption, $V$ is a finite set,
+  say, of cardinality $m>0$,
+  and since both $S$ and $X(\base)$ are decidable, so is $E$.
+
+  By~\cref{lem:spanning-tree}, the graph $(V,E)$ merely contains
+  a spanning tree with
+  $m-1$ edges $E_0$, and complementary edge set $E_1$. Hence,
+  using \cref{xca:graph-quotient-in-steps}, we have a chain of equivalences:
+  \[
+    V/E \equivto (V/E_0)/E_1
+    \equivto \bn 1/E_1 \equivto \BFG_{E_1}
+  \]
+  This establishes the first claim with $T \defeq E_1$.
+
+  If, furthermore, $S$ has cardinality $n$, then the graph $(V,E)$
+  has $mn$ edges, as there are precisely $n$ outgoing edges from each vertex.
+  Since $E_0$ has $m-1$ edges,
+  that leaves $mn - (m-1) = mn-m+1 = m(n-1)+1$ edges in $E_1$, as desired.
+\end{proof}
+(This also has an automata theoretic proof, see below.)
+
+\section{Intersecting subgroups}
+\label{sec:intersecting-subgroups}
+
+Stallings folding\footcite{Stallings1991}.
+
+\begin{theorem}
+  Let $H$ be a finitely generated subgroup of $F(S)$ and let $u\in\tilde S^*$
+  be a reduced word. Then $u$ represents an element of $H$ if and only if
+  $u$ is recognized by the Stallings automaton $\mathcal{S}(H)$.
+\end{theorem}
+\begin{theorem}
+  Let $H$ be a finitely generated subgroup of $F(S)$.
+  Then $H$ has finite index if and only if $\mathcal{S}(H)$ is total.
+
+  Furthermore, in this case the index equals the number of vertices of
+  $\mathcal{S}(H)$.
+\end{theorem}
+\begin{corollary}
+  If $H$ has index $n$ in $F(S)$, then $\casop{\constant{rk}} H = 1 + n(\casop{\constant{card}} S-1)$.
+\end{corollary}
+
+\begin{theorem}\label{thm:howson-neumann}
+  Suppose $H_1,H_2$ are two subgroups of $F$ with finite indices $h_1,h_2$.
+  Then the intersection $H_1\cap H_2$ has finite index at most $h_1h_2$.
+\end{theorem}
+\marginnote{The qualitative part of \cref{thm:howson-neumann}
+  is known as \emph{Howson's theorem}, while the inequality
+  is known as \emph{Hanna Neumann's inequality}.
+  Hanna's son, Walter Neumann, conjectured that the $2$ could be removed,
+  and this was later proved independently by Joel Friedman
+  and Igor Mineyev.}
+
+\section{Connections with automata (*)}
+
+($S$ is still a fixed finite set.)
+
+Let $\iota : F(S) \to \tilde S^*$ map an element of the free group to the corresponding reduced word.
+The kernel of $\iota$ is the \emph{2-sided Dyck language} $\mathcal D_S$.
+
+The following theorem is due to Benois.
+\begin{theorem}
+  A subset $X$ of $F(S)$ is rational if and only if
+  $\iota(X)\subseteq \tilde S^*$ is a regular language.
+\end{theorem}
+
+\begin{lemma}
+  Let $\rho : \tilde S^* \to \tilde S^*$ map a word to its reduction.
+  Then $\rho$ maps regular languages to regular languages.
+\end{lemma}
+
+The following is due to Sénizergues:
+\begin{theorem}
+  A rational subset of $F(S)$ is either disjunctive or recognizable.
+\end{theorem}
+
+Given a surjective monoid homomorphism $\alpha : S^* \to G$,
+we define the corresponding \emph{matched homomorphism} $\tilde\alpha : \tilde S^* \to G$ by $(\tilde\alpha(a^{-1}) \defeq \alpha(a)^{-1}$.
+\begin{theorem}[?]
+  Consider a f.g.\ group $G$ with a surjective homomorphism
+  $\alpha : F(S) \to G$. A subset $X$ of $G$ is recognisable by a finite $G$-action
+  if and only if $\tilde\alpha^{-1}(X) \subseteq \tilde S^*$ is rational (i.e., regular).
+\end{theorem}
+\begin{theorem}[Chomsky--Schützenberger]
+  A language $L \subseteq T^*$ is context-free if and only if
+  $L = h(R \cap D_S)$ for some finite $S$,
+  where $h : T^* \to \tilde S^*$ is a homomorphism,
+  $R \subseteq \tilde S^*$ is a regular language, and
+  $D_S$ is the Dyck language for $S$.\footnote{%
+    References TODO. The theorem is also true if we replace $D_S$
+    by its one-sided variant, but in this case it reduces to
+    the well-known equivalence between context-free languages
+    and languages recognizable by pushdown automata.}
+\end{theorem}
+\begin{theorem}[Muller--Schupp, ?]
+  Suppose $\tilde\alpha : \tilde S^* \to G$ is a surjective matched homomorphism
+  onto a group $G$. Then $G$ is virtually free (i.e., $G$ has a normal free subgroup of finite index) if and only if $\ker(\tilde\alpha)$ is a context-free language.
+\end{theorem}
+\begin{theorem}
+
+\end{theorem}
+The Stallings automaton is an \emph{inverse automaton}:
+it's deterministic,
+and there's an edge $(p,a,q)$ if and only if there's one $(q,A,p)$.
+We can always think of the latter as the \emph{reverse} edge.
+(It's then also deterministic in the reverse direction.)
+
+Two vertices $p,q$ get identified in the Stallings graph/automaton
+if and only if there is a run from $p$ to $q$ with a word $w$
+whose reduction is $1$. (So a word like $aAAaBBbb$.)
+
+\begin{theorem}
+  Let $X \subseteq F(S)$. Then $Y$ is a coset $Hw$ with $H$
+  a finitely generated subgroup,
+  if and only if
+  there is a finite state inverse automaton whose language (after reduction)
+  is $Y$.
+\end{theorem}
+
+\begin{corollary}
+  The generalized word problem in $F(S)$ is solvable:
+  Given a finitely generated subgroup $H$, and a word $u : \tilde S^*$,
+  we can decide whether $u$ represents an element of $H$.
+\end{corollary}
+\marginnote{%
+  The Stallings automaton for $H$ can be constructed in time
+  $O(n \log^*n)$, where $n$ is the sum of the lengths of the generators for $H$.
+  [Cite: Touikan: A fast algorithm for Stallings' folding process.]
+  Once this has been constructed, we can solve membership in $H$ in linear time.}
+
+As above, we get a basis for $H$ as a free group from a spanning tree in
+$\mathcal{S}(H)$.
+
+\begin{theorem}
+  We can decide whether two f.g.\ subgroups of $F(S)$ are conjugate.
+  Moreover, a f.g.\ subgroup $H$ is normal if and only if $\mathcal{S}(H)$
+  is vertex-transitive.
+\end{theorem}
+\begin{proof}
+  $G,H$ are conjugate of and only if their cores are equal.
+\end{proof}
+
+There are other connections between group theory and language theory:
+\begin{theorem}[Anisimov and Seifert]
+  A subgroup $H$ of $G$ is rational if and only if $H$ is finitely generated.
+\end{theorem}
+\begin{theorem}
+  A subgroup $H$ of $G$ is recognizable if and only if it has finite index.
+\end{theorem}
+%%% Local Variables:
+%%% mode: latex
+%%% fill-column: 144
+%%% TeX-master: "book"
+%%% End:

@@ -1,0 +1,1585 @@
+\chapter{Normal subgroups and quotients}
+\label{ch:subgroups}
+
+
+\section{Brief overview of the chapter}
+\label{sec:subgp-overview}
+
+TBW (and stolen from the below)
+
+\section{Epimorphisms}
+\label{sec:epis}
+
+In set theory we say that a function $f:B\to C$ of sets is an injection if for all $b,b':B$ we have that $f(b)=f(b')$ implies that  $b=b'$.  This conforms with our definitions.
+%\footnote{This continues to be true in type theory, but since equality needs not be unique, we should in addition require that the two identities $p, f(\sigma(p)):f(b)=f(b')$ are equal.}
+Furthermore, since giving a term $b:B$ is equivalent to giving a (necessarily constant) function $c_b:\bn 1\to B$, we could alternatively say that a function $f:B\to C$ is an injection if and only if for any two $g,h:\bn 1\to B$ such that $fg=fh$ we have that $g=h$.  In fact, by function extensionality we can replace $\bn 1$ by any set $A$ (two functions are identical if and only if they have identical values at every point).
+
+Similarly, a function $f:B\to C$ is surjective if for all $c:C$ the preimage $f^{-1}(c)=\sum_{b:B}c=f(b)$ is non-empty.  A smart way to say this is to say that the first projection from $\sum_{c:C}\Trunc{f^{-1}(c)}$ to $C$ is an equivalence.  Since $B$ is always equivalent to $\sum_{c:C}f^{-1}(c)$, we see that for a surjection $f:B\to C$ and family of propositions $P:C\to \Prop$, the propositions $\prod_{c:C}P(c)$ and $\prod_{b:B}Pf(b)$ are equivalent.  In particular, if $g,h:C\to D$ are two functions into a set $D$ the proposition $\prod_{c:C}(g(c)=h(c))$ is equivalent to $\prod_{b:B}(gf(b)=hf(c))$.
+
+From this we condense the following characterizations of injections and surjections of sets which will prove to generalize nicely to other contexts.
+% In other words, an injection between sets is a function $f:B\to C$ such that for any set $A$ and functions $g,h:A\to B$ such that $fg=fh:A\to C$
+% $$\xymatrix{A\ar[r]^f&B\ar@<1ex>[r]^g\ar@<-1ex>[r]_h&C}$$
+% we necessarily have that $g=h$.
+\begin{lemma}
+  \label{lem:injofsetsaremono}Let $f:B\to C$ be a function between sets.
+  \begin{enumerate}
+  \item the function is an injection of and only if for any set $A$ and functions $g,h:A\to B$,
+$$\xymatrix{A\ar@<1ex>[r]^g\ar@<-1ex>[r]_h&B\ar[r]^f&C},$$  then $fg=fh:A\to C$ implies $g=h$
+\item the function is an injection of and only if for any set $D$ and functions $g,h:C\to D$,
+$$\xymatrix{B\ar[r]^f&C\ar@<1ex>[r]^g\ar@<-1ex>[r]_h&D},$$  then $gf=hf:A\to C$ implies $g=h$.
+  \end{enumerate}
+\end{lemma}
+
+
+By \cref{lem:injofsetsaremono} there is a pleasing reformulation which highlights that injections/surjections of sets are characterized by injections of sets of functions: a function of sets $f:B\to C$ is
+\begin{enumerate}
+\item  an injection if and only if for any set $A$ postcomposition by $f$ given an injection from $A\to B$ to $A\to C$
+\item a surjection if and only if for any set $D$ precomposition by $f$ gives an injection from $B\to D$ to $B\to D$.
+\end{enumerate}
+
+This observation about sets translates fruitfully to other contexts and in particular to groups.  To make it clear that we talk about group homomorphisms (and not about the underlying unpointed functions of connected groupoids) we resort to standard categorical notation.
+\begin{definition}\label{def:monomorphism}
+Given groups $G,H$, a homomorphism $f: \Hom(G,H)$ is called a\label{def:epimorphism}
+\begin{enumerate}
+\item \emph{monomorphism}\index{monomorphism!of groups} if for any group $F$,
+  postcomposition by $f$ is an injection from $\Hom(F,G)$ to $\Hom(F,H)$, and an
+\item \emph{epimorphism}\index{epimorphism!of groups} if for any group $I$,
+  precomposition by $f$ is an injection from $\Hom(H,I)$ to $\Hom(G,I)$.
+\end{enumerate}
+
+The \emph{type of epimorphisms from $G$}\index{type! of epimorphisms from a groups}\glossary(EpiG){$\protect{\typeepi_G}$}{type of epimorphisms from the group $G$} is\footnote{Raw from old 5.3.21. 
+Good example: For groups $G_1$ and $G_2$, then the first projection from $G_1\times G_2$ is an epimorphism.}
+  $$\typeepi_G\defequi\sum_{H:\typegroup}\sum_{f:\Hom(G,G')}\isepi(f).$$
+ 
+The corresponding families of propositions are called
+\[
+  \ismono,\isepi:\Hom(G,H)\to\Prop.\qedhere
+\]
+\end{definition}
+
+ 
+  
+  \begin{exercise}
+      \begin{enumerate}
+      \item Show that $i:\Hom(H,G)$ is a monomorphism if and only if $\USymi$ is an injection of sets and that $i$ is proper if and only $Ui$ is not a bijection.
+      \item Show that $f:\Hom(G,G')$ is an epimorphism if and only if $\USymf$ is an surjection of sets.
+      \item Consider a composite $f=f_0f_2$ of homomorphisms.  Show that $f_0$ is an epimorphism if $f$ is and $f_2$ is a monomorphism if $f$ is.\qedhere
+      \end{enumerate}
+    \end{exercise}
+    
+
+\marginnote{$$\xymatrix{\USymG\ar[d]^\simeq\ar[r]^{\US f}&\USymH\ar[d]^\simeq\\
+    \Hom(\ZZ,G)\ar[r]^{f_*}\ar[d]^\simeq_\abstr&\Hom(\ZZ,H)\ar[d]^\simeq_\abstr\\
+    \absHom(\ZZ,\abstr(G))\ar[r]^{\abstr f_*}&\absHom(\ZZ,\abstr(H))
+ }$$
+commutes (we've written $\ZZ$ also for $\abstr(\ZZ$) since otherwise it wouldn't fit.}
+We've seen that for any group $G$, the underlying set $\USymG\defequi(\shape_G=\shape_G)$ of $\abstr(G)$ is equivalent to the set of homomorphisms $\Hom(\ZZ,G)$ which in turn is equivalent to the set of abstract homomorphisms $\absHom(\abstr(\ZZ),\abstr(G))$ and that abstraction preserves composition.
+Hence, if $f:\Hom(G,H)$ is a group homomorphism, then saying that
+$\US f$ is an injection is equivalent to saying that postcomposition by $f$ is an injection $\Hom(\ZZ,G)\to\Hom(\ZZ,H)$.
+In this observation, the integers $\ZZ$ plays no more of a r\^ole than $\bn 1$ does in \cref{lem:injofsetsaremono}; we can let the source vary over any group $F$:
+
+
+\begin{lemma}\label{lem:eq-mono-cover}
+Let $G$ and $H$ be groups and $f: \Hom(G,H)$ a homomorphism.
+The following propositions are equivalent:\label{lem:eq-epi-conn}
+\begin{enumerate}
+\item\label{it:mono} $f$ is a monomorphism;
+\item\label{it:injection} $\US f:\USymG\to\USymH$ is an injection;
+\item\label{it:cover} $\Bf_\div:\BG_\div\to \BH_\div$ is a \covering.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  We have already seen that condition~\ref{it:mono} implies condition~\ref{it:injection} (let $F$ be $\ZZ$).
+    Conversely, suppose that \ref{it:injection} holds and $F$ is a group.  Consider the commutative diagram
+$$\xymatrix{\Hom(F,G)\ar[r]\ar[d]&\Hom(F,H)\ar[d]\\
+  (\Hom(\ZZ,F)\to\Hom(\ZZ,G))\ar[r]&(\Hom(\ZZ,F)\to\Hom(\ZZ,H)),}$$
+where the vertical maps are the injections from the sets of (abstract) homomorphism to the sets of functions of underlying sets and the horizontal maps are postcomposition with $f$.  Since the bottom function is by assumption is an injection, so is the upper one.
+\footnote{ Alternatively:  and $g,h:\Hom(F,G)$.  Then $fg=fh$ implies that for all $p:\Hom(\ZZ,F)$ we have by associativity that $f(gp)=(fg)p=(fh)p=f(hp)$, and so, by assumption, that $gp=hp$.
+  Again, by function extensionality (of functions $\Hom(\ZZ,F)\to\Hom(\ZZ,G)$), this is exactly saying that $\US g$ is identical to $\US h$.}
+
+  The equivalence of \ref{it:cover} and \ref{it:injection} follows
+immediately from \cref{cor:fib-vs-path}\ref{set-fib-vs-path}, using
+that $\BG$ is connected and $f$ is pointed and the equivalence between $\Hom(G,H)$ and $\BG\ptdto \BH$.
+\end{proof}
+
+Similarly, we have:
+\begin{lemma}\label{lem:epi-surj}
+  The following propositions are equivalent:
+\begin{enumerate}[label=(\arabic*')]
+\item\label{it:epi} $f$ is an epimorphism;
+\item\label{it:surjection} $\US f:\USymG\to\USymH$ is a surjection.
+\item\label{it:connfib} $\Bf_\div:\BG_\div\to \BH_\div$ has connected fibers.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  The equivalence of \ref{it:surjection} and \ref{it:connfib} is immediate.
+
+  For the rest, the easy direction is that \ref{it:surjection} implies \ref{it:epi}:
+  (TODO)
+
+  The harder direction, that \ref{it:epi} implies \ref{it:surjection},
+  is a corollary of the following lemma, which states that monos are equalizers.
+  Indeed, we can factor any $f : \Hom(G,H)$ via the image as a surjection followed
+  by a mono:
+  \[
+    \begin{tikzcd}[cramped]
+      G \ar[r,"q"] & \im(f) \ar[r,"i"] & H
+    \end{tikzcd}
+  \]
+  If $f$ is an epi, then so is $i$. But $i$ is an equalizer,
+  \[
+    \begin{tikzcd}[cramped]
+      \im(f) \ar[r,"i"] & H\ar[r,shift left,"\varphi"]
+      \ar[r,shift right,"\psi"'] & L,
+    \end{tikzcd}
+  \]
+  so as an epi, $\varphi i = \psi i$ implies $\varphi = \psi$, so $i$
+  is an equalizer of already equal homomorphisms, so $i$ is an isomorphism,
+  which implies that $f$ is surjective.
+\end{proof}
+
+\begin{lemma}\label{lem:monos-are-equalizers}
+  Every monomorphism $i : H \to G$ is an equalizer.\footnote{%
+    This proof follows an idea by \citeauthor{TrimbleEpisSurjective}\footnotemark{}.}%
+  \footcitetext{TrimbleEpisSurjective}
+\end{lemma}
+\begin{proof}[Proof draft.] Consider the projection $\pi : G \to G/H$ to the set of cosets.
+  Let $j : G/H \to A$ be an injection into a group $A$.
+  (We could for instance let $A$ be the free (abelian) group on $G/H$. [Add xref to statement that inclusion of generators in an injection.])
+
+  Consider the group $W \defeq \Aut_E(\sh_G,\cst{\sh_A})$, where
+  \[
+    E \defeq \sum_{t : \BG}\bigl((\sh_G \eqto t) \to \BA\bigr).
+  \]
+  We have two homomorphisms $\varphi,\psi : G \to W$ with the same underlying map,
+  $t \mapsto (t , \cst{\sh_A})$, but with different pointing paths:
+  \[
+    \varphi_\pt \defeq \refl{\sh_G,\cst{\sh_A}}, \quad
+    \psi_\pt \defeq (\refl{\sh_G}, j\pi).
+  \]
+  The equalizer of $\varphi$ and $\psi$ thus consists of all $g:\USymG$
+  such that $j\pi(gg') = j\pi(g')$ for all $g':\USymG$. Since $j$ is injective,
+  this is equivalent to $\pi(gg')=\pi(g')$ for all $g':\USymG$, and this holds
+  if and only if $g$ belongs to $H$.
+\end{proof}
+
+
+\section{Images, kernels and cokernels}
+\label{subsec:ker}
+
+The set of subgroups of a group $G$ encodes much information about $G$, partially because homomorphisms between $G$ and other groups give rise to subgroups.
+
+In \cref{ex:Cm} we studied a homomorphism from $\ZZ$ to $\Sigma_m$ defined via the pointed map $R_m:S^1\to_*\BSG_m$ given by sending $\base$ to $\bn m$ and
+$\Sloop$ to the cyclic permutation $s_m\colon\USym\Sigma_m\oldequiv(\bn m\eqto{}\bn m)$, singling out the iterates of $s_m$ among all permutations.  From this we defined the group $C_m$ through a quite general process which we define in this section, namely by taking the \emph{image} of $R_m$.
+
+We also noted that the resulting pointed map from $S^1$ to $\B C_m$ was intimately tied up with the $m$-fold \covering $-^m:S^1\to_*S^1$ -- picking out exactly the iterates of $\Sloop^m$ -- which in our current language corresponds to a monomorphism $i_m:\Hom(\ZZ,\ZZ)$. This process is also a special case of something, namely the \emph{kernel}.
+
+The relations between the cyclic groups in the forms $\ZZ/m$, $C_m$ and $C'_m$ as in \cref{ex:cyclicgroups} are also special cases of  what we do in this section.
+
+\marginnote{For those familiar with the classical notion, the following summary may guide the intuition.}
+
+ \marginnote{ If $\phi:\absHom(\mathcal G,\mathcal G')$ is an abstract group homomorphism, the preimage $\phi^{-1}(e_G)$ is an abstract subgroup which is classically called the kernel of $\phi$.}
+
+\marginnote{On the other hand, the cokernel is the quotient set of $\mathcal G'$ by the equivalence relation generated by  $g'\sim g'\cdot\phi(g)$ whenever $g:\mathcal G$ and $g':\mathcal G'$.}
+
+In our setup with a group homomorphism
+$f:\Hom(G,G')$ being given by a pointed function $\Bf:\BG\to_*\BG'$, the above mentioned kernel, cokernel and image are just different aspects of the preimages
+$$(\Bf)^{-1}(z)\defequi\sum_{x:\BG}(z\eqto{}\Bf(x))$$
+for $z:\BG'$.  Note that all these preimages are groupoids.
+
+The kernel will correspond to a preferred component of the preimage of $\shape_{G'}$, the cokernel will be the ($G'$-)set of components and for the image we will choose the monomorphism into $G'$ corresponding to the cokernel.  This point of view makes it clear that the image will be a subgroup of $G'$, the kernel will be a subgroup of $G$, whereas there is no particular reason for the cokernel to be more than a ($G'$-) set.
+\marginnote{Even though the cokernel is in general just a $G'$-set, we will see in \cref{def:normalquotient} that in certain situations it gives rise to a group called the quotient group. }
+
+\subsection{Kernels and cokernels}
+The kernel of $f\colon\Hom(G,G')$ is a component of the fiber of $\Bf$, whereas the cokernel is the set of components of the fiber.  We spell out the details.
+\label{sec:kerandcoker}
+\begin{definition}
+  \label{def:kernel}
+  We define a function
+  \[
+    \ker:\Hom(G,G')\to\typemono_G
+  \]
+  which we call the \emph{kernel}\index{kernel}.%
+  \glossary(ker){$\protect\ker(f)$}{the inclusion of the kernel group of $f$
+    into its codomain}
+  If $f:\Hom(G,G')$  is a homomorphism we must specify the ingredients in
+  $\ker f\defequi(\Ker f,\incl_{\ker f},!):\typemono_G$.
+  The classifying type $\BKer f$ of the \emph{kernel group}%
+  \footnote{There is an inherent abiguity in our notation:
+    is the kernel of $f$ a group or a monomorphism into $G$?
+    This is common usage and is only resolved by a type check.}%
+  \index{kernel!group}%
+  \glossary(Ker){$\protect\Ker(f)$}{the kernel group of the homomorphism $f$}
+  (or most often just the ``kernel'') is the component of the fiber of $Bf$ pointed by
+  \[
+    \shape_{\Ker f}\defequi(\shape_G,p_f):(\Bf)^{-1}(\shape_{G'}),
+  \]
+  where $p_f:\shape_{G'}\eqto{}\Bf(\shape_G)$ is the part of $\Bf$
+  claiming it is a pointed map.\footnote{That is:
+    \[
+      \Ker f\defequi \Aut_{(\Bf)^{-1}(\shape_{G'})}(\shape_G,p_f)
+    \]}
+  The first projection $\BKer f\to \BG$ is a \covering,
+  since by \cref{cor:contract-away} the preimages are equivalent to the sets
+  $\sum_{p:\shape_{G'}\eqto{}\Bf(z)}\Trunc{\shape_{\Ker f}\eqto{}(z,p)}$,
+  giving a monomorphism
+  % $\kermap f$
+  $\incl_{\ker f}$ of $\Ker f$ into $G$;
+  together defining $\ker f\defequi(\Ker f,\incl_{\ker f},!):\typemono_G$.
+\end{definition}
+
+Written out, the classifying type of the kernel, $\BKer f_\div$, is
+\[
+  \sum_{z:\BG}\sum_{p:\shape_{G'}\eqto{}f(z)}\Trunc{(\shape_G,p_f)\eqto{}(z,p)}
+\]
+and $\incl_{\ker f}:\Hom(\Ker f, G)$ is given by the first projection.
+
+\begin{definition}
+  \label{def:cokernel}
+  Let $f:\Hom(G,G')$  be a homomorphism.
+  The \emph{cokernel}\index{cokernel}%
+  \glossary(coker){$\protect\coker f$}{cokernel of a homomorphism $f$}
+  of $f$ is the $G'$-set
+\[
+  \coker f:\BG'\to\Set,\qquad \coker f(z)\defequi  \Trunc{(\Bf)^{-1}(z)}_0;
+\]
+defining a function of sets\marginnote{%
+  The associated $\abstr(G')$-set $\coker f(\shape_{G'})$ is (also) referred to
+  as the (abstract) cokernel of $f$.}
+\[
+  \coker:\Hom(G,G')\to G'\text{-}\Set.\qedhere
+\]
+\end{definition}
+
+If a monomorphism $i$ from $G$ to $G'$ is clear from the context (``$G\subseteq G'$''), we may write $G'/G$ for the cokernel of $i$.
+% \newcommand*{\kermap}[1]{\mathrm{in}_{\ker #1}} something wrong fix
+\begin{lemma}
+  \label{lem:coker is transitive}
+  The cokernel $\coker f$ is a transitive $G'$-set.
+  %solution: 
+\end{lemma}
+\begin{proof}
+  It is enough to show that for all $|x,p|\in\coker(\shape_{G'})$ there is a $g:\UG$ s.t. $g\cdot |\shape_G,p_f|\eqto{} |x,p|$.  It suffices to do this for $x$ being $\shape_G$, and then $g\defequi p_f^{-1}p$ will do.
+\end{proof}
+\begin{remark}
+  \label{remark:imageandcokernel}
+\marginnote{The subgroup of $G'$ associated with the cokernel is the ``image'' of the next section.}
+  Since the cokernel is a transitive $G'$-set, we need just to provide $\coker f(\shape_{G'})\defequi\Trunc{\Bf^{-1}(\shape_{G'})}_0$ with a point to say that the cokernel defines a subgroup of $G'$. The obvious point to choose is $|\shape_G,p_f|$. In the next section we will consider this subgroup in more detail and call it the image of $f$.
+
+Another proof of $\coker f$ being a transitive $G'$-set would be to say that since $BG$ is connected and equivalent to $\sum_{z:\B G'}\Bf^{-1}(z)$ which maps surjectively onto $\sum_{z:\BG'}\Trunc{\Bf^{-1}(z)}_0$ the latter is connected -- and, when pointed at $(\shape_{G'},|\shape_G,p_f|)$, just another name for $E(\coker f):\typemono_{G'}$.
+\end{remark}
+
+
+\begin{xca}
+  Given a homomorphism $f:\Hom(G,G')$, prove that
+    \marginnote{Hint: consider the corresponding property of the preimage of $\Bf$.
+      $$\xymatrix{L\ar[drr]^h\ar@{.>}[dr]^{k}\ar[ddr]&&\\
+        &\Ker f\ar[r]_{\incl_{\ker f}}\ar[d]&G\ar[d]^f\\
+        &{1}\ar[r]&\,G'.}$$}
+  \begin{enumerate}
+  \item $f$ is a monomorphism if and only if the kernel is trivial
+  \item $f$ is an epimorphims if and only if the cokernel is contractible.
+  \item if $h:\Hom(L,G)$ is a homomorphism such that $fh:\Hom(L,G')$ is the
+    trivial homomorphism (equivalently, $fh$ factors through the trivial group $1$),
+    then there is a unique $k:\Hom(L,\Ker f)$ such that
+    $h\eqto{}\incl_{\ker f}k$.\qedhere
+  \end{enumerate}
+\end{xca}
+
+
+The kernel, cokernel and image constructions satisfy a lot of important relations which we will review in a moment, but in our setup many of them are just complicated ways of interpreting the following fact about preimages (see the illustration\footnote{$$\xymatrix{
+      F_2^{-1}(x_1,p_2)\ar[r]^H_\simeq\ar[d]_{\fst}&f_1^{-1}(x_1)\ar[d]^{\fst}\ar[dl]_{F_1}&\\
+      (f_2f_1)^{-1}(x_2)\ar[r]^{\fst}\ar[d]^{F_2}&X_0\ar[r]^{f_2f_1}\ar[d]^{f_1}&X_2\ar@{=}[d]\\
+    f_2^{-1}(x_2)\ar[r]^{\fst}&X_1\ar[r]^{f_2}&X_2.}
+  $$} in the margin  for an overview)
+\begin{lemma}
+  \label{lem:fibersofcomposites}
+  Consider pointed functions $(f_1,p_1):(X_0,x_0)\to_*(X_1,x_1)$ and $(f_2,p_2):(X_1,x_1)\to_*(X_2,x_2)$ and the resulting functions
+  $$F_1:f_1^{-1}(x_1)\to(f_2f_1)^{-1}(x_2),\qquad F_1(x,p)\defequi(x,p_2f_2p),$$
+  $$F_2:(f_2f_1)^{-1}(x_2)\to f_2^{-1}(x_2),\qquad F_2(x,q)\defequi(f_1x,q)$$
+  \marginnote{(here the function $\xymatrix{((x_1,p_2)\eqto{}(f_1x,q))\ar[r]^-{\pathpair p r\mapsto p}&(x_1\eqto{}f_1(x))}$ is the ``first projection'' explained in the discussion of the interpretation of pairs following \cref{def:pairtopath})}
+  $$H:F_2^{-1}(x_1,p_2)%\oldequiv\sum_{(x,q)\in (f_2f_1)^{-1}(x_2)}((x_1,p_2)\eqto{}(f_1x,q))\to \\
+  \to f_1^{-1}(x_1),\qquad H(x,q,\pathpair p r)\defequi (x,p))$$
+
+
+Then
+\begin{enumerate}
+\item $H$ is an equivalence with inverse
+$$H^{-1}(x,q)\defequi((x,p_2f_2(q)),(\overline{q,\refl{p_2f_2(q)}})),$$
+\item the composite $F_1H$ is identical to the first projection
+  $$\fst:{F_2^{-1}(x_1,p_2)\to(f_2f_1)^{-1}(x_2)},$$
+  more precisely, if $(x,q,\pathpair p r):F_2^{-1}(x,p_2)$, then $\fst(x,q,\pathpair p r)$ is $(x,q)$, whereas $F_1H(x,q,\pathpair p r)$ is $(x,p_2f_2p)$ and $r:p_2f_2p\eqto{}q$ provides the desired element in $F_1H\eqto{}\fst$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+  That $H$ is an equivalence is seen by noting that $F_2^{-1}(x_1,p_2)$ is equivalent to
+  $\sum_{x:X_0}\sum_{q:x_2\eqto{}f_2f_1x}\sum_{p:x_1\eqto{}f_1x}q\eqto{}p_2f_2p$ and that $\sum_{q:x_2\eqto{}f_2f_1x}q\eqto{}p_2f_2p$ is contractible.
+\end{proof}
+% When referring to \cref{lem:fibersofcomposites}
+% it is often useful to display an
+
+Hence, through univalence, $H$ provides an identification
+  $$\bar H:(F_2^{-1}(x_1,p_2),\fst)\eqto{}(f_1^{-1}(x_1),F_1)$$ in the type $\sum_{X:\UU}(X\to(f_2f_1)^{-1}(x_2))$ of function with codomain $(f_2f_1)^{-1}(x_2)$.
+  % ($\fst(t)$ refers to the discussion following \cref{def:pairtopath} so that if $t\oldequiv(\overline{a,b}):(x_1,p_1)\eqto{}(x,p_1f_2q)$, then $\fst(t)\defequi a:x_1\eqto{}f_1x$).
+  
+From the universal property of the preimage it furthermore follows that $F$ is the unique map such that $\fst F\eqto{}_{f_1^{-1}(x_1)\to X_0}\fst$ and $H^{-1}$ is similarly unique with respect to $\fst H^{-1}\eqto{}F$.
+
+\begin{corollary}
+  \label{cor:cokermaps}
+  \marginnote{$$\xymatrix{\Ker f_1\ar@{=}[r]\ar[d]^{F_1}&\Ker f_1\ar[d]^{\incl_{\ker f_1}}\\
+      \Ker f_2f_1\ar[d]^{F_2}\ar[r]^-{\incl_{\ker f_2f_1}}&G_0\ar[d]^{f_1}\ar[r]^{f_2f_1}&G_2\ar@{=}[d]\\
+      \Ker f_2\ar[r]^-{\incl_{\ker f_2}}&G_1\ar[r]^{f_2}&G_2% \\
+   % \coker F_2&\coker f_1
+ }
+  $$}
+  Consider two composable homomorphisms $f_1:\Hom(G_0,G_1)$ and $f_2:\Hom(G_1,G_2)$.
+  There is a unique monomorphisms $F_1$ from $\Ker f_1$ to $\Ker(f_2f_1)$
+  and a unique homomorphism $F_2$ from $\Ker(f_2f_1)$ to $\Ker f_2$ such that $\incl_{\ker f_1}\eqto{}\incl_{\ker f_2f_1}F_1$ and $f_1\incl_{\ker f_2f_1}\eqto{}\incl_{\ker f_2}F_2$.
+  Furthermore, $$F_1\eqto{}_{\typemono_{G_1}}\incl_{\ker F_2}$$ and $$(\coker f_1)\,\B\incl_{\ker f_2}\eqto{}_{\B\Ker f_2\to\Set}\coker (F_2).$$
+
+  Consequequently,
+  \begin{enumerate}
+  \item if $f_2$ is a monomorphism then $F_1:\Ker f_1\to\Ker f_2f_1$ is an isomorphism and
+  \item if $f_1$ is a monomorphism then $F_2:\Ker f_2f_1\to\Ker f_2$ is an isomorphism.
+  \end{enumerate}
+\marginnote{If $f,g:A\to\Set$ are two $A$-sets, then $f\to g$ is defined to be the set $$\prod_{a:A}(f(a)\to g(a))$$ and we say that $\phi:f\to g$ is an equivalence if $\prod_{a:A}\isEq\phi(a)$; see \cref{lem:fiberwise}.}
+Likewise, the set truncation of the maps $F_1$ and $F_2$ constructed in \cref{lem:fibersofcomposites} give maps  of families
+$$F_1':\coker f_1\to_{\BG_1\to\Set}\coker(f_2f_1)\,Bf_2,\quad F_2':\coker(f_2f_1)\to_{\BG_2\to\Set}\coker f_2$$
+  such that
+  \begin{enumerate}
+  \item if $f_2$ is an epimorphism then $F_1':\coker f_1\to_{\BG_2\to\Set}\coker(f_2f_1)\,Bf_2$ is an equivalence and
+  \item if $f_1$ is an epimorphism then $F_2':\coker(f_2f_1)\to_{\BG_2\to\Set}\coker f_2$  is an equivalence.
+  \end{enumerate}
+\end{corollary}
+\begin{xca}
+  Let $f:\Hom(G,G')$.  Then the subgroup $E(\ker f):\typesubgroup_G$ associated with the kernel is given by a $G$-set equivalent to the one sending $x:\BG$ to
+  $$\sum_{p:\shape_{G'}\eqto{}\Bf(x)}\Trunc{\sum_{\beta:\shape_G\eqto{}x}p\eqto{}\USymf(\beta)p_f}.$$
+  If $f$ is an epimorphism this is furthermore equivalent to
+  $$x\mapsto(\shape_{G'}\eqto{}\Bf(x)).$$
+\end{xca}
+
+\subsection{The image}
+\label{sec:image}
+
+
+For a function $f:A\to B$ of sets (or, more generally, of types) the notion of the ``image'' gives us a factorization through a surjection followed by an injection: noting that $a\mapsto (f(a),!)$ is a surjection from $A$ to the ``image'' $\sum_{b:B}\Trunc{f^{-1}(b)}$, from which we have an injection (first projection) to $B$.
+\marginnote{The formula for the image in group theory is the same as the one for sets, except that the propositional truncation we have for the set factorization is replaced by the set truncation present in our formulation of the cokernel $\coker(f)\defequi\Trunc{(\Bf)^{-1}(z)}_0$.}
+This factorization
+$$A\to\sum_{b:B}\Trunc{f^{-1}(b)}\to B$$
+is unique (\cref{xca:unique-fact-image}).
+
+For a homomorphism $f:\Hom(G,G')$ of groups we similarly have a unique factorization
+$$G\to \Img f \to G'
+$$
+through an epimorphism followed by a monomorphism which, on the level of connected groupoids, is given by
+$$\xymatrix{
+  {\BG_\div}\ar[rrr]^-{x\mapsto(\Bf(x),\trunc{(x, \refl {\Bf(x)})}_0)}&&&
+  \sum_{z:{BG'_\div}}\Trunc{({\Bf})^{-1}(z)}_0\ar[rr]^-{\fst} &&{BG'_\div,}
+}$$
+together with base point information.
+In particular, we choose the base point $(\shape_{G'},\trunc{(\shape_G,p_f)}_0)$, so that the \emph{image group} is  %type $\sum_{b:B}\Trunc{f^{-1}(b)}$ is simply replaces by
+$$\Img f\defequi\Aut_{\sum_{z:\BG'}\Trunc{(\Bf)^{-1}(z)}_0}((\shape_{G'},\trunc{(\shape_G,p_f)}_0)).$$
+In other words, the image is nothing but the subgroup of ${G'}$ associated with the cokernel as discussed in \cref{remark:imageandcokernel}.
+
+\begin{xca}\label{xca:IMg_pointed}
+With the choice of point of $\Img f$ above, give paths for
+${x\mapsto(\Bf(x),\trunc{(x, \refl {\Bf(x)})}_0)}$ and ${\fst}$
+so that these maps become pointed maps whose composition is indeed 
+equal to the pointed map $\Bf$.
+Show that these pointed maps indeed give an epimorphism and a monomorphism, respectively.
+Hint: for the epimorphism, use \cref{lem:trunc-n-connected}.
+\end{xca}
+
+That the image gives a \emph{unique factorization} is elegantly expressed by saying that it is the unique inverse of composition.
+We use the pullback construction from \cref{def:pullback} to express the type of epi/mono factorizations of homomorphisms from $G$ to $G'$ as $\typeepi_G\times_{\typegroup}\typemono_{G'}$ where the maps to $\typegroup$ are understood to be the first projections
+(so that the epimorphisms and monomorphisms in question can, indeed, be composed).
+
+
+  \begin{construction}\label{con:im}
+    For all groups $G,$ and $G'$ the map
+    $$
+    \circ:\typeepi_G\times_{\typegroup}\typemono_{G'}\to\Hom(G,G')
+    $$
+    given by composition,\footnote{here $p$ is an epimorphism from $G$ to the group $Z$, $j$ a monomorphims from the group $Z'$ to $G'$, $\alpha\colon Z\eqto{}Z$
+      and $\ptoe\alpha$ is the isomorphism corresponding to the identification $\alpha\colon Z\eqto{}Z'$, as in \cref{def:idtoeq},
+      so that the composite looks like
+    $$\xymatrix{G\ar[r]^p& Z\ar[r]^{\ptoe\alpha}_\sim&Z'\ar[r]^j&G'}$$}
+    %\marginnote{$\xymatrix{G\ar[r]^p& Z\ar@{=}[r]^\alpha_\to&Z'\ar[r]^j&G'}$}
+    $$\circ((Z,p,!),(Z',j,!),\alpha)\defequi j\ptoe \alpha p$$
+    is an equivalence
+    with inverse given by the image factorization.
+\end{construction}
+\begin{implementation}{con:im}
+  For any integer $n\geq -1$ -- and in our case for $n=0$ -- on the level of types the factorization of a function $f\colon X\to Z$ as
+  $$\xymatrix{X\ar[rrr]^-{x\mapsto (f(x),\trunc{(x,\refl{f(x)})}_n)}&&&\sum_{z:Z}\Trunc{f^{-1}(z)}_n\ar[rr]^\fst&&Z
+  }$$
+  is unique in the sense that
+  \begin{quote}
+    if $p:f\eqto{}jq$ where $q\colon X\to Y$ is so that for all $y:Y$ the $n$-truncation of $q^{-1}(y)$ is contractible and $j\colon Y\to Z$ is so that for all $z:Z$ the fiber $j^{-1}(z)$ is $n$-truncated, then for each $z:Z$ the function $f^{-1}(z)\to j^{-1}(z)$ induced by ($p$ and) $q$ 
+  gives an equivalence\footnote{To see that the function is an equivalence notice that it can be obtained as follows: rewrite $f^{-1}(z)$ first as
+    $$\sum_{x:X}\sum_{y:Y}(z\eqto{}f(x))\times(y\eqto{}q(x)),$$ then as
+    $$\sum_{y:Y}\sum_{x:X}(z\eqto{}j(y))\times(y\eqto{}q(x))$$ and finally use that the $n$-truncation of
+    $\sum_{x:X}y\eqto{}q(x)$ is contractible}
+  \marginnote{
+    $$\xymatrix{
+      X\ar[r]^q\ar[d]&Y\ar[d]^j\\\sum_{z:Z}\Trunc{f^{-1}(z)}_n\ar[r]_-{\fst}\ar@{.>}[ur]^{(j,q)}_\simeq&Z
+    }$$}
+  $$(j,q):\Trunc{f^{-1}(z)}_n\simeq j^{-1}(z)
+  $$
+  identifying (under univalence) the two factorizations of $f$.
+  \end{quote}
+
+  
+  If $X$ and $Z$ are connected groupoids, then so is $\sum_{z:Z}\Trunc{f^{-1}(z)}_n$, and so when applying the factorization to groups (when $n=0$), the only thing we need to worry about is the base point.
+  If if the point-data is given by $x_0:X$, $y_0:Y$, $z_0:Z$,
+  $p_q:y_0\eqto{}q(x_0)$,
+  $p_j:z_0\eqto{}j(y_0)$ and
+  $p_f:z_0\eqto{}f(x_0)$ with
+  $b:p_f\eqto{}a_{x_0}^{-1}j(p_q)p_j$, 
+  where $a:\prod_{x:X}f(x)\eqto{}j(q(x))$ witnesses that we have a factorization, 
+  then we point $\sum_{z:Z}\Trunc{f^{-1}(z)}_n$ in $(z_0,\trunc{(x_0,p_f)}_n)$ 
+  and note that the equivalence $\sum_{z:Z}\Trunc{f^{-1}(z)}_n\we Y$ is 
+  pointed via $p_q:y_0\eqto{}q(x_0)$ and
+  $$b:\xymatrix{
+    z_0\ar@{=}[rr]_\to^{p_j}\ar@{=}[d]_{\refl{z_0}}&&j(y_0)\ar@{=}[d]_{j{p_q}}^\uparrow\\
+    z_0\ar@{=}[r]^{p_f}_\to&f(x_0)\ar@{=}[r]_\to^{a_{x_0}}&j(q(x_0)).}$$
+\end{implementation}
+
+  \marginnote{$$\xymatrix{G\ar[rr]^f\ar@{->>}_{\prj_{\Img f}}[dr]&&G'\\&\,\image f.\,\ar@{>->}[ur]_{\incl_{\Img f}}}
+  $$}
+\begin{definition}
+  \label{def:image}
+Explicitly, the image factorization for groups is the function
+\begin{align*}
+\circ^{-1}:\Hom(G,G')&\to\typeepi_G\times_{\typegroup}\typemono_{G'}\\
+\circ^{-1}(f)&\defequi ((\Img f,\prj_{\img f},!),(\Img f,\incl_{\img f},!),\refl{\Img f}),
+\end{align*}
+    where as before the \index{image group}\emph{image group} is the group
+    $$\Img f\defequi \Aut_{\sum_{z:\BG'}\coker f(z)}(\shape_{G'},\trunc{(\shape_G,p_f)}_0),$$
+    the monomorphism $\incl_{\img f}$ is obtained from the wrapping of the first projection
+    $$\B\incl_{\img f}\defequi\fst: B\Img f\to \BG'$$
+    and
+the epimorphism
+  $\prj_{\img f}$  is given on the level of classifying types by sending $x:\BG$ to
+  $$B\prj_{\Img f} f(x)\defequi (\Bf(x),\trunc{(x,\refl{\Bf(x)})}_0):\B\image f.$$
+
+    
+ Occasionally we may refer to the two projections of the image factorization
+ \begin{align*}
+    \img:\Hom(G,G')\to\typemono_{G'},\qquad&\img(f)\defequi(\Img f,\incl_{\img f},!)\\
+ \prjim:\Hom(G,G')\to\typeepi_G, \qquad&\prjim f\defequi(\Img f,\prj_{\img f},!)
+  \end{align*}
+  as the \emph{image}\index{image!function} and the \emph{projection to the image}.\index{image!projection to}
+\end{definition}
+% $$f_{\Hom(G,G')}\incl_{\Img f}\prj_{\Img f},$$
+% referred to as the \emph{factorization of $f$ through its image.}
+
+
+In view of \cref{ex:charsurinj} below, the families
+$$\mathrm{isepi},\mathrm{ismono}:\Hom(G,G')\to\Prop
+$$
+of propositions that a given homomorphism is an epimorphism or monomorphism have several useful interpretations (parts of the exercise have already been done).
+\begin{xca}
+  \label{ex:charsurinj}
+  Let $f:\Hom(G,G')$ Prove that
+  \begin{enumerate}
+  \item the following are equivalent
+    \begin{enumerate}
+    \item $f$ is an epimorphism,
+    \item $\USymf$ is a surjection
+    \item the cokernel of $f$ is contractible,
+    \item the inclusion of the image $\incl_{\img f}:\Hom(\image f,G')$ is an isomorphism,
+    \end{enumerate}
+  \item the following are equivalent
+    \begin{enumerate}
+    \item $f$ is a monomorphism,
+    \item $\USymf$ is an injection
+\item the kernel of $f$ is trivial
+\item $\Bf:\BG\to \BG'$ is a \covering.
+\item the projection onto the image $\prj_{\img f}:\Hom(G,\Img f)$ is an isomorphism.
+    \end{enumerate}
+  \end{enumerate}
+\end{xca}
+
+We need to understand how the image factorization handles composition of homomorphisms.
+This is forced by the uniqueness as follows.
+
+\marginnote{
+  $$\xymatrix{
+    &&G_0\ar[dl]_{\prj_{\img f_1}}\ar[dd]_{\prj_{\img f_2f_1}}\\
+   & \Img f_1\ar[dl]_{\incl_{\img f_1}}\ar[d]^{\prj_{\img(\prj_{\img f_2}\incl_{\img f_1})}}&\\
+    G_1\ar[dr]_{\prj_{\img f_2}}&
+    \Img(\prj_{\img f_2}\incl_{\img f_1})\ar[d]^{\incl_{\img(\prj_{\img f_2}\incl_{\img f_1})}}
+    \ar@{=}[r]&\Img(f_2f_1)\ar[dd]_{\incl_{\img f_2f_1}}\\
+    &\Img f_2\ar[dr]_{\incl_{\img f_2}}&\\
+    &&G_2
+  }$$}
+\begin{lemma}
+  Given composable homomorphisms $f_1:\Hom(G_0,G_1)$ and $f_2:\Hom(G_1,G_2)$, unique factorization induces identifications
+  \begin{align*}
+    \img(f_2f_1)&\eqto{}_{\typemono_{G_2}}(\Img(\prj_{\img f_2}\incl_{\img f_1}),\incl_{\img f_2}\incl_{\img(\prj_{\img f_2}\incl_{\img f_1})},!)\\
+    \prjim(f_2f_1)&\eqto{}_{\typeepi_{G_0}}(\Img(\prj_{\img f_2}\incl_{\img f_1}),
+  \prj_{\img(\prj_{\img f_2}\incl_{\img f_1})}\prj_{\img f_1},!)\\%\prj^{\img}(\prj_{\img f_2}\prj_{\img f_1})
+  \end{align*}
+  
+  
+\end{lemma}
+\begin{proof}
+  Since composition preserves monomorphisms and epimorphisms
+  -- in particular
+  $\incl_{\img f_2} \incl_{\img(\prj_{\img f_2}\incl_{\img f_1})}:\Hom(\Img(\prj_{\img f_2}\incl_{\img f_1}),G_2)$ is a monomorphism and
+  $\prj_{\img(\prj_{\img f_2}\incl_{\img f_1})} \prj_{\img f_1}:\Hom(G_0,\Img(\prj_{\img f_2}\incl_{\img f_1}))$ is an epimorphism --
+  this is just uniqueness of the image factorization of the composite $f_2f_1$.
+\end{proof}
+
+
+% there is a unique homomorphism
+% $u:\Hom(\Img f_2f_1,\Img f_2)$ satisfying
+% \marginnote{$$\xymatrix{G_0\ar[rr]^{\prj_{\img f_2f_1}}\ar[d]_{f_1}&&
+%     \Img f_2f_1\ar[r]^-{\incl_{\img f_2f_1}}\ar[d]_{u}&G_2\ar@{=}[d]\\
+% G_1\ar[rr]_-{\prj_{\img f_2}}&&\Img f_2\ar[r]_{\incl_{\img f_2}}&G_2}$$}
+% \begin{enumerate}
+% \item $\incl_{\img f_2f_1}=\incl_{\img f_2}u$ and
+% \item $\prj_{\img f_2}f_1=u\,prj_{\img f_2f_1}$.
+% \end{enumerate}
+% The homomorphism $u$ is always a monomorphism and is an isomorphism if and only if  $f_1$ is an epimorphism.
+% % Given two homomorphisms $f_1:\Hom(G_0,G_1)$ and $f_2:\Hom(G_1,G_2)$, the homomorphism
+% % $\incl_{\img \prj_{\img f_2}f_1}:\Hom(\Img f_2f_1,\Img f_2)$ is a monomorphism satisfying
+% % \marginnote{$$\xymatrix{G_0\ar[rr]^{\prj_{\img f_2f_1}}\ar[d]_{f_1}&&
+% %     \Img f_2f_1\ar[dr]^-{\incl_{\img f_2f_1}}\ar[d]_{\incl_{\img{\prj_{\img f_2}f_1}}}&\\
+% % G_1\ar[rr]_-{\prj_{\img f_2}}&&\Img f_2\ar[r]_{\incl_{\img f_2}}&G_2}$$}
+% % \begin{enumerate}
+% % \item $\incl_{\img \prj_{\img f_2}f_1}$ is an isomorphism if and only if  $f_1$ is an epimorphism,
+% % \item $\incl_{\img f_2f_1}=\incl_{\img f_2}\incl_{\img \prj_{\img f_2} f_1}$ and
+% % \item $\prj_{\img f_2}f_1=\incl_{\img \prj_{\img f_2} f_1}\prj_{\img f_2f_1}$.
+% % \end{enumerate}
+
+% The factorization of $f:\Hom(G,G')$ through its image is unique
+% in the sense that if given two homomorphisms $f_1:\Hom(G_0,G_1)$ and $f_2:\Hom(G_1,G_2)$ such that $f_1$ is an epimorphism and $f_2$ in a monomorphism,
+% \marginnote{%
+% $$\xymatrix{G_0\ar[d]_{f_1}\ar[r]^-{\prj_{\img f_2f_1}}&\Img f_2f_1\ar[d]^{\incl_{\img f_2f_1}}\\
+%   G_1\ar@{.>}[ur]^t\ar[r]_{f_2}&G_2}
+% $$
+% % $$\xymatrix{&\Img f_2f_1\ar[dr]^{\incl_{\img f_2f_1}}\ar@{.>}[dd]^t&\\
+% %     G_0\ar[dr]_{f_1}\ar[ur]^{\prj_{\img f_2f_1}}&&G_2\\
+% %   &G_1\ar[ur]_{f_2}&}
+% % $$
+% }
+% then there is a unique isomorphism $t:\Hom(\Img f_2f_1,G_1)$ such that $f_1=t\,\prj_{\img f_2f_1}$ and $f_2\,t=\incl_{\img f_2f_1}$.  Through univalence $t$ gives rise to identifications
+% $$f_1=_{\typeepi_G}\prj_{\img f_2f_1}\text{ and }f_2=_{\typemono_{G'}}\incl_{\img f_2f_1}.$$
+
+%   Consider the element
+%   $$\shape_{\Img f}\defequi (\shape_{G'},|\shape_G,p_f|):\sum_{z:\BG'}\coker f(z)$$ and define the image group of $f$ to be
+%   $$\Img f\defequi \aut_{\sum_{z:\BG'}\coker f(z)}(\shape_{\Img f}).$$
+%   The first projection $\fst: B\image f\to \BG'$ is a \covering
+%   (since $\coker f(z)$ is a set) giving the desired monomorphism $\incl_{\img f}$ of $\Img f$ into $G$.
+
+%   The homomorphism
+%   $\prj_{\img f}:\Hom(G,\Img f)$  is given on the level of classifying types by sending $x:\BG$ to
+%   $$B\prj_{\Img f} f(x)\defequi (\Bf(x),|x,\refl{\Bf(x)}|):\image f.$$
+%   From this it is clear that $\Bf$ is equal by definition to the composite of $B\incl_{\Img f}$ and $B\prj_{\Img f}$.
+%   \marginnote{and if the wrapping destroys this fact in some ugly manner, it is an argument against wrapping}
+%   That $\prj_{\img f}$ is an epimorphims is best seen by using the equivalence between $BG$ and $\sum_{z:\BG'}(\Bf)^{-1}(z)$ which translates $\prj_{\img f}$ to the sum over $z:\BG'$ of the truncation $(\Bf)^{-1}(z)\to\Trunc{(\Bf)^{-1}(z)}_0\oldequiv\coker f(z)$ which has connected fiber (recall that a homomorphism is an epimorphism iff its classifying map has connected fibers).
+
+%   Assume given homomorphisms $f_1\Hom(G_0,G_1)$ and $f_2:\Hom(G_1,G_2)$.  The claimed homomorphism $u:\Hom(\Img f_2f_1,\Img f_2)$ has classifying map $Bu:\sum_{z:\BG_2}(\coker f_2f_1)(z)\to_*\sum_{z:\BG_2}(coker f_2)(z)$ given by $F_2'(z):(\coker f_2f_1)(z)\to(\coker f_2)(z)$ from \cref{cor:cokermaps} (which was the truncation of the map of preimages $F_2:(\Bf_2f_1)^{-1}(z)\to(\Bf_2)^{-1}(z)$ with $F_2(x,p)\oldequiv(f_1x,p)$).  That $\incl_{\img f_2f_1}=\incl_{\img f_2}u$ and $\prj_{\img f_2}f_1=u\,prj_{\img f_2f_1}$ follows by the definitions of the maps and the uniqueness of $u$ follows from the fact that $\incl_{\img f_2}$ is a monomorphism and the demand $\incl_{\img f_2f_1}=\incl_{\img f_2}u$ -- which also forces $u$ to be a monomorphism since $\incl_{\img f_2f_1}$ is a monomorphism.  Conversely, if $f_1$ is an epimorphism, then the composite $\prj_{\img f_2}f_1$ is an epimorphism and $\prj_{\img f_2}f_1=u\,prj_{\img f_2f_1}$ forces $u$ to be an epimorphism, and so an isomorphims.
+
+%   As for the uniqueness of the factorization, assume given $f_1\Hom(G_0,G_1)$ and $f_2:\Hom(G_1,G_2)$ such that $f_1$ is an epimorphism and $f_2$ in a monomorphism, we let $t:\Hom(G_1,\Img f_2f_1)$ be the composite $u^{-1}\prj_{\img f_2}$, where $u$ is invertible since $f_1$ is an epimorphism.  Since $f_1$ is an epimorphism, $f_2$ a monomorphism and the claimed diagram commutes this forces $t$ to be an isomorphism. % Since  $\incl_{\img f_2f_1}$ is a monomorphism, there is at most one homomorphism $t:\Hom(G_1,\Img f_2,f_1)$ such that $f_2=\incl_{\img f_2f_1}t$.  We must show that such a $t$ exist and that it furthermore satisfies  $t\,f_1=\prj_{\img f_2f_1}$.  This is achieved by setting
+%   % $$Bt_\div(y)\defequi (\Bf_2(y),|(\Bf_2(y),\refl{}|.
+%   % $$
+
+
+% % \begin{definition}
+% %   \label{def:image}
+% %  We define a function
+% %   $$\img:\Hom(G,G')\to\typemono_G$$
+% %   which we call the \emph{image}\index{image}.
+% %   If $f:\Hom(G,G')$  is a homomorphism we must specify the ingredients in $\img f\defequi(\Img f,\incl_{\img f},!):\typemono_G$.
+% %   The \emph{image group}\index{image!group} (or most often just the image) of $f$ is the group
+% %   $$\Img f\defequi \aut_{\sum_{z:\BG'}\coker f(z)}(\shape_{G'},|\shape_G,p_f|).$$
+% %   The first projection $\fst: B\image f\to \BG'$ is a \covering
+% %   (since $\coker f(z)$ is a set) giving a monomorphism $\incl_{\img f}$ of $\Img f$ into $G$;
+% %   together defining $\img f=(\Img f,\incl_{\img f},!):\typemono_G$.
+
+
+% % The \emph{induced homomorphism} $\tilde f:\Hom(G,\image f)$ is given by sending $x:\BG$ to
+% % $$B\tilde f(x)\defequi (\Bf(x),|x,\refl{\Bf(x)}|):\image f.$$
+% % \end{definition}
+
+% % % \begin{remark}   \label{rem:cokerasGset}   If $f:\Hom(G,G')$ we notice that the abstract group $\abstr(G')$ acts on $\coker(f)\defequi\Trunc{f^{-1}(\shape_{G'})}_0$, making the cokernel an $\abstr(G')$-set.  If we prefer to talk about a $G'$-set, we consider the cokernel as the set-family $$\BG'\to\Set,\qquad z\mapsto   \Trunc{f^{-1}(z)}_0.$$   We will see this used most frequently when considerint inclusions of subgroups: if $H$ is a subgroup of $G$, then $G/H$ is a $G$-set. \end{remark}
+  
+
+% Note that if $f:\Hom(G,G')$, then the composite of the induced homomorphism $\tilde f:\Hom(G,\image f)$ with the subgroup inclusion $\image_f$ (first projection on the level of classifying types) of $\image f$ in $G'$ is $f$ by definition.  We will refer to this as the \emph{factorization of $f$ through its image}.
+% \marginnote{$$\xymatrix{G\ar[rr]^f\ar@{->>}_{\tilde f}[dr]&&G'\\&\,\image f.\,\ar@{>->}[ur]_{\image_f}}
+%   $$}
+
+
+
+\begin{lemma}
+  \label{lem:kerandcoker}
+  Let $f:\Hom(G,G')$ be a group homomorphism.
+  The induced map $(B\prj_{\img f})^{-1}(\shape_{\Img f})\to (\Bf)^{-1}(\shape_{G'})$ gives an identification
+  \[
+    \ker\prj_{\img f}\eqto{}_{\typemono_G} \ker f.
+  \]
+\end{lemma}
+\begin{proof}
+  Using univalence, this is a special case of \cref{cor:cokermaps} with $f_2\defequi\incl_{\img f}$ and $f_1\defequi\prj_{\img f}$.
+% This follows by univalence and connectivity since since for $x:\BG$ the first projection from the identity type $\shape_{\Img f}\eqto{}(\Bf(x),\trunc{(x,\refl{\Bf(x)})}_0)$ to $\shape_{G'}\eqto{}\Bf(x)$ is an equivalence (the fibers are true propositions).
+  \footnote{%\color{blue}
+    See also counting results for finite groups.
+  }
+\end{proof}
+\begin{xca}
+  \begin{enumerate}
+  \item If $f:\typemono_{G'}$, then $\ua(\prj_{\img f}):f\eqto{}_{\typemono_{G'}}\incl_{\img f}$.
+  \item If $f:\typeepi_G$, then $\ua(\incl_{\img f}):f\eqto{}_{\typeepi_{G}}\prj_{\img f}$.
+  \end{enumerate}
+(True propositions suppressed).
+\end{xca}
+
+
+% Finally, the image factorization would have been useless were it not for the fact that it is unique:
+% \begin{lemma}
+%   \label{lem:uniquenessofimagefactorizationforgroups}
+%   Let $G,H,G'$ be groups, let $h:\Hom(G,H)$ and $j:\Hom(H,G')$ be homomorphisms and let $!:f\eqto{}j\,h$.  If $h$ is surjective there is a unique homomorphism $t:\Hom(H,\image f)$ so that $\tilde f\eqto{}t\, h$ and $j$ is $t$ composed with the first projection from $\image f$ to $ G'$.
+% \end{lemma}
+% \begin{proof}
+%   We've used that we're operating with groupoids to simplify the statement, but a similar statement follows generally by essentially the proof below if you keep track of the element in $f\eqto{}j\,h$.  To simplify we drop the ``$B$''s from the notation, writing ``$f$'' instead of ``$\Bf$''.
+
+% That $h$ is a surjective homomorphism amounts to saying that for $y:\BH$, then the set truncation $\Trunc{h^{-1}(y)}_0$ of the preimage is contractible, and so the first projection $\mathrm{pr_1}:\sum_{y:\BH}\Trunc{h^{-1}(y)}_0\to \BH$ is an equivalence.
+
+% For $y:\BH$, consider the map
+% $$T_y:h^{-1}(y)\to f^{-1}(j y),\qquad T_y(x,p)\defequi (x,!_xj(p))$$ where $x:\BG$, $p:y\eqto{}h(x)$ and $!_xj(p):j(y)\eqto{}f(x)$ is the composite of $j(p):j(y)\eqto{}j\,h(x)$ and $!:j\,h\eqto{}f$ (as applied to $x$).  Performing set-truncation on $T_y$ and precomposing with the inverse of the first projection, we get a map
+% $$t:\BH%\sum_{y:\BH}\Trunc{h^{-1}(y)}_0
+% \to\sum_{z:\BG'}\Trunc{f^{-1}(z)}_0\oldequiv B\image f,\qquad Bt(y)\defequi(jy,|T_y|(q_y))$$
+% where $q_y:\Trunc{h^{-1}(y)}_0$ is the second projection of the inverse of the first projection.  The agreement of $t$ with $\tilde f$ and $j$ follows by construction.
+% \end{proof}
+
+\begin{example}
+  An example from linear algebra: let $A$ be any $n\times n$-matrix with nonzero determinant and with integer entries, considered as a homomorphism $A:\Hom(\ZZ^n,\ZZ^n)$. ``Nonzero determinant'' corresponds to ``monomorphism''.  Then the cokernel of $A$ is a finite set with cardinality the absolute value of the determinant of $A$.  You should picture $A$ as a $|\det(A)|$-fold \covering of the $n$-fold torus $(S^1)^{\times n}$ by itself.
+
+  In general, for an $m\times n$-matrix $A$, then the ``nullspace'' is given by the kernel and the ``rowspace'' is given by the image.
+\end{example}
+
+
+\section{The action on the set of subgroups}
+\label{sec:actiononsub}
+
+Not only is the type of subgroups  of $G$ a set, it is in a natural way (equivalent to the value at $\shape_G$ of) a $G$-set which we denote by the same name.  We first do the monomorphism interpretation
+\begin{definition}
+  If $G$ is the group, the \emph{$G$-set of monomorphisms into $G$}%
+  \glossary(MonoG){$\protect\typemono_G$}{$G$-set of monomorphisms into $G$}
+  $\typemono_G:\BG\to\Set$ is given by
+  $$%\typesubgroup_G:\BG\to\Set,\qquad
+  \typemono_G(y)\defequi \sum_{H:\typegroup}\sum_{f:\Hom(H,G)(y)}\isset(\Bf^{-1}(\shape_G))$$
+  for $y:\BG$,
+where  -- as in \cref{ex:HomHGasGset} --
+$$\Hom(H,G)(y)\defequi\sum_{F:\BH_\div\to \BG_\div}(y\eqto{}F(\shape_H))$$
+is the $G$-set of homomorphisms from $H$ to $G$.
+\end{definition}
+\marginnote{The type of monomorphisms into $G$ is $\typemono(\shape_G)$, and as $y:\BG$ varies, the only thing that changes in $\typemono_G(y)$ is that $\BG\eqto{}(\BG_\div,\shape_G)$ is replaced by $(\BG_\div,y)$.}
+
+\begin{definition}
+  \label{def:conjactonmonos}
+  If $G$ is a group, then the action of $G$ on the set of monomorphisms into $G$ is called \emph{conjugation}\index{conjugation}.
+
+  \label{def:conjugate}
+  If $(H,F,p,!):\typemono_G(\shape_G)$ is a monomorphism into $G$ and $g:\USymG$, then the monomorphisms  $(H,F,p,!),(H,F,p\,g^{-1},!):\typemono_G(\shape_G)$ are said to be \emph{conjugate}\index{conjugate}\index{conjugate}.
+\end{definition}
+\begin{remark}
+  \label{rem:whyconjugate}
+  The term ``conjugation'' may seem confusing as the %(abstract)
+action of $g:\USymG$ on a monomorphism $(H,F,p,!):\typemono_G(\shape_G)$ (where $p:x\eqto{}F(\shape_H)$) is simply $(H,F,p\,g^{-1},!)$, which does not seem much like conjugation.
+However, as we saw in \cref{ex:abstrandconj}, under the equivalence $\abstr:\Hom(H,G)\we\absHom(\abstr(H),\abstr(G))$, the corresponding action on $\absHom(\abstr(H),\abstr(G))$ is exactly (postcomposition with) conjugation $c^g:\abstr(G)\eqto{}\abstr(G)$.
+\footnote{The same phenomenon appeared in \cref{xca:HomZGvsAdG} where we gave an equivalence between the $G$-sets $\Hom(\ZZ,G)$ and $\Ad_G$ (where the action is very visibly by conjugation).}
+  \label{rem:conjactiononmonos}
+\end{remark}
+Summing up the remark:
+\begin{lemma}
+  \label{lem:conjugationabstractly}
+  Under the equivalence of \cref{lem:actionsconcreteandabstract} between $G$-sets and $\abstr(G)$-sets, the $G$-set $\typemono_G$ corresponds to the $\abstr(G)$-set
+$$\sum_{H:\typegroup}\sum_{\phi:\absHom(\abstr(H),\abstr(G))}\isprop(\phi^{-1}(e_G))$$ of \emph{abstract monomorphisms}\index{abstract monomorphisms} of $\abstr(G)$, with action $g\cdot(H,\phi,!)\defequi(H,c^g\,\phi,!)$ for $g:\abstr(G)$, where  $c^g:\abstr(G)\eqto{}\abstr(G)$ is conjugation as defined in \cref{ex:conjhom}.
+\end{lemma}
+\begin{remark}
+  \label{rem:typeofsubgpstrivifab}
+  We know that a group $G$ is abelian if and only if conjugation is trivial: for all $g:\USymG$ we have $c^g\eqto{}\id$, and so we get that $\typemono_G$ is a trivial $G$-set if and only if $G$ is abelian.
+\end{remark}
+
+The subgroup analog of $y\mapsto\typemono_G(y)$ is
+
+\begin{definition}
+  Let $G$ be a group and $y:\BG$, then the $G$-set of \emph{subgroups of $G$} is
+  $$\typesubgroup_G:\BG\to\Set,\qquad\typesubgroup_G(y)\defequi\sum_{X:\BG\to\Set}
+  % \sum_{\pt_y:X(y)}
+  X(y)\times\mathrm{isTrans}(X).$$
+\end{definition}
+The only thing depending on $y$ in $\typesubgroup_G(y)$ is where the ``base'' point is residing
+(in $X(y)$ rather than in $X(\shape_G)$).
+
+\begin{definition}
+  Extending the equivalence of sets we get an equivalence of $G$-sets $E:\typemono_G\to\typesubgroup_G$ via
+$$
+E(y):\typemono_G(y)\to\typesubgroup_G(y),\qquad E(H,F,p_F,!)\defequi(F^{-1}, (\shape_H,p_F),!)
+$$
+for $y:\BG$ (where $H$ is a group, $F:\BH_\div\to \BG_\div$ is a map and $p_F:y\eqto{}F(\shape_H)$ an identity in $\BG$; and $F^{-1}:\BG\to\Set$ is $G$-set given by the preimages of $F$ and $(\shape_H,p_F):F^{-1}(y)\defequi \sum_{x:\BH}y\eqto{}F(x)$ is the base point).  If $y$ is $\shape_G$ we follow our earlier convention of dropping it from the notation.
+\end{definition}
+
+
+
+Since the families are equivalent (via $E$) we use $\typemono_G$ or $\typesubgroup_G$ interchangeably.
+
+\section{Normal subgroups}
+\label{sec:normal}
+In the study of groups, the notion of a ``normal subgroup'' is of vital importance
+and, as for any important concept, it comes in many guises revealing different aspects.
+For now we just state the definition in the form that it is a subgroup ``fixed under the action of $G$'' on the $G$-set of subgroups.
+
+\begin{definition}
+  \label{def:normalsubgroup}
+  The set of \emph{normal subgroups}\index{normal subgroup}\index{type! of normal subgroups} is
+  $$\typenormal_G\defequi\prod_{y:\BG}\typesubgroup_G(y)$$
+  considered as a subset of $\typesubgroup_G$ via the injection
+  $$i:\typenormal_G\to\typesubgroup_G,\qquad i(N)\defequi N(\shape_G).$$
+\end{definition}
+\begin{remark}
+  The function $i$ taking a fixed point of the action $\Sub_G$ to its actual
+  subgroups is indeed an injection.
+  Given two normal subgroups %fixed points
+  $N,N':\prod_{y:\BG} \Sub_G(y)$ and a shape $y:\BG$, the identity type $N(y) \eqto N'(y)$ is a
+  proposition as $\Sub_G(y)$ is a set. Hence, by connectedness of $\BG$, we
+  construct an element $N \eqto N'$ as soon as we have one of
+  $N(\shape_G) \eqto{} N'(\shape_G)$. This is exactly the statement of $i$ being an
+  injection.
+
+  In particular, $\Nor_G$ being a subset of $\Sub_G$ allows us to make the same
+  abuse as we did for other subtype: a subgroup $H$ of $G$ is said to be normal
+  whenever the fiber $\inv i (H)$ has an (necessarily propositionally unique)
+  element.
+\end{remark}
+
+
+
+  The corresponding set of fixed point in the $G$-set of monomorphisms
+  \marginnote{Restricting the equivalence $E:\typemono_G\to\typesubgroup_G$ to the fixed sets, we get an equivalence from $\prod_{y:\BG}\typemono_G(y)$ to $\typenormal_G$}
+  $$\prod_{y:\BG}\typemono_G(y)$$
+will not figure as prominently, since the focus shifts naturally to an equivalent set which we have already defined, namely the kernels.
+  \begin{definition}
+    \label{def:setofkernels}
+    If $G$ is a group, let
+    $$\xymatrix{\typeepi_G\ar@{->>}[r]^{\ker}&\typekernel_G\,\,\ar@{>->}[r]^i&\typemono_G}$$\index{set! of kernels}
+    be the surjection/injection factorization of the kernel function restricted to the epimorphisms from $G$.  We call the subset $\typekernel_G$ the \emph{set of kernels}.
+  \end{definition}
+
+  Our aim is twofold:
+  \begin{enumerate}
+  \item we want to show that $\ker:\typeepi_G\to\typekernel_G$ is an equivalence, so that knowing that a monomorphism is \emph{a} kernel is equivalent to knowing an epimorphism it is \emph{the} kernel of.
+  \item we want to show that the kernels correspond via the equivalence $E$ to the fixed points under the $G$ action on the $G$-set of subgroups.
+  \end{enumerate}
+\marginnote{We will achieve these goals by defining a function $\nor:\typeepi_G\to\typenormal_G$ which we show is an equivalence and, furthermore, that the two functions  $i\nor,Ei\ker:\typeepi_G\to\typesubgroup_G$ are identical.  Since $i\nor$ is an injection, this forces the surjection $\ker$ to be injective too and we are done.}
+
+
+
+% {\color{blue}To be deleted by BID june 20\tiny
+%   are called \emph{kernels} with inclusion $i:\typekernel_G\to \typemono_G$ again given by $i(M)\defequi M(\shape_G)$.  We let $E^G:\typekernel_G\to\typenormal_G$ denote the equivalence given by the equivalence of $G$-sets $E:\typemono_G\to\typesubgroup_G$.
+% \begin{remark}
+%   From \cref{rem:typeofsubgpstrivifab} we know that the $G$-set $\typemono_G$ is a trivial $G$-set (the family is constant) if and only if $G$ is abelian.  Consequently, $G$ is abelian if and only if all ``subgroups are normal'' (\ie $i\typenormal_G\to\typesubgroup_G$ is an equivalence).
+% \end{remark}
+% \sususe{Subgroups through $G$-sets}
+% Occasionally it is useful to define ``subgroups'' slightly differently.  As we've defined it a subgroup of a group $G$ of the form $(H,f,!)$ where $H$ is a group (pointed connected groupoid  $\BH$), $f:\BH\to_* \BG$ is a pointed map whose fibers are sets (a pointed \covering).  There is really no need to specify that $H$ is a group: if $F:T\to \BG$ is a \covering, then $T$ is automatically a groupoid.
+
+% On the other hand,  the type of \coverings over $\BG$ is equivalent to the type of $G$-sets: if $X:\BG\to\Set$ is a $G$-set, then the \covering is given by the first projection $\tilde X\to \BG$ where $\tilde X\defequi\sum_{y:\BG}X(y)$ and the inverse is obtained by considering the fibers of a \covering.  Furthermore, we saw in \cref{lem:conistrans} that $\tilde X$ being connected is equivalent to the condition $\istrans(X)$ of \cref{def:transitiveGset} claiming that the $G$-set $X$ is transitive.
+
+% Hence, the type (set, really) $\typesubgroup_G$ of subgroups of $G$ is equivalent to the type of pointed connected \coverings over $\BG$, which again is equivalent to the type $\typesubgroup_G'$ of transitive $G$-sets $X:\BG\to\Set$ together with a point in $X(\shape_G)$.
+
+% The family of sets $\typesubgroup_G(y)$ where we let the element $y:\BG$ vary is by the same reasoning equivalent to the family $\typesubgroup_G'(y)$ which we for reference spell out in symbols.
+
+% \begin{definition}
+%   Let $G$ be a group and $y:\BG$, then the $G$-set of \emph{subgroups' of $G$} is
+%   $$\typesubgroup_G':\BG\to\Set,\qquad\typesubgroup_G'(y)\defequi\sum_{X:\BG\to\Set}\sum_{\pt_y:X(y)}\mathrm{isTrans}(X)$$ and the type of \emph{normal subgroups'} is the set of fixed points
+% $$\typenormal_G'\defequi\prod_{y:\BG}\typesubgroup_G'(y).$$
+% \end{definition}
+% Likewise, in symbols, the above described equivalence between the families $\typesubgroup_G$ and $\typesubgroup_G'$ is provided by the map
+% $$E(y):\typesubgroup_G(y)\to\typesubgroup_G'(y),\qquad E(H,F,p_F,!)\eqto{}(F^{-1}, (\shape_H,p_F),!)$$
+% (where $H$ is a group, $F:\BH_\div\to \BG_\div$ is a map and $p_F:y\eqto{}F(\shape_H)$ an identity in $\BG$; and $F^{-1}:\BG\to\Set$ is $G$-set given by the preimages of $F$ and $(\shape_H,p_F):F^{-1}(y)\defequi \sum_{x:\BH}y\eqto{}F(x)$ is the base point).  If $y$ is $\shape_G$ we follow our earlier convention of dropping it from the notation.
+
+% Since the families are equivalent we may use $\typesubgroup_G$ or $\typesubgroup_G'$ interchangeably.  There is, however, a little explanation needed in order to see that the type $\typenormal_G$ of normal subgroups is equivalent to $\typenormal'_G$.  We do this by using the intermediate set of surjections from $G$:
+% \begin{definition}
+%   \label{def:typeepi}
+%   If $G$ is a group, then the \emph{set of surjections from $G$} is the set
+% $$\typeepi_G\defequi\sum_{G':\typegroup}\sum_{f:\Hom(G,G')}\mathrm{issurj}(f).$$
+% \end{definition}
+
+% Note that if $f:\Hom(G,G')$ is a surjective homomorphism and $e:G'\eqto{}G''$ is an identity of groups, then $(G',f,!)$ and $(G'',f',!)$ are identitified via $e$, where $f':\Hom(G,G'')$ is the homomorphism given by the composite of $f$ and the homomorphism corresponding to $e$.
+% To be deleted by BID june 20}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+
+For $x',y':\BG'$, recall the notation $\pathsp{y'}(x')\defequi(y'\eqto{}x')$.
+\begin{definition}
+  \label{def:ker2}
+  %If $f:\Hom(G,G')$ is a homomorphism and $x,y:\BG$, set $P^f_y(x)\defequi (f(y)\eqto{}f(x))$.
+  Define $$\nor:\typeepi_G\to\typenormal_G$$
+  by $\nor(G',f,!)(y)\defequi(\pathsp{f(y)}f,\refl{f(y)},!)$ for $y:\BG$.
+\end{definition}
+\begin{remark}
+  The $G$-set $\pathsp{f(y)}f$ is not a $G$-torsor (except if $f$ is an isomorphism).
+\end{remark}
+
+\begin{lemma}
+  \label{lem:diagfornormal}
+  The diagram
+  $$\xymatrix{
+  &\typekernel_G\,\,\ar@{>->}[r]^i&\typemono_G\ar[dd]_{\simeq}^{E}\\
+  \typeepi_G\ar@{->>}[ur]^{\ker}\ar[dr]_{\nor}&&\\
+  &\typenormal_G\,\,\ar@{>->}[r]^i&\typesubgroup_G}
+$$
+commutes, where the top composite is the image factorization of the kernel and the bottom inclusion is the inclusion of fixed points.
+\end{lemma}
+\begin{proof}
+  Following $(G',f,!):\typeepi_G$ around the top to $\typesubgroup_G$ yields the transitive $G$-set sending $y:\BG$ to the set $\shape_{G'}\eqto{}f(y)$ together with the point $p_f:\shape_{G'}\eqto{}f(\shape_G)$ while around the bottom we get the transitive $G$-set sending $y:\BG$ to the set $f(\shape_G)\eqto{}f(y)$ together with the point $\refl{f(\shape_G)}:f(\shape_G)\eqto{}f(\shape_G)$.  Hence, precomposition by $p_f$ gives the identity proving that the diagram commutes.
+\end{proof}
+We will prove that both $\ker$ and $\nor$ in the diagram of \cref{lem:diagfornormal} are equivalences, leading to the desired conclusion that the equivalence $E:\typemono_G\we\typesubgroup_G$ takes the subset $\typekernel_G$ identically to $\typenormal_G$.
+Actually, since $\ker:\typeepi_G\to\typekernel_G$ is a surjection, we only need to know it is an injection, and for this
+% by the uniqueness of the image factorization shown in \cref{lem:uniquenessofimagefactorizationforgroups},
+it is enough to show that $\nor$ is an equivalence; we'll spell out the details.
+
+Since it has independent interest, we take a detour via a quotient group construction of \cref{def:normalquotient} which gives us the desired inverse of $\nor$.
+
+We start with a small, but crucial observation.
+\begin{lemma}
+  \label{lem:evaliseqwhennormal}
+  Let $N:\typenormal_G$ be a normal subgroup with $N(y)\oldequiv (X_y,\pt_y,!)$ for $y:\BG$.
+  Then for any $y,z:\BG$
+  \begin{enumerate}
+  \item the evaluation map
+$$\mathrm{ev}_{yz}:(X_y\eqto{}X_z)\to X_z(y),\qquad \mathrm{ev}_{yz}(f)\eqto{}f_y(\pt_y)$$
+is an equivalence and
+  \item  the map $X:(y\eqto{}z)\to(X_y\eqto{}X_z)$ (given by induction via $X_{\refl y}\defequi\refl{X_y}$) is surjective.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+To establish the first fact we need to do induction independently on $y:\BG$ and $z:\BG$ in $X_y(z)$ at the same time as we observe that it suffices (since $\BG$ is connected) to show that $\mathrm{ev}_{yy}$ is an equivalence.
+
+% Induction on the index gives rise to the map $X:(y\eqto{}z)\to(X_y\eqto{}X_z)$ ($X_{\refl y}\defequi\refl{X_y}$) and t
+The composite
+$$\mathrm{ev}_{yy}X:(y\eqto{}y)\to X_yy$$ is determined by $\mathrm{ev}_{yy}X(\refl y)\oldequiv \pt_y$.
+By transitivity of $X_y$ this composite is surjective, hence $\mathrm{ev}_{yy}$ is surjective too.
+
+On the other hand, in  \cref{lem:evisinjwhentransitive} we used the transitivity of $X_y$ to deduce that $\mathrm{ev}_{yy}$ was injective.  Consequently $\mathrm{ev}_{yy}$ is an equivalence.  But since $\mathrm{ev}_{yy}$ is an equivalence and $\mathrm{ev}_{yy}X$ is surjective we conclude that $X$ is surjective
+\end{proof}
+\begin{definition}
+\label{def:normalquotient}
+Let $N:\typenormal_G$ be a normal subgroup with $N(y)\oldequiv (X_y,\pt_y,!)$ for $y:\BG$.  The \emph{quotient group}\index{quotient group} is
+$$G/N\defequi\Aut_{G\text{-}\Set}(X_{\shape_G}).
+$$
+%the component of the groupoid of $G$-sets containing and pointed at $X_{\shape_G}$.
+
+The \emph{quotient homomorphism}\index{quotient homomorphism} is the homomorphism $q_N:\Hom(G,G/N)$  defined by $Bq_N(z)\eqto{}X_z$ (strictly pointed).
+By \cref{lem:evaliseqwhennormal}, $q_N$ is an epimorphism and we have defined a map
+$$q:\typenormal_G\to\typeepi_G,\qquad q(N)\defequi(G/N,q_N,!).$$
+\end{definition}
+
+\begin{remark}
+It is instructive to see how the quotient homomorphism $Bq_N:\BG\to \BG/N$ is defined in the torsor interpretation of $\BG$.  If $Y\colon \BG\to\UU$ is a $G$-type we can define the quotient as
+$$
+Y/N:\BG\to\UU,\qquad Y/N(y)\defequi\sum_{z:\BG}Y(z)\times X_z(y).
+$$
+We note that in the case $\princ G(y)\defequi (\shape_G\eqto{}y)$ we get
+that
+$
+\princ G /N(y)\defequi\sum_{z:\BG}(\shape_G\eqto{}z)\times X_z(y)
+$
+is equivalent to $X_{\shape_G}$.  Consequently, if $Y$ is a $G$-torsor, then $Y/N$ is in the component of $X_{\shape_G}$ and we have
+$$-/N:\typetorsor_G\defequi (G\text{-set})_{(\princ G)}\to (G\text{-set})_{(X_{\shape_G})}.
+$$ Our quotient homomorphism $q_N:\Hom(G,G/N)$ is the composite of the equivalence $\pathsp{}^G:\BG\we\typetorsor_G$ of \cref{lem:BGbytorsor} and the quotient map $-/N$.
+\end{remark}
+
+\begin{lemma}
+  \label{lem:qeq}
+  The map $\nor:\typeepi_G\to\typenormal_G$ is an equivalence with inverse $q:\typenormal_G\to\typeepi_G$.
+\end{lemma}
+\begin{proof}
+  Assume $N:\typenormal_G$ with $N(y)\defequi(X_y,\pt_y,!)$ for $y:\BG$.
+  Then $\nor\, q(N):\BG\to\Set$ takes $y:\BG$ to $(\nor\, q(N))(y)\oldequiv(Y_y,\refl{X_y},!)$, where $Y_y(z)\defequi (X_y\eqto{}X_z)$.
+  Noting that the equivalence $\mathrm{ev}_{yz}:(X_y\eqto{}X_z)\we X_z(y)$ of \cref{lem:evaliseqwhennormal} has $\mathrm{ev}_{yy}(\refl{X_y})\defequi \pt_y$ we see that univalence gives us the desired identity $\nor\, q(N)\eqto{}N$.\footnote{fix so that it adhers to dogmatic language and naturality in $N$ is clear}
+
+  Conversely, let $f:\Hom(G,G')$ be an epimorphism.
+  Recall that the quotient group is $G/\nor(f)\defequi\Aut_{G\text{-}\Set}(\pathsp{f(\shape_G)}f)$ and the quotient homomorphism $q_{\nor f}:\Hom(G,G/\nor f)$ is given by sending $y:\BG$ to $\pathsp{f(y)}f:\BG\to\Set$ (strictly pointed -- \ie by $\refl{\pathsp{f(\shape_G)}f}$).
+  We define a homomorphism $Q:\Hom(G',G/\nor f)$ by sending $z:\BG'$ to $\pathsp{z}f$ and using the identification $\pathsp{\shape_{G'}}f\eqto{}\pathsp{f(\shape_G)}f$ induced by $pf:\shape_{G'}\eqto{}f(\shape_G)$ and notice the equality by definition:
+  $$Q\,f\oldequiv q_{\nor f}:\Hom(G,G/\nor f).$$
+
+We are done if we can show that $Q$ is an isomorphism.
+The preimage of the base point $\pathsp{f(\shape_G)}f$ is
+$$\sum_{z:\BG'}\prod_{y:\BG}(z\eqto{}f(y))\eqto{}(f(\shape_G)\eqto{}f(y))$$
+which by
+\cref{lem:epifullyfaithful} is equivalent to
+$$\sum_{z:\BG'}\prod_{v:\BG'}(z\eqto{}v)\eqto{}(f(\shape_G)\eqto{}v)$$
+which by \cref{lem:pathsptransportiseq} is equivalent to the contractible type $\sum_{z:\BG'}z\eqto{}f(\shape_G)$.
+% \marginnote{{\color{blue}\tiny DELETE BID June
+%     Conversely, consider a surjective homomorphism $f:\Hom(G,G')$.
+% For $x:\BG$ and $z:\BG'$ let $Q^f_z(x)\defequi (z\eqto{}f(x))$.
+% Then the quotient group $G/\nor(f)$ is the component  of the groupoid of $G$-sets containing and pointed at $Q^f_{f(pt_G)}$ and the quotient homomorphism $q_{\nor f}:\BG\to_* \BG/\nor f$ is given by  $q_{\nor f}(y)\defequi Q^f_{f(y)}$ (strictly pointed -- \ie by $\refl{Q^f_{f(\shape_G)}}$).
+% Observe that by using the identification of the basepoint $Q^f_{f(\shape_G)}$ of $\BG/\nor f$ with $Q^f_{\shape_{G'}}$ given by $p_f:\shape_{G'}\eqto{}f(\shape_G)$ we have defined a homomorphism $Q^f:\Hom(G',G/\nor f$) such that
+%  $$\xymatrix{&\BG\ar[dl]_f\ar[dr]^{q_{\nor f}}&\\
+%  \BG'\ar[rr]_{Q^f}&&\BG/\ker'f
+% }$$
+% commutes.
+% We are done if we can show that $Q^f$ is an equivalence.
+% The preimage of the base point $Q^f_{f(\shape_G)}$ is
+% $$\sum_{z:\BG'}\prod_{y:\BG}(z\eqto{}f(y))\eqto{}(f(\shape_G)\eqto{}f(y))$$
+% which by
+% \cref{lem:epifullyfaithful} is equivalent to
+% $$\sum_{z:\BG'}\prod_{v:\BG'}(z\eqto{}v)\eqto{}(f(\shape_G)\eqto{}v)$$
+% which by \cref{lem:pathsptransportiseq} is equivalent to the contractible type $\sum_{z:\BG'}z\eqto{}f(\shape_G)$.
+% }}
+\end{proof}
+
+\begin{corollary}
+  \label{cor:normalisnormal}
+  The kernel $\ker:\typeepi_G\to \typekernel_G$ is an equivalence of sets.
+\end{corollary}
+\begin{proof} Since $\nor:\typeepi_G\to\typenormal_G$ and $E:\typemono_G\to\typesubgroup_G$ are equivalences, the inclusion of fixed points $i:\typenormal\to\typesubgroup$ is an injection and the diagram
+  \marginnote{the diagram in \cref{lem:diagfornormal}
+    $$\xymatrix{
+  &\typekernel_G\,\,\ar@{>->}[r]^i&\typemono_G\ar[dd]_{\simeq}^{E}\\
+  \typeepi_G\ar@{->>}[ur]^{\ker}\ar[dr]_{\nor}^\simeq&&\\
+  &\typenormal_G\,\,\ar@{>->}[r]^i&\typesubgroup_G}
+$$}
+in \cref{lem:diagfornormal} commutes, the surjection $\ker:\typeepi_G\to\typekernel_G$ is also an injection.
+%the kernel from $\typeepi_G$ to $\typemono_G$ is an injection.   %Hence, given a monomorphism which is a kernel, the type of epimorphisms of which it is the kernel is contractible.
+\end{proof}
+
+
+Summing up, using the various interpretations of subgroups, we get the following list of equivalent sets all interpreting what a normal subgroup is.
+%The explicit equivalences are left out of the statements.
+\begin{lemma}
+  \label{lem:characterizations of normal}
+  Let $G$ be a group, then the following sets are equivalent
+\begin{enumerate}
+\item The set $\typeepi_G$ of epimorphisms from $G$,
+\item the set $\typekernel_G$ of kernels of epimorphisms from $G$,
+\item the set $\typenormal_G$ of fixed points of the $G$-set $\typesubgroup_G$ (aka.~normal subgroups),
+\item the set of fixed points of the $G$-set $\typemono_G$,
+\item the set of fixed points of the $G$-set of abstract subgroups of $\abstr(G)$ of \cref{lem:conjugationabstractly}.
+\end{enumerate}
+\end{lemma}
+
+
+\subsection{The associated kernel}
+\label{sec:assker}
+
+With this much effort in proving that different perspectives on the concept of ``normal subgroups'' (in particular, kernels and fixed points) are the same, it can be worthwhile to make the composite equivalence
+$$\ker\,q:\typenormal_G\we\typekernel_G$$
+explicit -- where the quotient group function $q:\typenormal_G\to\typeepi_G$ is the inverse of $\nor$ constructed in \cref{def:normalquotient} --  and even write out a simplification.
+
+Let $N:\typenormal_G$ be a normal subgroup with $N(y)\oldequiv (X_y,\pt_y,!)$ for $y:\BG$ with $X_y:\BG\to\Set$, $\pt_y:X_y(y)$ and $!:\mathrm{isTrans}(X_y)$.
+Then
+$$\Ker q(N)\defequi\Aut_{\sum_{x:\BG}(X_x\eqto{}X_{\shape_G})}(\shape_G,\refl{X_{\shape_G}})
+$$
+and with the monomorphism $\incl_{\ker q(N)}:\Hom(\Ker q(N),G)$ given by the first projection from $\sum_{x:\BG}(X_x\eqto{}X_{\shape_G})$ to $\BG$.
+% $$(B\ker q_N)_\div\defequi\sum_{z:\BG}(X_z\eqto{}X_{\shape_G})$$
+% pointed at $(\shape_G,\refl{X_{\shape_G}})$ and with $i_{\ker f}:B\ker q_N\to_*\BG$ given by the first projection.
+
+However, going the other way around the pentagon of \cref{lem:diagfornormal}, we see that $\mathrm{ass}(N)\defequi E^{-1}i(N):\typemono_G$ consists of the group
+$$\mathrm{Ass}(N)\defequi\Aut_{\sum_{x:\BG}X_{\shape_G}(x)}(\shape_G,\pt_{\shape_G})
+$$
+and the monomorphism into $G$ given by the first projection (monomorphism because $X_{\shape_G}$ has values in sets).  Since the pentagon commutes we know that $\mathrm{ass}(N)$ is the kernel of $q(N)\colon\typeepi_G$, and the identification $\mathrm{ev}:i\ker q(N)\eqto{}_{\typemono_G}\mathrm{ass}(N)$ is given via \cref{lem:evaliseqwhennormal} and univalence by the equivalence
+$$\mathrm{ev}_{x\,\shape_G}:(X_x\eqto{}X_{\shape_G})\to X_{\shape_G}(x)% ,\qquad \mathrm{ev}_{x\,\shape_G}(f)\eqto{}f_x(\pt_x)
+.$$
+
+
+
+Letting the proposition that $\mathrm{ass}(N)$ is a kernel be invisible in the notation we may summarize the above as follows:
+
+\begin{definition}
+  \label{def:associatednormal}
+  If $N:\typenormal_G$ is a normal subgroup we call the kernel $\mathrm{ass}(N):\typekernel_G$ the \emph{kernel assocaited to $N$}\index{kernel!associated to}.
+\end{definition}
+\marginnote{\begin{remark}
+    In forming the kernel associated to $N$, where did we use that $N$ was a fixed point of the $G$-set $\typesubgroup_G$?
+    If $Y:\BG\to\Set$ is a transitive $G$-set and $\pt:Y(\shape_G)$, then surely we could consider the group
+    $$W\defequi\Aut_{X:\BG\to\Set}(Y)$$ % defined as the component of the groupoid of $G$-sets containing and pointed at $Y$
+    as a substitute for the quotient group (see \cref{sec:Weyl}).
+    %
+    One problem is that we wouldn't know how to construct a homomorphism from $G$ to $W$ which we then could consider the kernel of.  And even if we tried our hand inventing formulas for the outcomes, ignoring all subscripts, we'd be stuck at the very end where we
+used \cref{lem:evaliseqwhennormal} to show that the evaluation map is an equivalence; if we only had transitivity we could try to use a variant of \cref{lem:evisinjwhentransitive} to pin down injectivity, but surjectivity needs the extra induction freedom.
+\end{remark}}%marginnote
+
+
+\begin{lemma}
+  \label{lem:normalsarekernels}
+  The diagram of equivalences
+  $$\xymatrix{&\typekernel_G\,\,\ar@{>->}[r]^i&\typemono_G\ar[dd]^E_\simeq\\
+\typeepi_G\ar[ur]^{\ker}_{\simeq}\ar[dr]^{\nor}_\simeq&\\
+&\,\typenormal_G'\ar[uu]^{\mathrm{ass}}_\simeq\,\,\ar@{>->}[r]^i&\typesubgroup_G}$$
+commutes.
+\end{lemma}
+
+
+
+
+%   This can be simplified somewhat:
+
+% \begin{definition}
+%   \label{def:associatednormal}
+%   Let $N:\typenormal'_G$ be a normal subgroup' with $N(y)\oldequiv (X_y,\pt_y,!)$ for $y:\BG$ with $X_y:\BG\to\Set$, $\pt_y:X_y(y)$ and $!:\mathrm{isTrans}(X_y)$.  Define a subgroup $(\mathrm{ass}(N),i_N,!)$ of $G$, called the \emph{associated normal subgroup}, as follows:
+%   \begin{enumerate}
+%   \item the connected groupoid $B\mathrm{ass}(N)_\div\defequi\sum_{z:\BG}X_{\shape_G}(z)$,
+%   \item together with the point $\pt_N\defequi(\shape_G,\pt_{\shape_G})$,
+%   \item the first projection $\Bi:B\mathrm{ass}(N)\to_*\BG$
+%   \item together with the assertion that the preimages of $\Bi$ (which are equivalent to $X_{\shape_G}(z)$ for varying $z:\BG$) are sets.
+%   \end{enumerate}
+% \end{definition}
+
+
+% We obviously need to show that the ``normal'' in the name is warranted.
+% \begin{lemma}
+%   \label{lem:normalsarekernels}
+% The map
+% $$\mathrm{ev}:B\ker q_N\to B\mathrm{ass}(N),\qquad \mathrm{ev}(z,f)\defequi(z,f(\pt_z))$$ is an equivalence and furthermore commutes with the first projections to $\BG$.  The pointed map $\mathrm{ev}_*\defequi(\mathrm{ev},\refl{(\shape_G,\pt_{\shape_G})}):B\ker q_N\to_* B\mathrm{ass}(N)$
+% (well defined since $\mathrm{ev}(\shape_G,\refl{X_{\shape_G}})\defequi (\shape_G,\pt_{\shape_G})$) induces an identification of the subgroups $\ker\,q(N)$ and $\mathrm{ass}(N)$.
+
+% Provided with this information, the associated normal subgroup $\mathrm{ass}(N)$ \emph{is} a normal subgroup and we get a commuting diagram
+% $$\xymatrix{&\typenormal_G\\
+% \typeepi_G\ar[ur]^{\ker}_{\simeq}\ar[dr]^{\ker'}_\simeq&\\
+% &\,\typenormal_G'.\ar[uu]^{\mathrm{ass}}_\simeq}$$
+
+%   % The associated normal subgroup of $N:\typenormal_G'$ is a normal subgroup; more precisely $N(\shape_G)$ is the kernel of the quotient homomorphism $q_N:\Hom(G,G/N)$.
+%   % Let $N:\typenormal'_G$ be a normal subgroup' with $N(y)\defequi (X_y,\pt_y,!)$ for $y:\BG$ with $X_y:\BG\to\Set$, $\pt_y:X_y(y)$ and $!:\mathrm{isTrans}(X_y)$.  Define a subgroup $(\mathrm{ass}(N),i_N,!)$ of $G$ as follows:
+%   % \begin{enumerate}
+%   % \item the connected groupoid $B\mathrm{ass}(N)_\div\defequi\sum_{z:\BG}X_{\shape_G}(z)$,
+%   % \item together with the point $\pt_N\defequi(\shape_G,\pt_{\shape_G})$,
+%   % \item the first projection $\Bi:B\mathrm{ass}(N)\to_*\BG$
+%   % \item together with the assertion that the preimages of $\Bi$ (which are equivalent to $X_{\shape_G}(z)$ for varying $z:\BG$) are sets.
+%   % \end{enumerate}
+%   % Then $(\mathrm{ass}(N),i_N,!)$ is a normal subgroup of $G$ in the sense that it is the kernel of a homomorphism.
+% \end{lemma}
+% \begin{proof}
+%   % Let $N(y)\oldequiv (X_y,\pt_y,!)$ for $y:\BG$.  Let $G/N$ be the group defined as the component of the groupoid of $G$-sets containing and pointed in $X_{\shape_G}$.  Let $f:\Hom(G,G/N)$ be the homomorphism defined by $\Bf(z)\eqto{}X_z$.
+%  %  Consider the kernel of the quotient homomorphism $q_N:\Hom(G,G/N)$ of \cref{def:normalquotient},
+% % $$(B\ker q_N)_\div\defequi\sum_{z:\BG}(X_z\eqto{}X_{\shape_G})$$
+% % pointed in $(\shape_G,\refl{X_{\shape_G}})$ and with $i_{\ker f}:B\ker q_N\to_*\BG$ given by the first projection.  Consider t
+
+% % We claim that $\mathrm{ev}$ is an equivalence.
+% Compared with the proof of $\ker'$ being an equivalence (\cref{lem:qeq}) there are no new ingredients.
+% Since $B\mathrm{ass}(N)$ is connected it is enough to show that the preimage of $\mathrm{ev}^{-1}(\shape_G,\pt_{\shape_G})$ is contractible.
+% Since $\mathrm{ev}$ agrees with the projections to $\BG$, the preimage is equivalent to $\sum_{f:X_{\shape_G}=X_{\shape_G}}f(\pt_{\shape_G})=\pt_{\shape_G}$.  We recognize this as the preimage $\mathrm{ev}_{{\shape_G}{\shape_G}}^{-1}(\pt_{\shape_G})$
+% of the evaluation map
+% $\mathrm{ev}_{{\shape_G}{\shape_G}}:(X_{\shape_G}=X_{\shape_G})\to X_{\shape_G}(\shape_G)$ which is an equivalence by \cref{lem:evaliseqwhennormal}.
+% % the preimage $\mathrm{ev}_{X_{\shape_G}}^{-1}(\pt_{\shape_G})$
+% % of the evaluation map
+% % $\mathrm{ev}_{X_{\shape_G}}:(X_{\shape_G}=X_{\shape_G})\to X_{\shape_G}(\shape_G)$.
+% % In \cref{lem:evisinjwhentransitive} %{lem:conistrans}
+% % we proved that (since $X_{\shape_G}$ is transitive) $\mathrm{ev}_{X_{\shape_G}}$ is an injection.  Hence the preimage is a proposition, but since it contains $(\refl{X_{\shape_G}},\refl{\pt_{\shape_G}})$ it is contractible.
+
+% Evoking univalence we get an identification of subgroups between the kernel of $f$ and $(\mathrm{ass}(N),i_N,!)$.
+% \end{proof}
+
+
+
+
+% The associated normal subgroup defines an equivalence from $\typenormal_G'$ to the type $\typenormal_G$ of kernels of surjective homomorphism. To see this we construct an inverse.
+
+% \begin{definition}
+%   \label{def:kerneltofixedpoint}
+%   Let $f:\Hom(G,G')$ be a surjective homomorphism.  For $y,z:\BG$ consider the set $X_y^f(z)\defequi (f(z)=f(y))$ and the element $\pt^f_y\defequi\refl{f(y)}:X_y(y)$.  The $G$-set $X_y:\BG\to\Set$ is transitive since $f$ is surjective and so we have a map
+% $$\mathrm{ssa}:\typenormal_G\to\typenormal_G',\qquad \mathrm{ssa}(f)(y)\defequi(X_y^f,\pt_y^f,!).$$
+% \end{definition}
+
+% \begin{lemma}
+%   \label{lem:characterizations of normal}
+%   Let $G$ be a group, then the associated normal subgroup is an equivalence
+%   $$\mathrm{ass}:\typenormal_G'\to\typenormal_G$$
+% with inverse $\mathrm{ssa}$.  Summing up the following sets are equivalent
+% \begin{enumerate}
+% \item The set $\typenormal_G$ of kernels of surjections from $G$,
+% \item the set $\typenormal_G'$ of fixed points of the $G$-set $\typesubgroup_G'$,
+% \item the set of fixed points of the $G$-set $\typesubgroup_G$
+% \item the set of fixed points of the $G$-set of abstract subgroups of $\abstr(G)$.
+% \end{enumerate}
+% \end{lemma}
+% \begin{proof}
+%   The last three entries are equivalent since they are the fixed points of equivalent $G$-sets, so we only need to comment on the first assertion.
+
+% Let $f:\Hom(G,G')$ be a surjective homomorphism.
+% The kernel $N\oldequiv \ker f$ is then given by the first projection
+% $$\text{pr}:\sum_{z:\BG}\shape_{G'}=\Bf(z)\to_*\BG.$$
+% Then $\mathrm{ass\,ssa}(\ker f)$ defined to be
+% $$
+% (\sum_{z:\BG}\prod_{y:\BG}
+% (\pathsp{f(\shape_G)}^{G'}{f(y)}=\pathsp{f(z)}^{G'}{f(y)},
+% \text{pr}, (\shape_G,\refl{\pathsp{f(\shape_G)}^{G'}{f(\shape_G)}},!),$$
+% where $\pathsp{a}^{G'}{b}\defequi (a=b)$ for $a,b:\BG'$.
+% The desired identification between $\ker f$ and $\mathrm{ass\,ssa}(\ker f)$ is then given by composing the identifications
+% $\preinv(p_f):(\shape_{G'}=f(z))=(f(\shape_G)=f(z))$ and
+% $$\preinv:(f(\shape_G)=f(z))=
+% \prod_{y:\BG}(\pathsp{f(\shape_G)}^{G'}{f(y)}=\pathsp{f(z)}^{G'}{f(y)})$$
+% \footnote{((find ref where this was demonstrated: slight modification since we only claim naturality in $G$)).}
+% \end{proof}
+
+
+
+% There are many valuable constructions to be extracted from the proof of \cref{lem:normalsarekernels}.
+% \begin{definition}
+%   \label{def:associatedquotient}
+% \end{definition}
+% \footnote{COMEBACK 190509 Do the converse and elevate constructions to definitions}
+
+
+
+% \section{The pullback}
+% \label{sec:pullback}
+% Given two functions $f:B\to D$ and $g:C\to D$ with common target, the ``pullback'' which we will now define should be thought about as the type of all pairs of elements $(b,c):B\times C$ so that $f(b)=g(c)$.  This construction is important in many situations also beyond group theory.
+
+% \begin{definition}
+%   \label{def:pullback}
+%   Let $B, C, D$ be types and let $f:B\to D$ and $g:C\to D$ be two maps.
+% The \emph{pullback}\index{pullback} of $f$ and $g$ is the type
+% $$\prod(f,g)\defequi\sum_{(b,c):B\times C}(f(b)=_Dg(c))$$
+% together with the two projections $\prj_B:\prod(f,g)\to B$ and $\prj_C:\prod(f,g)\to C$ sending $(b,c,p):\prod(f,g)$ to $b:B$ or $c:C$.  If $f$ and $g$ are clear from the context, we may write $B\times_DC$ instead of $\prod(f,g)$ and summarize the situation by the diagram
+% $$\xymatrix{B\times_DC\ar[r]^{\prj_C}\ar[d]^{\prj_B}&C\ar[d]^g\\B\ar[r]^f&\,D.}$$
+% \end{definition}
+% \begin{xca}
+%   \marginnote{Illustrating the exercise: if the solid diagram commutes there is a unique dotted arrow so that the resulting diagram commutes:
+%     $$\xymatrix{A\ar@{.>}[dr]\ar[drr]\ar[ddr]&&\\
+%     &B\times_DC\ar[r]\ar[d]&C\ar[d]\\&B\ar[r]&D}
+%   $$}
+%   \label{xca:univpropofpullback}
+%   Let $f:B\to D$ and $g:C\to D$ be two maps with common target.  If $A$ is a type show that
+%   \begin{align*}
+%     (A\to B)\times_{(A\to D)}(A\to C)\to &(A\to B\times_DC)\\
+% (\beta,\gamma,p:f\beta=g\gamma)\,\mapsto\,&(a\mapsto (f(a),g(a),p(a):f\beta(a)=g\gamma(a)))
+%   \end{align*}
+%  is an equivalence.
+% \end{xca}
+% In view of \cref{xca:univpropofpullback} we will say that we have a \emph{pullback diagram}\index{pullback diagram}
+% $$\xymatrix{A\ar[d]^{g'}\ar[r]^{f'}&C\ar[d]^g\\B\ar[r]^f&D}$$
+% to indicate that we have an element in $(A\to B)\times_{(A\to D)}(A\to C)$ such that the resulting map $A\to B\times_DC$ is an equivalence.
+
+% \begin{example}
+%   \marginnote{Preimage as a pullback: $$\xymatrix{f^{-1}(d)\ar[d]\ar[r]&\bn1\ar[d]^d\\B\ar[r]^f&D}$$}
+%   If $g:\bn 1\to D$ has value $d:D$ and $f:B\to D$ is any map, then $\prod(f,g)\oldequiv B\times_D\bn 1$ is equivalent to the preimage $f^{-1}(d)\defequi\sum_{b:B}d=f(b)$.
+% \end{example}
+% \begin{example}
+%   \label{ex:pullbackandgcd}
+%   Much group theory is hidden in the pullback.  For instance, the greatest common divisor $\gcd(a,b)$ of $a,b:\NN$ is another name for the number of components you get if you pull back the $a$-fold and the $b$-fold \coverings of the circle: we % will see in \cref{lem:iso2} we
+%   have a pullback
+% $$\xymatrix{S^1\times\B C_{\gcd(a,b)}\ar[d]\ar[r]& S^1\ar[d]^{(-)^b}\\
+% S^1\ar[r]^{(-)^a}&\,S^1}
+% $$
+% (where $C_n$ was the cyclic group of order $n$).
+% To get a geometric idea, think of the circle as the unit circle in the complex numbers so that the $a$-fold \covering is simply taking the $a$-fold power.  With this setup, the pullback should consist of pairs $(z_1,z_2)$ of unit length complex numbers with the property that $z_1^a=z_2^b$.  Let $a=a'\gcd(a,b)$ and $b=b'\gcd(a,b)$. Taking an arbitrary unit length complex number $z$, then the pair $(z^{b'},z^{a'})$ is in the pull back (since $a'b=ab'$).  But so is $(\zeta z^{b'},z^{a'})$, where $\zeta$ is any $\gcd(a,b)$\th root of unity.  Each of the $\gcd(a,b)$-choices of $\zeta$ contributes in this way to a component of the pullback.  In more detail: identifying the cyclic group $C_{\gcd(a,b)}$ of order $\gcd(a,b)$ with the group of $g$\th roots of unity, the top horizontal map $S^1\times C_{\gcd(a,b)}\to S^1$ sends $(z,\zeta)$ to $z^{a'}$ and the left vertical map sends $(z,\zeta)$ to the product $\zeta z^{b'}$.
+
+% Also the least common multiple $\lcm(a,b)=a'b$ is hidden in the pullback; in the present example it is demonstrated that the map(s) accross the diagram makes each component of the pullback a copy of the $\lcm(a,b)$-fold \covering.
+% \end{example}
+
+
+% \begin{definition}
+%   \label{def:intersectionand unionofsets}
+%   Let $S$ be a set and consider two subsets $A$ and $B$ of $S$ given by two families of propositions (for $s:S$) $P(s)$ and $Q(s)$.  The \emph{intersection}\index{intersection! of sets} $A\cap B$ of the two subsets is given by the family of propositions $P(s)\times Q(s)$.  The \emph{union}\index{union of sets} $A\cup B$ is given by the set family of propositions $A(s)+B(s)$.
+% \end{definition}
+% \begin{xca}
+%   \label{xca:intersectionpullbackofsets}
+%   Given two subsets $A$, $B$ of a set $S$, prove that
+%   \begin{enumerate}
+%   \item The pullback $A\times_SB$ maps by an equivalence to the intersection $A\cap B$,
+%   \item\label{xca:cardinalityintersectionunion}
+%     If $S$ is finite, then the sum of the cardinalities of $A$ and $B$ is equal to the sum of the cardinalities of $A\cup B$ and $A\cap B$.\qedhere
+%   \end{enumerate}
+% \end{xca} 
+
+% \begin{definition}
+%   \label{def:intersectionofgroups}
+%   Let $f:\Hom(H,G)$ and $f':\Hom(H',G)$ be two homomorphisms with common target.  The \emph{pullback}\index{pullback!of groups} $H\times_GH'$ is the group obtained as the (pointed) component of
+% $$\pt_{H\times_GH'}\defequi(\shape_H,\pt_{H'},p_{f'}p_f^{-1})$$ of the pullback $\BH\times_{\BG}\BH'$ (where $p_f:\shape_G=f(\shape_H)$ is the name we chose for the data displaying $f$ as a pointed map, so that $p_{f'}p_f^{-1}:f(\shape_H)=f'(\pt_{H'})$).
+
+% If $(H,f,!)$ and $(H',f',!)$ are monomorphisms into $G$, then the pullback is called the \emph{intersection}\index{intersection! of monomorphisms} and if the context is clear denoted simply $H\cap H'$.
+% \end{definition}
+% \begin{example}
+%   If $a,b:\NN$ are natural number with least common multiple $L$, then $L\ZZ$ is the intesection $a\ZZ\cap b\ZZ$ of the subgroups $a\ZZ$ and $b\ZZ$ of $\ZZ$.
+% \end{example}
+% % \begin{example}this came out wrong DELETE June
+% %   If $H,K:\typemono_G$ with $X,Y:\BG\to\Set$ being the corresponding transitive $G$-sets under the equivalence $E$, then the intersection of $H$ and $K$ corresponds to the $G$-set $X\times Y:\BG\to\Set$ (with $(X\times Y)(x)\defequi X(x)\times Y(x)$).
+% % \end{example}
+
+% \begin{xca}
+%   Prove that if $f:\Hom(H,G)$ and $f':\Hom(H',G)$ are homomorphisms,
+%   then the pointed version of \cref{xca:univpropofpullback} induces an equivalence
+%   \[
+%     \USymH \times_{\USymG} \USymH'
+%     \simeq (\shape_{H\times_GH'}=\shape_{H\times_GH'}).\text{\footnotemark}
+%   \]
+%   Elevate this equivalence to a statement about abstract groups.\footnotetext{%
+%     Hint: set $A\defequi \Sc$, $B\defequi \BH$, $C\defequi \BH'$ and $D\defequi \BG$.}
+% \end{xca}
+\section{Intersecting with normal subgroups}
+In \cref{sec:pullback} we defined the intersection of two monomorphisms and by extension, of two subgroups.  This is particularly interesting when one of them is represented by a normal subgroup.
+\begin{xca}
+  If $\mathcal G$ is an abstract group and $\mathcal H$ and $\mathcal K$ are abstract subgroups.  Give a definition of the intersection $\mathcal H\cap\mathcal K$ is the abstract subgroup of $\mathcal G$ agreeing with our definition for monomorphisms as in \cref{def:intersectionofgroups}.
+\end{xca}
+\begin{lemma}
+  \label{lem:whatSylow2needs}
+  Let $(G',f,!):\typeepi_G$ be an epimorphism, let $N$ be the kernel of $f$  and let $(H,i,!):\typemono_G$.
+  Then
+$N\cap H$ is the kernel of $fi:\Hom(H,G')$. 
+and the induced homomorphism in $\Hom(H/(N\cap H),G')$ is a monomorphism.
+  \begin{proof}
+Now, $N$ is the kernel of the epimorphism $f$, giving an equivalence between $\BN_\div$ and the preimage
+$$(\Bf)^{-1}(\shape_{G'})\defequi\sum_{y:\BG}(\shape_{G'}\eqto{}\Bf(y)).$$
+Writing out the definition of the pullback (and using that for each $x:\BH$ the type $\sum_{y:\BG}y\eqto{}\Bi(x)$ is contractible), we get an equivalence between $\BN\times_{\BG}\BH$ and
+$$B(fi)^{-1}(\shape_{G'})\defequi\sum_{x:\BH}\shape_{G'}\eqto{}B(fi)x,$$
+the preimage of $\shape_{G'}$ of the composite $B(fi):\BH\to \BG'$.
+ By definition, the intersection $B(N\cap H)$ is the pointed component of the pullback containing $(\pt_N,\shape_H)$.  Under the equivalence with $B(fi)^{-1}(\shape_{G'})$ the intersection corresponds to the component of $(\shape_H,\Bf(p_i)\,p_f)% :\sum_{x:\BH}\shape_{G'}\eqto{}B(fi)x
+ $.
+Since (by definition of the composite of pointed maps) $p_{fi}\defequi \Bf(p_i)\,p_f$ we get that the intersection $N\cap H$ is identified with the kernel of the composite $fi:\Hom(H,G')$.
+%    \item
+
+Finally, since $N\cap H$ is the kernel of the composite $fi:\Hom(H,G')$, under the equivalence of \cref{lem:kerandcoker}, $N\cap H$ is equivalent to the kernel of the epimorphism $\prj_{\img(fi)}:\Hom(H,\image (fi))$.  Otherwise said, the quotient group $H/(N\cap H)$ is another name for the image $\Img (fi)$, and $\incl_{\img(fi)}$ is indeed a monomorphism into $G'$.
+%    \end{enumerate}
+  \end{proof}
+\end{lemma}
+\begin{xca}
+  Write out all the above in terms of the set $\typesubgroup_G$ of subgroups of $G$ instead of in terms of the set $\typemono_G$ of monomorphism into $G$.
+\end{xca}
+
+
+\marginnote{Is the below misplaced?}
+Recall that if $X:\BG\to\Set$ is a $G$-set, then the set of fixed points is the set $\prod_{v:\BG}X(v)$, which is a subset of $X(\shape_G)$ via the evaluation map.  If a homomorphism from a group $H$ to $G$ is given by $F:\BH_\div\to \BG_\div$ and $p_F:\shape_G\eqto{}F(\shape_H)$, then precomposition (``restriction of scalars'') by $F$ gives an $H$-set
+$$F^*X\defequi X\,F:\BH\to\Set.$$
+In the case of inclusions of subgroups (or other situations where the homomorphism is clear from the context) it is not uncommon to talk about ``the $H$-set $X$'' rather than ``$F^*X$''.
+This can be somewhat confusing when it comes to fixed points: the fixed points of $F^*X$ are given by $\prod_{v:\BH}XF(v)$ which evaluates nicely to $XF(\shape_H)$, but in order to considered  these as elements in $X(\shape_G)$ we need to apply $X(p_F^{-1}):X(F(\shape_H))\eqto{}X(\shape_G)$.
+
+Consequently, we'll say that $x:X(\shape_G)$ is an \emph{$H$-fixed point} if there is an $f:\prod_{v:\BH}XF(v)$ such that $x\eqto{}X(p_F^{-1})f(\shape_H)$.
+
+
+
+\begin{lemma}
+  \label{lem:thereisaconjugate}
+  Let $G$ be a group, $X:\BG\to Set$ a $G$-set, $x:X(\shape_G)$, $g:\USymG$ and $H\eqto{}(H,F,p,!):\typesubgroup_G$ a subgroup of $G$ ($F:\BH_\div\to \BG_\div$ and $p:\shape_G\eqto{}F(\shape_H)$).
+
+Then $g\,x$ is a fixed point for the $H$-action on $X$ if and only if $x$ is a fixed point for the action  of the conjugate subgroup $g\,H\defequi(H,F,g^{-1}p_F,!)$ on $X$.
+\end{lemma}
+\begin{proof}
+  Consider an $f:\prod_{v:\BH}XF(v)$.  Then $g\cdot x\eqto{}X(p_F^{-1})(f(\shape_H))$ if and only if $x\eqto{}g^{-1}\cdot X(p_F^{-1})(f(\shape_H))\oldequiv X((g^{-1}p_F)^{-1}(f(\shape_H))$.
+\end{proof}
+
+
+
+% {\color{blue}Remove when lemma above gets stable \begin{lemma}
+%   \label{lem:thereisaconjugate}
+%   Let $G$ be a group, $X$ a $G$-set, $x:X$ and $H\eqto{}(H,i,!)$ a subgroup of $G$.  If $y$ is an element in the orbit of $x$ s.t. $H\subseteq Stab_y$  (\ie $y$ is an $H$-fixed point), then there is a conjugate $H'\eqto{}(H',i',!)$ of $H$ with $H'\subseteq Stab_x$.
+% \end{lemma}
+% \begin{proof}
+%   CLASSICAL: There is a $g:G$ s.t. $y\eqto{}g\cdot x$ and for all $h:H$ we have $h\cdot y\eqto{}y$.  Define $H'\eqto{}g^{-1}Hg$.  If $h':H'$, then $h'\eqto{}g^{-1}hg$ for a unique $h:H$ and
+% $$h'\cdot x\eqto{}(g^{-1}hg)\cdot x \eqto{} g^{-1}\cdot(h\cdot (g\cdot x))\eqto{}g^{-1}\cdot(h\cdot y)\eqto{}g^{-1}\cdot y \eqto{} x.$$
+% \end{proof}
+% }
+
+\section{Automorphisms of groups}
+\label{sec:aut-group}%
+
+\MB{Most of this intro including Rem. 5.7.1 has been copied to the end of
+\cref{sec:homomorphisms}, but a short recap is of course never wrong.}
+This section explores the relation between the symmetries {\em in} a group $G$,
+and the symmetry {\em of} the group $G$. More formally, recall that $\Group$ is
+a groupoid, hence $\Aut_\Group(G)$ is defining a group, that we will simply
+denote $\Aut(G)$ in the rest of this section. Recall in particular that
+$\BAut(G)$ is the connected component of $G$ in type of groups (pointed at $G$),
+which is equivalent to the connected component of $\BG$ in $\UUp$ (pointed at
+$\BG$). Let us now use this equivalence to define an homomorphism
+$\inn: G \to \Aut(G)$ by setting
+\begin{displaymath}
+  \Binn : \BG \ptdto \BAut(G), \quad y \mapsto \mkgroup(\BG_\div , y)
+\end{displaymath}
+where the path pointing $\Binn$ is \MB{$p_{\inn}\defeq \refl{G} :  G \eqto \Binn (\shape_G)$.}
+Notice that for
+this map $\Binn$ to be defined properly, we need to show that, for all $y:\BG$, the proposition
+$\Trunc{G \eqto \mkgroup((\BG_\div , y))}$ holds. \MB{Easy with \cref{exa:conj-concrete}} 
+We are targeting a family of propositions
+from the connected type $\BG$, so it is enough to prove the proposition at
+$y\jdeq \shape_G$, for which it is obvious: take $\trunc{\refl G}$ as an
+element of $\Trunc{G \eqto \mkgroup(\BG_\div , \shape_G)}$.
+
+\begin{remark}
+  For pedagogical purposes, we will now make explicit the map
+  \begin{displaymath}
+    \USym\inn: \USymG \to \USym(\Aut(G)).
+  \end{displaymath}
+  More precisely, for each symmetry $g:\USymG$, the element $\USym\inn(g)$ is a
+  symmetry of $\Aut(G)$, that is, through univalence, a isomorphism of groups
+  from $G$ to itself. We want to describe the automorphism $\USym\inn(g)$. By
+  definition, \MB{(Easier with \cref{exa:conj-concrete})} 
+  $\USym\inn \jdeq \inv{\refl{G}} \cdot \ap {\Binn} (\blank) \cdot \refl{G}$. So it
+  remains to determine $\ap \Binn$. We proceed by induction on
+  $p:\shape_G \eqto y$ to prove that $\B(\ap\Binn(p))$ is equal to the path in
+  $\BG \eqto (\BG_\div, y)$ given by the pair of paths $(\refl{\BG_\div}, p)$:
+  indeed, this is trivial for $p\jdeq \refl{\shape_G}$. Then, through
+  univalence, $\B(\atop\Binn(p))$ is the equivalence $\id_{\BG_\div}$ pointed by
+  the path $p$. In particular, when $p:\USymG$ is a symmetry in $G$, then
+  $\B(\USym\inn(g))$ is the equivalence in $\BG \equivto \BG$ given by
+  $\id_{\BG_\div}$ pointed by $g$. Or in terms of abstract groups:
+  \begin{displaymath}
+    \USym(\USym\inn(g)) : \USymG \isomto \USymG, \quad h \mapsto \inv g h g
+  \end{displaymath}
+
+  In that form, it is easier for the reader that is used to group theory in
+  set-theoretic foundations to see that the homomorphism $\inn$ is taking each
+  elements of the group to the inner automorphism associated to it.
+\end{remark}
+
+After the interlude in the remark, it should come as no surprise that we can
+identify the kernel of $\inn$ with the center of $G$. Indeed, there is a
+composition of identifications from the fiber at $G':\BAut(G)$ of $\Binn$ as
+follows:
+\begin{align*}
+  \inv{(\Binn)} (G') &\jdeq \left(  \sum_{y:\BG}G' \eqto \mkgroup((\BG_\div,y)) \right)
+  \\
+  &\equivto \left( \sum_{y:\BG}\sum_{p:\BG'_\div \eqto \BG_\div} y \eqto \trp p (\shape_{G'}) \right)
+  \\
+  &\equivto (\BG'_\div \eqto \BG_\div)
+\end{align*}
+In particular, we can consider the equivalence from the fiber at
+$\shape_{\Aut(G)} \jdeq G$ to $\BG_\div \eqto \BG_\div$. Through this
+equivalence, the point $(\shape_G,\Binn_{\ast})$ is transported to
+$\refl{\BG_\div}$. Hence, we have an identification in
+\begin{displaymath}
+  \Ker(\inn) \defequi \Aut_{\inv{(\Binn)} (G)}(\shape_G, \refl{\BG})
+  \equivto \Aut_{(\BG_\div \eqto \BG_\div)}(\refl{\BG_\div})
+  \equivto \Z(G).
+\end{displaymath}
+Under this equivalence, the associated map $\incl_{\ker(\inn)}$ becomes the
+homomorphism $\grpcenterinc G$ described in \cref{sec:abelian-groups}.
+
+\newcommand{\outaut}{\constant{out}}%
+\begin{definition}
+  The $\Aut(G)$-set of {\em outer automorphism}, denoted $\out(G)$, is the
+  cokernel of $\inn$.
+\end{definition}
+\begin{lemma}\label{lemma:coker-out-action}%
+  The $\Aut(G)$-set $\out(G)$ can be identified with
+  \begin{displaymath}
+    \Aut(G) \to \Set, \quad G' \mapsto \setTrunc{\BG'_\div \eqto \BG_\div}
+  \end{displaymath}
+\end{lemma}
+\begin{proof}
+  Simply recall the computation of the fibers of $\Binn$ above. Then, for each
+  $G':\BAut(G)$, we have an element of
+  \begin{displaymath}
+    \out(G)(G') \jdeq \setTrunc{\inv{(\Binn)}(G')} \eqto \setTrunc{\BG'_\div \eqto \BG_\div}
+  \end{displaymath}
+\end{proof}
+
+\begin{definition}
+  The group $\Inn(G)$ of inner morphisms of $G$ is the image $\Img (\inn)$ of
+  $\inn$.
+\end{definition}
+Notice that, the classifying type $\B\Img(\inn)$ being the total type of the
+cokernel of $\inn$, the above identification of $\out(G)$ provides us with an
+equivalence in
+\begin{displaymath}
+  \B\Inn(G) \equivto \left( \sum_{G':\Group} \setTrunc{\BG'_\div \eqto \BG_\div} \right)
+\end{displaymath}
+
+\begin{lemma}
+  The group $\Inn(G)$ is normal when seen as a subgroup of $\Aut(G)$.
+\end{lemma}
+\begin{proof}
+  The precise meaning of the statement is that there exists a dependent function
+  $N: \prod_{G':\Aut(G)} \Sub_{\Aut(G)}(G')$ and a path in
+  $N(\shape_{\Aut(G)}) \eqto E(\img(\inn))$. Expanding the
+  definition of $\Sub_{\Aut(G)}$, our task in defining $N$ is to find for every
+  $G'$ a transitive $\Aut(G)$-set $X$ together with a point of $X(G')$. We
+  suggest to define $N(G')$ to be the transitive $\Aut(G)$-set
+  \begin{displaymath}
+    X: \Aut(G) \to \Set,\quad H \mapsto \setTrunc{\BG'_\div \eqto \BH_\div}
+  \end{displaymath}
+  together with the point $\settrunc{\refl{\BG'}} : X(G')$.
+
+  Let us prove that $N(\shape_{\Aut(G)})$ can be identified with the subgroup
+  $E(\im(\inn))$. First notice that $\shape_{\Aut(G)} \jdeq G$ and that
+  $E(\im(\inn)) \jdeq (\out(G),\settrunc{(G,\refl{\BG})})$. For simplicity,
+  write $X_G$ for the first component $N(G)$ and $x_G: X_G(G)$ for its second
+  component. \cref{lemma:coker-out-action} provides us with a path
+  $p:\out(G) \eqto X_G$. Checking that $\trp p (\settrunc{(G,\refl{\BG})})$ can
+  be identified with $\settrunc{\refl{\BG}}$ is just a matter of looking at the
+  equivalence exhibited in \cref{lemma:coker-out-action}.
+
+
+  To be thorough, we actually need to prove that the first component of each
+  $N(G')$ (denoted $X$ above) is transitive: being transitive is a proposition
+  and by connectedness of $\Aut(G)$, it suffices to prove it when $G'\jdeq G$,
+  for which the first component of $N(G')$ has been identified with $\out(G)$;
+  however, $\out(G)$, as a cokernel, is known to be transitive.
+\end{proof}
+We make the abuse of denoting $\Inn(G)$ for the normal subgroup of $\Aut(G)$
+defined by $\Inn(G)$ as specified above.
+
+\begin{definition}
+  The group of {\em outer automorphisms} of $G$, denoted $\Out(G)$, is the group
+  \begin{displaymath}
+    \Out(G) \defequi \Aut(G)/\Inn(G) \jdeq \Aut_{\GSet[\Aut(G)]}(\out(G))
+  \end{displaymath}
+\end{definition}
+\begin{construction}\label{cons:simpler-version-Out}
+  There is an identification of groups
+  \begin{displaymath}
+    \Phi : \Aut_{\grpdTrunc{\UU}}(\grpdtrunc{\BG_\div}) \eqto \Out(G) 
+  \end{displaymath}
+\end{construction}
+Before going through the construction of $\Phi$, let us describe its domain in
+more details. The goal of this construction is to have a alternative version of
+$\Out(G)$ with a more tractable classifying type. Because $\out(G)$ is a
+transitive $\Aut(G)$-set, and because the associated subgroup is normal, then
+its type of symmetries should be equivalent to $\out(G)(G)$, which we know can
+be identified with $\setTrunc{\BG_\div \eqto \BG_\div}$. The idea is then to
+find a pointed groupoid for which the loop space is readily
+$\setTrunc{\BG_\div \eqto \BG_\div}$. However, $\setTrunc{a\eqto _Ab}$ is
+equivalent to $\grpdtrunc a \eqto_{\grpdTrunc A} \grpdtrunc b$ for any element
+$a$ and $b$ of type $A$. Hence it becomes natural to try to establish an
+equivalence between $\Out(G)$ and the group of symmetries of
+$\grpdtrunc{\BG_\div}$ in the groupoid $\grpdTrunc{\UU}$.
+\begin{implementation}{cons:simpler-version-Out}
+  Notice that the function $\grpdtrunc \blank : \UU \to \grpdTrunc\UU$ induces
+  an isomorphism on connected components: indeed,
+  $\grpdtrunc X \eq \grpdtrunc Y$ if and only if $\Trunc{\setTrunc{X \eqto Y}}$
+  if and only if $X \eq Y$. In other words,
+  $\BAut_{\grpdTrunc\UU}(\grpdtrunc{\BG_\div})$ identifies with the
+  $1$-truncation of $\conncomp\UU{\BG_\div}$.
+
+  As $\BOut(G)$ is a groupoid, every map
+  $\BAut_{\grpdTrunc\UU}(\grpdtrunc{\BG_\div}) \ptdto \BOut(G)$ is indud by a map
+  $\conncomp\UU{\BG_\div} \ptdto \BOut(G)$. Thus we define $\Phi$ by setting the
+  pointed map $\B\Phi$ to be the map induced by:
+  \begin{align*}
+    \varphi:
+    \left(\sum_{X:\UU}\BG_\div \eq X\right) &\ptdto \BOut(G) \\
+    (X,\omega) &\mapsto \left\{
+      \BAut(G) \to \Set, \, G' \mapsto \setTrunc{\BG'_\div \eqto X}
+      \right\}
+  \end{align*}
+  
+  This map is well defined: given $(X,\omega)$ is the domain, we are trying to
+  prove the proposition $\out(G) \eqto{} \varphi(X,\omega)$, so we can lift the
+  propositional truncation of $\omega$ and assume that we have
+  $w:\BG_\div \eqto X$. Then, we craft an identification of type
+  $\out(G) \eqto \phi(X,\omega)$ by noticing that we have for every
+  $G':\BAut(G)$ an identification\marginnote{Here, $\settrunc w$ is not the
+    element represented by $w$ in $\setTrunc{\BG_\div \eqto X}$, but in fact the
+    equivalence $\setTrunc{\BG_\div} \equivto \setTrunc{X}$ induced by $w$.}
+  \begin{displaymath}
+    \settrunc{w} \circ \blank : \setTrunc{\BG'_\div \eqto \BG_\div} \eqto \setTrunc{\BG'_\div \eqto X}
+  \end{displaymath}
+  
+  We no proceed to prove that $\B\Phi$ is an equivalence, to conclude that
+  $\Phi$ is an isomorphism of groups. As both the domain and codomain of
+  $\B\Phi$ are connected, to prove that it is an equivalence, it is enough to
+  show that $\ap {\B\Phi}: (a \eqto a) \to (\B\Phi a \eqto \B\Phi a)$ for a
+  chosen $a$ in the domain. We consider of course
+  $a \jdeq (\grpdtrunc{\BG_\div},\refl{\grpdtrunc{\BG_\div}})$. Then,
+  \begin{displaymath}
+    \B\Phi(a) \jdeq \phi(\BG_\div,\refl{\BG_\div}) \jdeq  \left(
+      G' \mapsto \setTrunc{\BG'_\div \eqto \BG_\div}
+    \right)
+  \end{displaymath}
+  By path induction, one can show that for each
+  $p:\grpdtrunc{\BG_\div} \eqto \grpdtrunc{\BG_\div}$, we get paths of type
+  \begin{displaymath}
+    \ap{\B\Phi} (p) \eqto \left\{
+      G' \mapsto \hat p \circ \blank
+    \right\}
+  \end{displaymath}
+  where $\hat \blank$ is the equivalence
+  $(\grpdtrunc{x} \eqto \grpdtrunc{y}) \equivto \setTrunc{x \eqto y}$.
+
+  Because the subgroup associated with $\out(G)$ is normal,
+  \cref{lem:evaliseqwhennormal} povides us with an equivalence
+  $\ev : (\out(G) \eqto \out(G)) \to \out(G)(G)$. Write $\psi$ for the path
+  $\out(G) \eqto {G' \mapsto \setTrunc{\BG'_\div \eqto \BG_\div}}$ of
+  \cref{lemma:coker-out-action}. Then, for every
+  $p:\grpdtrunc{\BG_\div} \eqto \grpdtrunc{\BG_\div}$, one get an identification
+  \begin{displaymath}
+    \psi_G \left(
+      \ev \left( \inv\psi \cdot \ap{\B\Phi} (p) \cdot \psi \right)
+    \right) \eqto \hat p
+  \end{displaymath}
+  Hence, composition of $\ap{\B\Phi}$ with equivalences is an equivalence,
+  proving that $\ap{B\Phi}$ itself is an equivalence.
+\end{implementation}
+
+
+\section{The Weyl group}
+\label{sec:Weyl}
+
+In \cref{def:normalquotient} defined the quotient group of a normal subgroup.
+As commented in \cref{def:associatednormal}, the definition itself never used that the subgroup was normal (but the quotient homomorphism did) and is important in this more general context.
+
+Recall the equivalence $E$ between the set $\typemono_G$ of monomorphisms and the set $\typesubgroup_G$ of of subgroups of $G$ (pointed transitive $G$-sets): The subgroup $(X,\pt_X,!):\typesubgroup_G$ where $X:\BG\to\Set$ is a transitive $G$-set and $\pt_X:X(\shape_G)$ corresponds to $(H,i_H,!):\typemono_G$ defined by
+$$H\defequi\Aut_{\sum_{y:\BG}X(y)}(\shape_G,\pt_X)
+$$ together with the first projection from $\sum_{y:\BG}X(y)$ to $\BG$.  Conversely, if $(H,i_H,!):\typemono_G$, then the corresponding transitive $G$-set is $G/H\defequi\coker i_H$ pointed at $|\shape_H,p_{i_H}|:\coker i_H(\shape_G)\defequi\Trunc{\sum_{x:\BH}\shape_G\eqto{}\Bi_H(x)}_0$.
+
+For the remainder of the section we'll consider a fixed group $G$, monomorphism $i_H:\Hom(H,G)$ and $(X,\pt_X,!)$ will be the associated pointed transitive $G$-set.
+\begin{definition}
+  % Let $G$ be a group and consider the subgroup represented by the transitive $G$-set $X:\BG\to\Set$ together with the point $\pt_X:X(\shape_G)$ % (so that $\BH_\div\defequi\sum_{y:\BG}X(y)$ pointed at $\shape_H\defequi (\shape_G,\pt_X)$ together with the first projection $\Bi_H:\BH\to_*\BG$ defines an element in $(H,i_H,!):\typesubgroup_G$)
+  % .
+
+The \emph{Weyl group} \label{def:Weyl}\index{Weyl group}
+$$W_GH\defequi\Aut_{G\text{-set}}(X)$$ is defined by the component $\BW_GH$ of the groupoid of $G$-sets pointed at $X$.
+
+The \emph{normalizer subgroup} \label{def:normalizer}\index{normalizer}
+$$N_GH\defequi\Aut_{\sum_{y:\BG}\typesubgroup_G(y)}(\shape_G,X,\pt_X)$$ is defined by the component $\BN_GH$ of the groupoid $\sum_{y:\BG}\typesubgroup_G(y)$ pointed at $(\shape_G,X,\pt_X)$.
+\end{definition}
+
+Unpacking, we find that
+$$\BN_GH_\div\oldequiv \sum_{y:\BG}\sum_{Y:\BG\to\Set}\sum_{\pt^y_Y:Y(y)} \Trunc{(\shape_G,X,\pt_X)\eqto{}(y,Y,\pt^y_Y)}.$$
+While the projection $((\shape_G,X,\pt_X)\eqto{}(y,Y,\pt^y_Y))\to (X\eqto{}Y)$ may not be an equivalence, the transitivity of $X$ tells us that for any $\beta:X\eqto{}Y$ there is a $g:\shape_G\eqto{}y$ such that $X(g)\,p^y_Y\eqto{}\beta^{-1}_y\pt_X$, and so the propositional truncation $\Trunc{(\shape_G,X,\pt_X)\eqto{}(y,Y,\pt^y_Y)} \to \Trunc{X\eqto{}Y}$ is an equivalence.
+Consequently, the projection
+$$\BN_GH_\div\to \sum_{y:\BG}\sum_{Y:\BG\to\Set}Y(y)\times\Trunc{X\eqto{}Y}$$
+is an equivalence.  With an innocent rewriting, we see that we have provided an equivalence
+$$e:\BN_GH_\div\we\sum_{(y\times Y):\BG\times \BW_GH}Y(y)\qquad e(y,Y,\pt^y_Y,!)\defequi (y,Y,\pt^y_Y,!).$$
+This formulation has the benefit of simplifying the analysis of the monomorphism
+$$i_{N_GH}:\Hom(N_GH,G)$$
+given by $\Bi_{N_GH}(y,Y,\pt^y_Y,!)\defequi y$, the ``projection''
+ $$p_G^H:\Hom(N_GH,W_GH)$$
+$\Bp_G^H(y,Y,\pt^y_Y,!)\defequi (Y,!)$ and the monomorphism
+$$j_H:\Hom(H,N_GH)$$
+given by $\Bj_H(y,v)\defequi(y,X,v,!))$.
+
+
+% \begin{definition}
+% The projections from $N_GH$ to $\BG$ and $\BW_GH$ are referred to as the inclusion $i_G^H:\Hom(N_GH,G)$ and the projection $p_G^H:\Hom(N_GH,W_GH)$.
+% Define $j_H:\Hom(H,N_GH)$ by the pointed map
+% $$\Bj_H:\sum_{y:\BG}X(y)\to_*\sum_{(y,Y):\BG\times \BW_GH}Y(y),\qquad \Bi_H(y,v)\defequi ((y,X),v).$$
+% \end{definition}
+
+% The \emph{normalizer subgroup} $N_GH$ is alternatively defined as
+% $$N_GH\defequi(\sum_{(y,Y):\BG\times \BW_GH}Y(y),((\shape_G,X),\pt_X)).$$
+
+\begin{lemma}
+  The monomorphism $i_G^H:\Hom(N_GH,G)$ displays the normalizer as a subgroup of $G$ and the projection $p_G^H:\Hom(N_GH,W_GH)$ is an epimorphism.
+
+The homomorphism $j_H:\Hom(H,N_GH)$ defines $H$ as a normal subgroup of the normalizer,
+$$\ker p_G^H\eqto{}_{\typemono_{N_GH}for}(H,i_H,!)$$
+and $i_H\eqto{}_{\Hom(H,G)}i_G^H\,j_H$.
+\end{lemma}
+\begin{proof}
+  Immediate from (our rewriting of) the definitions.
+\end{proof}
+
+The Weyl group $W_GH$ has an important interpretation.  It is defined as symmetries of the transitive $G$-set $X$, and so $\pt_{W_GH}\eqto{}\pt_{W_GH}$ is nothing but $(X\eqto{}_{G\text{-set}}X)\eqto{}\prod_{y:\BG}(X(y)\eqto{}X(y))$.  On the other hand, $\BH_\div$ is equivalent to $\sum_{y:\BG}X(y)$ and
+$$\prod_{y:\BG}(X(y)\eqto{}X(y))\simeq \prod_{\sum_{y:\BG}X(y)}X(y),$$ so $\pt_{W_GH}\eqto{}\pt_{W_GH}$ is equivalent to the set $% (i_H^*X)^H\defequi
+\prod_{x:\BH}X\, \Bi_Hx$ of fixed points of $X\eqto{}G/H$ (regarded as an $H$-set through $i_H$).
+
+Summing up
+\begin{lemma}
+  \label{lem:WGHisHfixofG/H}
+  The map  $e:(X\eqto{}X)\to \prod_{x:\BH}X\, \Bi_Hx$ with $e(f)(y,v)\eqto{}f(y)$ defines an equivalence
+$$e:(\pt_{W_GH}\eqto{}\pt_{W_GH})\we (G/H)^H.$$
+\end{lemma}
+
+\input{symmetry}
+
+%%% Local Variables:
+%%% mode: latex
+%%% fill-column: 144
+%%% TeX-master: "book"
+%%% End:

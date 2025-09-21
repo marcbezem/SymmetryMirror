@@ -1,0 +1,272 @@
+\chapter{Metamathematical remarks}
+\label{app:metamath}
+
+Metamathematics is the study of mathematical theories as
+mathematical objects in themselves.
+This book is primarily a mathematical theory of symmetries.
+Occasionally, however, we have made statements like
+``the law of the excluded middle is not provable in our theory''.
+This is a statement \emph{about}, and not \emph{in}, the type theory of this book.
+As such it is a metamathematical statement.
+
+Sometimes it is possible to encode statements
+about a theory in the language of the theory itself.%
+\marginnote{We leave aside that this sometimes can be done in different ways.
+  Historically, the first way was by ``Gödel-numbering'':
+  encoding all bits of syntax, including statements, as natural numbers,
+  so that the constructions and deductions of the theory correspond to definable operations on the encoding numbers.
+  In type theory, there are usually much more perspicacious ways of encoding mathematical theories
+  using types and type families.}
+Even if true, the encoded metamathematical statement can
+be unprovable in the theory itself.
+The most famous example is G\"{o}del's second incompleteness theorem.\footnote{%
+  The original reference is~\citeauthor{Goedel2nd}\footnotemark{},
+  translated into English in~\citeauthor{Heijenoort-source}\footnotemark{}.
+  For an accessible introduction, see for instance~\citeauthor{Franzen-Goedel}\footnotemark{}
+  or~\citeauthor{Smullyan-Goedel}\footnotemark{}.}%
+\addtocounter{footnote}{-4}%
+\stepcounter{footnote}\footcitetext{Goedel2nd}%
+\stepcounter{footnote}\footcitetext{Heijenoort-source}%
+\stepcounter{footnote}\footcitetext{Franzen-Goedel}%
+\stepcounter{footnote}\footcitetext{Smullyan-Goedel}.
+G\"{o}del encoded, for any theory $T$ extending Peano Arithmetic and satisfying
+some general assumptions, the statement that $T$ is consistent as
+a statement $\Con(T)$ in Peano Arithmetic.
+Then he showed that $\Con(T)$ is not provable in $T$.
+
+We say that a metamathematical statement about a theory $T$
+is \emph{internally} provable if its encoding is provable in $T$.
+For example, the metamathematical statement ``if $P$ is unprovable in $T$,
+then $T$ is consistent'' is internally provable in $T$, for any $T$ that
+satisfies the assumptions of G\"{o}del's second incompleteness theorem.
+
+The type theory in this book satisfies the assumptions of
+G\"{o}del's second incompleteness theorem, which include, of course,
+the assumption that $T$ is consistent. Thus there is no hope
+that we can prove the consistency of our type theory internally.
+Moreover, by the previous paragraph, we must be prepared that
+no unprovability statement can be proved internally.
+
+[TODO For consistency of UA, LEM, etc, refer to simplicial set model \footcite{KapLum}.
+For unprovability of LEM, refer to cubical set model \footcite{BezCoqHub}.]
+
+One property of type theory that we will use is \emph{canonicity}.
+We call an expression \emph{closed} if it does not contain free variables.
+One example of canonicity is that every closed expression of type $\NN$
+is a \emph{numeral}, that is, either $0$ or $S(n)$ for some numeral $n$.
+Another example of canonicity is that every closed expression of 
+type $L\coprod R$ is either of the form $\inl{l}$ for some $l:L$ or
+of the form $\inr{r}$ for some $r:R$.
+
+Both examples of canonicity above are clearly related to the
+inductive definitions of the types involved: they are
+expressed in terms of the constructors of the respective types.
+One may ask what canonicity then means for the empty type $\false$,
+defined in \cref{sec:finite-types} as the inductive type
+with no constructors at all. The answer is that canonicity for $\false$
+means that there cannot be a closed expression of type $\false$.
+But this actually means that our type theory is consistent!
+Therefore we cannot prove general canonicity internally.
+
+[TODO no canonical forms: $x:\NN$, $\trp[P]{\ua(\id)}(0): \NN$,
+with $P\defeq (p:\true \mapsto \NN)$
+and (problematic) $\trp[Q]{\Sloop}(0): \NN$
+with $Q\defeq (z:\Sc \mapsto \NN)$.]
+
+[TODO A second important property of our theory is 
+that one can compute canonical forms.]
+
+\section{Equality by definition}
+\label{sec:defeq}
+
+\subsection{Basics}
+\label{sec:defeq-basics}
+
+The concept of definition was introduced in \cref{univalent-mathematics},
+together with what it means to be \emph{the same by definition}. 
+Being the same by definition (NB appears for the first time on p. 26!) 
+is a relationship between syntactic expressions.
+In this section we provide more details about this relationship.
+
+There are four basic forms of equality by definition:
+\begin{enumerate}
+\item\label{it:exp-defeq} Resulting from making an explicit definition, 
+e.g., $1 \defeq \Succ(0)$, after which we have $1 \jdeq \Succ(0)$;%
+\footnote{The notation $\defeq$ tells the reader that we make a definition
+(or reminds the reader that this definition has been made).}
+
+\item\label{it:imp-defeq} Resulting from making an implicit definition, 
+like we do in inductive definitions,
+e.g., $n+0 \defeq n$ and $n+\Succ(m) \defeq \Succ(n+m)$,
+after which we have $n+0 \jdeq n$ and $n+\Succ(m) \jdeq \Succ(n+m)$;
+
+\item\label{it:beta} Simplifying the application of an explicitly defined 
+function to an argument, e.g., $(x \mapsto e_x)(a) \jdeq e_a$;
+
+\item\label{it:eta} Simplifying $(x \mapsto e_x)$ to $f$ when $e_x$
+is the application of the function $f$ to the variable $x$,
+e.g., $(x \mapsto S(x)) \jdeq S$.
+\end{enumerate}
+
+Equality by definition is the \emph{congruence closure} of these 
+four basic forms, that is, the smallest reflexive, symmetric, transitive
+and congruent relation that contains all instances of the four basic forms.
+Here a congruent relation is a relation that is closed under all syntactic
+operations of type theory. One such operation is substitution, so that we
+get from the examples above that, e.g., $1+0 \jdeq 1$ 
+and $n+\Succ(\Succ(m)) \jdeq \Succ(n+\Succ(m))$. Another important
+operation is application. For example, we can apply $\Succ$ to each of
+the sides of $n+\Succ(m) \jdeq \Succ(n+m)$ and get 
+$\Succ(n+\Succ(m)) \jdeq \Succ(\Succ(n+m))$, and also
+$n+\Succ(\Succ(m)) \jdeq \Succ(\Succ(n+m))$ by transitivity.
+
+Let's elaborate $\id \circ f \jdeq f$ claimed on page~\pageref{page:idofetaf}.
+The definitions used on the left hand side are 
+$\id \defeq (y \mapsto y)$ and $g \circ f \defeq (x \mapsto g(f(x)))$.
+In the latter definition we substitute $\id$ for $g$ and get
+$\id \circ f \jdeq (x \mapsto \id(f(x)))$. Unfolding $\id$ we get
+$(x \mapsto \id(f(x))) \jdeq (x \mapsto (y\mapsto y)(f(x)))$.
+Applying \ref{it:beta} we can substitute $f(x)$ for $(y\mapsto y)(f(x)))$
+and get $(x \mapsto (y\mapsto y)(f(x))) \jdeq (x \mapsto f(x))$.
+By \ref{it:eta} the right hand side is equal to $f$ by definition.
+Indeed $\id \circ f \jdeq f$ by transitivity.
+
+Equality by definition is also relevant for typing.
+For example, let $A: \UU$ and $P: A\to\UU$. If $B\jdeq A$,
+then  $ (B\to\UU)\jdeq(A\to\UU)$ by congruence, and also $P: B\to\UU$,
+and even $\prod_{x:B} P(x) \jdeq \prod_{x:A} P(x)$.
+
+
+%Discuss later: If syntactic expressions $e$ and $e'$ are equal by definition, denoted by $e\jdeq e'$, then $e$ and $e'$ have the same type $T$, then $\refl e : e=_T e'$; the converse is not true.
+
+\subsection{Deciding equality by definition (not updated yet)}
+\label{sec:defeq-computation}
+
+By a \emph{decision procedure} we mean a terminating algorithmic procedure that 
+answers a yes/no question.
+Although it is possible to enumerate all true equalities by definition,
+this does not give a test that answers whether or not a given instance $e\jdeq e'$ holds.
+In particular when $e\jdeq e'$ does not hold, such an enumeration will not terminate.
+A test of equality by definition is important for type checking,
+as the examples in the last paragraph of the previous section show.
+
+A better approach to a test of equality by definition is the following.
+First direct the four basic forms of equality by definition from left to right
+as they are given.\footnote{%
+TODO: think about the last, $\eta$.}
+For the first two forms this can be viewed as unfolding definitions,
+and for the last two forms as simplifying function application and (unnecessary) 
+abstraction, respectively.
+This defines a basic reduction relation, and we write $e\to e'$ if $e'$ can
+be obtained by a basic reduction of a subexpression in $e$. 
+The reflexive transitive closure of $\to$ is denoted by $\to^*$.
+The symmetric closure of $\to^*$ coincides with $\jdeq$.
+
+We mention a few important properties of the relations $\to,\to^*$ and $\jdeq$.
+The first is called the Church--Rosser property, and states that,
+if $e\jdeq e'$, then there is an expression $c$ such that $e\to^* c$
+and $e'\to^* c$. The second is called type safety and states that,
+if $e:T$ and $e\to e'$, then also $e':T$.
+The third is called termination and states that for well-typed expressions $e$
+there is no infinite reduction sequence starting with $e$.
+The proofs of Church--Rosser and type safety are long and tedious, but pose no essential
+difficulties. For a non-trivial type theory such as in this book the last property,
+termination, is extremely difficult and has not been carried out in full detail.
+The closest come results on the Coq \footcite{Coq} (TODO: find good reference).
+
+Testing whether or not two given well-typed terms $e$ and $e'$ 
+are equal by definition can now be done
+by reducing them with $\to$ until one reaches irreducible expressions $n$ and $n'$
+such that $e\to^* n$ and $e'\to^* n'$, and then comparing $n$ and $n'$. 
+Now we have: $e\jdeq e'$ iff $n\jdeq n'$ iff (by Church--Rosser)
+there exists a $c$ such that $n\to^* c$ and $n'\to^* c$.
+Since $n$ and $n'$ are irreducible the latter is equivalent to
+$n$ and $n'$ being identical syntactic expressions.
+
+\section{The Limited Principle of Omniscience}
+\label{sec:LPO}
+
+\begin{remark}\label{rem:LPO-solves-halting problem}
+Recall the Limited Principle of Omniscience (LPO), \cref{LPO}:
+  for any function $P:\NN\to\bn 2$,
+  either there is a smallest number $n_0:\NN$ such that $P(n_0)=1$,
+  or $P$ is a constant function with value $0$.
+We will show that LPO is not provable in our theory.
+
+The argument is based on the halting problem: given a Turing machine
+$M$ and an input $n$, determine whether $M$ halts on $n$.
+It is known that the halting problem cannot be solved by an algorithm
+that can be implemented on a Turing machine.\footnote{It's commonly accepted that
+  every algorithm \emph{can} be thus implemented.}
+
+We use a few more facts from computability theory.
+First, Turing machines can be enumerated. We denote the $n$\th Turing machine $M_n$,
+so we can list the Turing machines in order: $M_0,M_1,\ldots$.
+Secondly, there exists a function $T(e,n,k)$ such that $T(e,n,k) = 1$
+if $M_e$ halts on input $n$ in at most $k$ steps, and $T(e,n,k) = 0$
+otherwise. This function $T$ can be implemented in our theory.
+
+Towards a contradiction, assume we have a closed proof $t$ of LPO in our theory.
+We assume as well that $t$ does not depend on any axiom.\footnote{It is possible to weaken the notion
+  of canonicity so that the argument still works even if the proof $t$ uses the Univalence Axiom.
+Of course, the argument must fail if we allow $t$ to use LEM!}
+It is clear that $k\mapsto T(e,n,k)$ is a constant function with value $0$
+if and only if $M_e$ does not halt on input $n$. Now consider $t(k\mapsto T(e,n,k))$,
+which is an element of a type of the form $L\coprod R$.
+
+We now explain how to solve the halting problem.
+Let $e$ and $n$ be arbitrary numerals.
+Then $t(k\mapsto T(e,n,k))$ is a closed element of $L\coprod R$.
+Hence we can compute its canonical form. If $t(k\mapsto T(e,n,k))\jdeq\inr{r}$ for some
+$r:R$, then $k\mapsto T(e,n,k)$ is a constant function with value $0$,
+and $M_e$ does not halt on input $n$. If $t(k\mapsto T(e,n,k))\jdeq\inl{l}$ for some
+$l:L$, then $M_e$ does halt on input $n$.
+Thus we have an algorithm to solve the halting problem
+for all $e$ and $n$. Since this is impossible, we have refuted the assumption
+that there is a closed proof $t$ of LPO in our theory.
+\end{remark}
+
+\section{Topology}
+\label{sec:topology}
+In this section we will explain how our intuition about types relates to our intuition about topological spaces.
+
+INSERT AN INTRODUCTORY PARAGRAPH HERE.
+[Intuitively, the types of type theory can be modeled by topological spaces,
+and elements as points thereof. However, this is not so easy to achieve, and the first
+model of homotopy theory theory was in simplicial sets. Topological spaces and simplicial sets are both \emph{models} of homotopy types. And by a lucky coincidence, it makes sense
+to say that homotopy type theory is a theory of homotopy types.]
+Some references include: \textcite{Hatcher-AlgTop,May-Concise,MayPonto-MoreConcise}
+
+\begin{remark}
+  \label{rem:injectionsurjectionisnotwhatyouthink}
+  Our definitions of injections and surjections are lifted directly from the intuition about sets.  However, types need not be sets, and
+  thinking of types as spaces may at this point lead to a slight confusion.
+
+  The real line is contractible and the inclusion of the discrete subspace $\{0,1\}$ is, well, an inclusion (of sets, which is the same thing as
+  an inclusion of spaces).  However, $\{0,1\}$ is not connected, seemingly contradicting the next result.
+
+  This apparent contradiction is resolved once one recalls the myopic nature of our setup: the contractibility of the real line means that ``all
+  real numbers are identical'', and \emph{our} ``preimage of $3{.}25$'' is not a proposition: it contains \emph{both} $0$ and $1$.  Hence
+  ``$\{0,1\}\subseteq\mathbb R$'' would not count as an injection in our sense.
+
+  We should actually have been more precise above: we were referring to the \emph{homotopy type} of the real line, rather than the real line itself.\footnote{\label{ft:cohesive}%
+    We don't define this formally here,
+    see \citeauthor{Shulman-Real-Cohesive}\footnotemark{} for a synthetic account.
+    The idea is that the homotopy type $\constant{h}(X)$ of a type $X$
+    has a map from $X$, $\iota : X \to \constant{h}(X)$,
+    and any continuous function $f : [0,1] \to X$
+    gives rise to a path
+    $\iota(f(0)) = \iota(f(1))$ in
+    $\constant{h}(X)$.}\footcitetext{Shulman-Real-Cohesive}
+  We shall later (in the chapters on geometry) make plenty of use of the latter,
+  which is as usual a set with uncountably many elements.
+\end{remark}
+
+\input{choicefin}
+
+%%% Local Variables:
+%%% mode: latex
+%%% fill-column: 144
+%%% latex-block-names: ("lemma" "theorem" "remark" "definition" "corollary" "fact" "properties" "conjecture" "proof" "question" "proposition")
+%%% TeX-master: "book"
+%%% End:
