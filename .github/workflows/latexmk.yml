@@ -1,0 +1,45 @@
+name: Build the book
+on: [push, pull_request]
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v3
+      - name: Create the directory figures/
+        run: mkdir -p figures
+      - name: Make version.tex
+        run: make version.tex
+      - name: Disable TikZ externalize
+        run: echo "\newcommand{\OPTnotikzexternal}{true}" >> version.tex
+      - name: Enable github specific flag
+        run: echo "\newcommand{\OPTgithub}{true}" >> version.tex
+      - name: Precompilation
+        uses: dante-ev/latex-action@latest
+        with:
+          compiler: pdflatex
+          args: -ini -jobname="macros"
+          root_file: "&pdflatex macros.tex\\dump"
+      - name: Compile LaTeX document
+        uses: dante-ev/latex-action@latest
+        with:
+          args: -pdf -latexoption=-file-line-error -latexoption=-interaction=nonstopmode -latexoption=-shell-escape
+          root_file: book.tex
+      - name: Gather file in build directory
+        run: |
+          mkdir build
+          cp icocayley.html icosahedron.html build/
+          mv book.pdf build/
+      - name: Check GitHub Pages status
+        uses: crazy-max/ghaction-github-status@v3
+        with:
+          pages_threshold: major_outage
+      - name: Publish to GitHub pages
+        if: success() && github.ref == 'refs/heads/master'
+        uses: crazy-max/ghaction-github-pages@v3
+        with:
+          target_branch: gh-pages
+          build_dir: build/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
