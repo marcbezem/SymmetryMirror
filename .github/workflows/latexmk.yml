@@ -35,7 +35,7 @@ jobs:
         with:
           pages_threshold: major_outage
       - name: Publish to GitHub pages
-        if: success() && github.ref == 'refs/heads/master'
+        if: success() && github.ref == 'refs/heads/main'
         uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages
