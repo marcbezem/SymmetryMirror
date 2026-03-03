@@ -58,13 +58,17 @@
 \newcommand{\Trunc}[1]{{\lVert}#1{\rVert}} % truncated type
 \newcommand{\Ss}{\mathrm{s}}
 
-\input macros
 
-\title{\url{https://unimath.github.io/SymmetryBook/book.pdf}}
+\newcommand*{\typeformer}[1]{\mathrm{#1}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand*{\bn}[1]{{{#1\!\!\!#1}}}
+\newcommand*{\Id}{\typeformer{Id}}
+\newcommand*{\vectype}[2]{\typeformer{vec}~#1~#2}
 
-\author{https://unimath.github.io/SymmetryBook/book.pdf\\
-Department of Informatics\\
-University of Bergen
+
+\title{Symmetry}
+
+\author{\url{https://unimath.github.io/SymmetryBook/book.pdf}
 }
 \date{March 2026}
 
@@ -74,67 +78,62 @@ University of Bergen
 
 
 \begin{frame}
-\frametitle{Poem}
+\frametitle{Crash course in Type Theory}
+Types:
  \begin{itemize}[<+->]
-\item[] Little by little we subtract
-\item[] Faith and Fantasy from Fact,
-\item[] The Illusory from the True,
-\item[] And starve upon the Residue.
+\item $\bn{0},~\bn{1},~\bn2,~\ldots,\NN$(inductive types)
+\item $\prod_{x:A}B(x),\ \sum_{x:A}B(x)$ (nondep: $\to,\times$)
+\item $\UU_0 : \UU_1 : \UU_2 : \cdots$ (universe types)
+\item $\Id_A(a,a')$ (inductive with constructor $\refl_a:\Id_A(a,a)$)
 \end{itemize}
-\vspace*{1cm}               
-
-Samuel Goodman Hoffenstein, in: "Year In, You're Out", 1930.
-%Screen writer, humorist\\
-%Related work: "Poems in Praise of Practically Nothing", 1928.
+%\vspace*{1cm}               
+Useful:
+\begin{itemize}[<+->]
+\item $A\to(B\to C)$ (higher-order function type)
+\item $\vectype n A$ (type of vectors of $n$ elements of $A$)
+\item $(A:\UU)\mapsto ((x:A) \mapsto x) : \prod_{A:\UU}(A\to A)$ (polymorphism)
+%\item $\Id_A(a,a')$ (inductive with constructor $\refl_a:\Id_A(a,a)$)
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Critique}
- \begin{itemize}[<+->]
-\item[] Little by little we subtract
-\item[] Faith and Fantasy from Fact,
-\item[] The Illusory from the True,
-\item[] And starve upon the Residue.
+\frametitle{Two great ideas}
+\begin{itemize}[<+->]
+\item Propositions-as-types (Curry, Howard, de Bruin): 
+(dependent) types can represent propositions
+in logic, with $\to,\times,\prod$ for $\to,\land,\forall$. 
+With some effort one also gets $\neg,\lor,\exists$.\\ 
+This has led to (AUT,MLTT),Coq(Rocq),Agda,Lean.
+\item The tower of $\Id$-types: $p,p':\Id_A(a,a')$; 
+$s,s':\Id_{\Id_A(a,a')}(p,p')$; etc. 
+This has led to a new interpretation of equality, based on
+homotopy theory, (Voevodsky, Awodey, Warren): HoTT.
+AKA Univalent Foundations, or univalent mathematics. 
 \end{itemize}
-\vspace*{1cm}               
-
-Samuel Goodman Hoffenstein, in: ``Year In, You're Out'', 1930.
-%Screen writer, humorist\\
-
-\vspace*{1cm}  
-Review from Zentralblatt für Lyrik, 1931:
- \begin{itemize}[<+->]
-\item Awkward alliteration in second line
-\item Fatal flaw in last line, perhaps poetic licence?
-\item Too negative, much like earlier work: 
-``Poems in Praise of Practically Nothing'', 1928.
-\end{itemize}   
+\vspace*{1cm}
+Notation: $a=_A a'$ for $\Id_A(a,a')$, subscript $A$ may be omitted.
 \end{frame}
 
-
-\begin{frame}
-\frametitle{Carpet}
-\includegraphics[height=8cm]%, angle=90, origin=c]
-{NOTsvn/PXL_20250522_183644987.jpg}
-\end{frame}
 
 \begin{frame}%[fragile]
-\frametitle{Carpet cleaned}
-\[
-\begin{tikzcd}[ampersand replacement=\&, 
-               column sep={0.8cm, between origins}, 
-                  row sep={0.8cm, between origins}]
-\mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\\
-\&\mydot\&\&\exists\&\& \stsixe\&\&\exists\&\& \stsixe\&\&\mydot\\
-\mydot\&\&\exists\&\& \stsixe\&\&\exists\&\& \stsixe\&\&\exists\&\& \mydot\\
-\&\mydot\&\&\stsixe\&\&\exists\&\& \stsixe\&\&\exists\&\& \mydot\\
-\mydot\&\&\stsixe\&\& \exists\&\& \stsixe\&\&\exists\&\& \stsixe\&\&\mydot\\
-\&\mydot\&\&\exists\&\& \stsixe\&\&\exists\&\&\stsixe\&\&\mydot\\
-\mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\\
-\end{tikzcd}
-\]
-\vspace*{1cm}
-What symmetries do we see?
+\frametitle{Homotopy levels}
+\begin{itemize}[<+->]
+\item Cumulative and non-exhaustive hierarchy of types,
+based on the complexity of the identity types.
+\item Proposition: a type in which all elements are equal
+\item Set: a type in which all identity types are propositions
+\item Groupoid: a type in which all identity types are sets
+\item and so on
+\end{itemize}
+Examples (often you need some axiom or result to prove it):
+\begin{itemize}[<+->]
+\item Propositions: $\bn{0},~\bn{1}~(\text{not}~\bn{2})$, 
+$\sum_{x:T} t=x$, $T\to\bn0$ \quad(any $T$).
+\item Sets: any prop, $\NN$, $T\to\NN$, $\prod_{n:\NN} \vectype n S$ 
+\quad(any $T$, set $S$)
+\item Groupoid: any set, now what ??
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}
@@ -290,6 +289,14 @@ do them twice
 
 
 \end{document}
+
+\begin{frame}
+\frametitle{Carpet}
+\includegraphics[height=8cm]%, angle=90, origin=c]
+{NOTsvn/PXL_20250522_183644987.jpg}
+\end{frame}
+
+
 
 
 
