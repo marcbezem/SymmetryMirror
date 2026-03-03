@@ -1,0 +1,302 @@
+\documentclass[handout,11pt]{beamer}
+%\documentclass[slides]{beamer}
+
+%\usetheme{Warsaw}
+\usetheme{Montpellier}
+\usefonttheme[onlymath]{serif}
+\setbeamertemplate{headline}{}
+%\setbeamertemplate{navigation symbols}{}
+
+\usepackage[english,norsk]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+%\usepackage[T1]{fontenc}
+\usepackage{url}
+\usepackage{float}
+\usepackage{graphics}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{tikz-cd}
+
+
+\hyphenation{in-ter-pretation}
+
+%\usepackage[all]{xy}
+\usepackage{amssymb,amsmath}
+\usepackage{algorithmic}
+
+\newcommand{\noo}[1]{{}}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\green}[1]{{\color{green} #1}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\newcommand\myhrf[2]{\href{https://#1}{\color{red}#2}}
+\newcommand{\UU}{\mathrm{U}}
+\newcommand{\Zet}{\mathrm{Z}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand\set[1]{\{#1\}}
+\newcommand\Ninf{\N^\infty}
+\newcommand\N{\mathbb{N}}
+\newcommand\Dwn[1]{{\downarrow}(#1)}
+\newcommand\M{\mathsf{Maxgain}}
+\newcommand\upS[1]{\overline{S_{#1}}}
+\newcommand{\FYI}[1]{{\color{red}#1}}
+\newcommand\forw{\mathit{forward}}
+\newcommand\simp{\mathit{simplify}}
+\newcommand\None{\mathit{None}}
+\newcommand\Some{\mathit{Some}}
+\newcommand\main{\mathit{thm32}}
+\newcommand\inner{\mathit{lem33}}
+\newcommand\calls{\rightsquigarrow}
+%\newcommand\simp{\mathit{simplify}}
+\newcommand\mydot{\cdot}
+\newcommand\stsixe{\rotatebox[origin=c]{180}{$\exists$}}
+\renewcommand\aa{\mathring{a}}
+\newcommand{\defeq}{:\equiv}
+\newcommand{\sh}{\mathrm{sh}}
+\newcommand{\refl}{\mathrm{refl}}
+\newcommand{\Set}{\mathrm{Set}}
+\newcommand{\Trunc}[1]{{\lVert}#1{\rVert}} % truncated type
+\newcommand{\Ss}{\mathrm{s}}
+
+\input macros
+
+\title{\url{https://unimath.github.io/SymmetryBook/book.pdf}}
+
+\author{https://unimath.github.io/SymmetryBook/book.pdf\\
+Department of Informatics\\
+University of Bergen
+}
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{frame}
+\frametitle{Poem}
+ \begin{itemize}[<+->]
+\item[] Little by little we subtract
+\item[] Faith and Fantasy from Fact,
+\item[] The Illusory from the True,
+\item[] And starve upon the Residue.
+\end{itemize}
+\vspace*{1cm}               
+
+Samuel Goodman Hoffenstein, in: "Year In, You're Out", 1930.
+%Screen writer, humorist\\
+%Related work: "Poems in Praise of Practically Nothing", 1928.
+\end{frame}
+
+\begin{frame}
+\frametitle{Critique}
+ \begin{itemize}[<+->]
+\item[] Little by little we subtract
+\item[] Faith and Fantasy from Fact,
+\item[] The Illusory from the True,
+\item[] And starve upon the Residue.
+\end{itemize}
+\vspace*{1cm}               
+
+Samuel Goodman Hoffenstein, in: ``Year In, You're Out'', 1930.
+%Screen writer, humorist\\
+
+\vspace*{1cm}  
+Review from Zentralblatt für Lyrik, 1931:
+ \begin{itemize}[<+->]
+\item Awkward alliteration in second line
+\item Fatal flaw in last line, perhaps poetic licence?
+\item Too negative, much like earlier work: 
+``Poems in Praise of Practically Nothing'', 1928.
+\end{itemize}   
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Carpet}
+\includegraphics[height=8cm]%, angle=90, origin=c]
+{NOTsvn/PXL_20250522_183644987.jpg}
+\end{frame}
+
+\begin{frame}%[fragile]
+\frametitle{Carpet cleaned}
+\[
+\begin{tikzcd}[ampersand replacement=\&, 
+               column sep={0.8cm, between origins}, 
+                  row sep={0.8cm, between origins}]
+\mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\\
+\&\mydot\&\&\exists\&\& \stsixe\&\&\exists\&\& \stsixe\&\&\mydot\\
+\mydot\&\&\exists\&\& \stsixe\&\&\exists\&\& \stsixe\&\&\exists\&\& \mydot\\
+\&\mydot\&\&\stsixe\&\&\exists\&\& \stsixe\&\&\exists\&\& \mydot\\
+\mydot\&\&\stsixe\&\& \exists\&\& \stsixe\&\&\exists\&\& \stsixe\&\&\mydot\\
+\&\mydot\&\&\exists\&\& \stsixe\&\&\exists\&\&\stsixe\&\&\mydot\\
+\mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\&\&\mydot\&\& \mydot\\
+\end{tikzcd}
+\]
+\vspace*{1cm}
+What symmetries do we see?
+\end{frame}
+
+\begin{frame}
+\frametitle{Symmetries of the carpet}
+ \begin{itemize}[<+->]
+\item Translation along the diagonal (generator $d$)
+\item Even-step translation along the anti-diagonal (generator $\aa$)
+\item Rotations over $180^\circ$ around each $(\exists,\stsixe)$-midpoint
+\end{itemize}
+\vspace*{1cm}
+Do we really need infinitely many generators?              
+\end{frame}
+
+
+\begin{frame}%[fragile]
+\frametitle{One generator suffices, group presentation}
+\[
+\begin{tikzcd}[ampersand replacement=\&, column sep={1cm, between origins}]
+\vec{x}\ar[drrr]\ar[rrrr]\&\&\&\&
+\vec{c'}\ar[rrrr]\&\&\&\&
+r_{\vec{c'}}(\vec{x}) \\
+\&\&\&\vec{c}\ar[drrr] \ar[ur] \\
+\&\&\&\&\&\&r_{\vec{c}}(\vec{x}) \arrow{uurr}[swap]{2({\vec{c'}}-{\vec{c}})} \&
+\end{tikzcd}
+\]
+
+ \begin{itemize}[<+->]
+\item So: $180^\circ$-rotations around different centers differ a translation
+of twice the difference between those centers.
+\item For every two $(\exists,\stsixe)$-midpoints 
+$\vec{c},\vec{c'}$ we do have
+the translation $2({\vec{c'}}-{\vec{c}})$ as a symmetry  
+\item So we need only one $180^\circ$-rotation (generator $r$)
+\end{itemize}
+%\vspace*{1cm}
+Presentation of the group of symmetries of the carpet:
+\[
+\langle d,\aa,r \mid d\aa=\aa d, 1=rr=rdrd=r\aa r\aa\rangle
+\]
+(The latter two relations can be seen by considering $\rhd\!\lhd$)
+\end{frame}
+
+\begin{frame}
+\frametitle{Univalent group theory}
+ \begin{itemize}[<+->]
+\item Book in progress:  
+\href{https://github.com/UniMath/SymmetryBook}{``{\color{blue}Symmetry}''},
+jww Ulrik Buchholtz, Pierre Cagne, Bjørn Ian Dundas, Dan Grayson)
+\item Group $G$ is given by a pointed connected 1-type $(BG,\sh_G)$
+\item Underlying set of $G$ is $UG \defeq (\sh_G  = \sh_G)$ (`symmetries')
+\item Group operation on $UG$ is path composition, unit is $\refl_{\sh_G}$
+\item AIM: develop group theory on the level of the pointed 1-types,
+called `classifying types'
+\end{itemize}
+Notation: $T_{(t)} \defeq \sum_{x:T}\Trunc{t=x}$, the
+component of $T$ at $t:T$
+\end{frame}
+
+\begin{frame}
+\frametitle{Examples of univalent groups}
+ \begin{itemize}[<+->]
+\item $(\Set_{(S)},(S,!))$, the symmetric group of $S:\Set$ (we omit "!")
+\item $((\sum_{X:\Set}(X\simeq X))_{(\Zet,\Ss)},(\Zet,\Ss))$, 
+the group $\ZZ$ of the integers
+\item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{m},\Ss_m)},(\mathbf{m},\Ss))$,
+the cyclic group $C_m$ %, $m>0$
+\item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{4},\pi)},(\mathbf{4},\pi))$ 
+with $\pi=(01)(23)$, group?
+\end{itemize}
+Definitions ($X$ is a non-empty set):
+\begin{itemize}[<+->]
+\item a \emph{cycle} is a pair $(X,\pi)$ 
+with $\pi:X\simeq X$ `connecting everything'
+\item a \emph{bicycle} is a pair $(X,\pi,\rho)$ 
+with $\pi,\rho:X\simeq X$ `together connecting everything'
+\item a \emph{tricycle} is a pair $(X,\pi,\rho,\sigma)$ 
+with $\pi,\rho,\sigma:X\simeq X$ `together connecting everything'
+\end{itemize}
+\end{frame}
+
+\def\existsa{\exists\ar[ur,draw=red]\ar[dr,draw=blue,bend left]}
+\def\stsixea{\stsixe\ar[dl,draw=red]\ar[ul,draw=blue,bend left]}
+\def\mydotu{\mydot\ar[ur,draw=red]\ar[dr,draw=blue,bend left]}
+\def\mydotd{\mydot\ar[dl,draw=red]\ar[ul,draw=blue,bend left]}
+
+\begin{frame}
+\frametitle{Grid with red and blue permutations (ignore $\exists,\stsixe$)}
+\[
+\begin{tikzcd}[ampersand replacement=\&, 
+               column sep={0.8cm, between origins}, 
+                  row sep={0.8cm, between origins}]
+\mydot\&\&\mydot\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\&\& \mydot\\
+\&\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
+\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydot\\
+\&\mydotu\&\&\stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydotd\\
+\mydot\&\&\stsixea\&\& \existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
+\&\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\&\stsixea\&\&\mydot\\
+\mydot\&\&\mydot\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\&\& \mydot\\
+\end{tikzcd}
+\]
+Which symmetries commute with red and blue? The ones we want,
+but way more, and the graph is not connected.
+
+\end{frame}
+
+\def\drg{\ar[dr,draw=green,bend left]}
+\def\ulg{\ar[ul,draw=green,bend left]}
+\def\existsa{\exists\ar[ur,draw=red]\ar[dr,draw=blue,bend left]\ulg}
+\def\stsixea{\stsixe\ar[dl,draw=red]\ar[ul,draw=blue,bend left]\drg}
+
+\begin{frame}
+\frametitle{Grid with three permutations (ignore $\exists,\stsixe$)}
+\[
+\begin{tikzcd}[ampersand replacement=\&, 
+               column sep={0.8cm, between origins}, 
+                  row sep={0.8cm, between origins}]
+\mydot\&\&\mydot\drg\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\drg\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\&\& \mydot\\
+\&\mydot\drg\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
+\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydot\\
+\&\mydotu\&\&\stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydotd\\
+\mydot\&\&\stsixea\&\& \existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
+\&\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\&\stsixea\&\&\mydot\ulg\\
+\mydot\&\&\mydot\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\ulg\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\ulg\&\& \mydot\\
+\end{tikzcd}
+\]
+Which symmetries commute with red and blue and green?
+\end{frame}
+
+\begin{frame}%[fragile]
+\frametitle{A different presentation (Ulrik Buchholtz)}
+
+Presentation U of the group of symmetries of the carpet:
+\[
+\langle a,b,c \mid 1=aa=bb=cc=(abc)^2\rangle
+\]
+Presentation M was:
+\[
+\langle d,\aa,r \mid d\aa=\aa d, 1=rr=(rd)^2=(r\aa)^2\rangle
+\]
+\vspace*{-0.5cm}
+\begin{itemize}[<+->]
+\item Why are these isomorphic?
+\item NB This decision problem is in general undecidable
+\item From U to M: $a\mapsto r\aa, ~ b\mapsto rd, ~ c\mapsto r$,
+only non-trivial case: $(r\aa rd r)^2 = r\aa r(d \aa) rd r
+= r\aa r(\aa d) r d r = drdr=rrdrdr=1$
+\item From M to U: $d\mapsto cb, ~ \aa\mapsto ac, ~ r\mapsto c$,
+only non-trivial case: $(cb)(ac)=(cba)c=(abc)c=(ac)(cb)$
+\item Round trips conjugate $a\mapsto cac$ and $\aa\mapsto r\aa r$,
+do them twice
+\end{itemize}
+\end{frame}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
