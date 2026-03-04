@@ -59,11 +59,14 @@
 \newcommand{\Ss}{\mathrm{s}}
 
 
-\newcommand*{\typeformer}[1]{\mathrm{#1}}
+\newcommand{\UA}{\mathrm{UA}}
 \newcommand{\NN}{\mathbb{N}}
-\newcommand*{\bn}[1]{{{#1\!\!\!#1}}}
-\newcommand*{\Id}{\typeformer{Id}}
-\newcommand*{\vectype}[2]{\typeformer{vec}~#1~#2}
+\newcommand{\bn}[1]{{{#1\!\!\!#1}}}
+\newcommand{\Id}{\mathrm{Id}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\vectype}[2]{\mathrm{vec}~#1~#2}
+\newcommand*{\jdeq}{\equiv}
+\newcommand*{\defequi}{\mathrel{:{\jdeq}}}
 
 
 \title{Univalent Group Theory}
@@ -111,7 +114,8 @@ homotopy theory, (Voevodsky, Awodey, Warren): HoTT.
 AKA Univalent Foundations, or univalent mathematics. 
 \end{itemize}
 \vspace*{1cm}
-Notation: $a=_A a'$ for $\Id_A(a,a')$, subscript $A$ may be omitted.
+Notation: $a=_A a'$ for $\Id_A(a,a')$, subscript $A$ may be omitted.\\
+Terminology: and element of $a= a'$ is called a \emph{path} from $a$ to $a'$.  
 \end{frame}
 
 
@@ -137,59 +141,55 @@ $\sum_{x:T} t=x$, $T\to\bn0$ \quad(any $T$).
 \end{frame}
 
 \begin{frame}
-\frametitle{Symmetries of the carpet}
- \begin{itemize}[<+->]
-\item Translation along the diagonal (generator $d$)
-\item Even-step translation along the anti-diagonal (generator $\aa$)
-\item Rotations over $180^\circ$ around each $(\exists,\stsixe)$-midpoint
+\frametitle{Univalence Axiom for (h-)sets}
+\begin{itemize}[<+->]
+\item $\UA_{\Set}$: for all sets $S,S'$, $S=S'$ is a set, and the map
+$$i: (S=S') \to (S\simeq S'): \refl_S\mapsto \id_S$$
+is a bijection, $S\simeq S'$ is the type of bijections $S\to S'$.
+\item Assuming $\UA_{\Set}$,
+\begin{itemize}[<+->]
+\item $\Set$ is a groupoid and not a set: $(\bn2=\bn2)=\bn2$
+\item $i$ identifies $S=S$ with the set of permutations of $S$
+\item the action of $i$ on paths equips $S=S$ with a group structure.
+\item Elements of $S=S$ are called \emph{symmetries} of $S$ in $\Set$.
 \end{itemize}
-\vspace*{1cm}
-Do we really need infinitely many generators?              
-\end{frame}
-
-
-\begin{frame}%[fragile]
-\frametitle{One generator suffices, group presentation}
-\[
-\begin{tikzcd}[ampersand replacement=\&, column sep={1cm, between origins}]
-\vec{x}\ar[drrr]\ar[rrrr]\&\&\&\&
-\vec{c'}\ar[rrrr]\&\&\&\&
-r_{\vec{c'}}(\vec{x}) \\
-\&\&\&\vec{c}\ar[drrr] \ar[ur] \\
-\&\&\&\&\&\&r_{\vec{c}}(\vec{x}) \arrow{uurr}[swap]{2({\vec{c'}}-{\vec{c}})} \&
-\end{tikzcd}
-\]
-
- \begin{itemize}[<+->]
-\item So: $180^\circ$-rotations around different centers differ a translation
-of twice the difference between those centers.
-\item For every two $(\exists,\stsixe)$-midpoints 
-$\vec{c},\vec{c'}$ we do have
-the translation $2({\vec{c'}}-{\vec{c}})$ as a symmetry  
-\item So we need only one $180^\circ$-rotation (generator $r$)
+\item $\UA$: for all types $A,B$, the map
+$$i: (A=B) \to (A\simeq B): \refl_A\mapsto \id_A$$ is an equivalence,
+where $A\simeq B$ is the type of equivalences $A\to B$.\footnote{%
+The notion of \emph{equivalence} generalizes that of a bijection of sets 
+to types. Given types $X,Y$, a map $f:X\to Y$ is an equivalence if for 
+all $y:Y$ the inverse image (fiber) 
+$f^{-1}(y)\defeq\sum_{x:X}(y=f(x)$ is a true proposition
+(a \emph{contractible} type), that is, a proposition such that 
+we have an element (proof, center of contraction).}
 \end{itemize}
-%\vspace*{1cm}
-Presentation of the group of symmetries of the carpet:
-\[
-\langle d,\aa,r \mid d\aa=\aa d, 1=rr=rdrd=r\aa r\aa\rangle
-\]
-(The latter two relations can be seen by considering $\rhd\!\lhd$)
+\vspace*{1cm}          
 \end{frame}
 
 \begin{frame}
 \frametitle{Univalent group theory}
  \begin{itemize}[<+->]
-\item Book in progress:  
-\href{https://github.com/UniMath/SymmetryBook}{``{\color{blue}Symmetry}''},
-jww Ulrik Buchholtz, Pierre Cagne, Bjørn Ian Dundas, Dan Grayson)
-\item Group $G$ is given by a pointed connected 1-type $(BG,\sh_G)$
+\item Group $G$ is given by a pointed connected\footnote{%
+A type $T$ is \emph{connected} if it is non-empty and for every
+$x,y:T$ there exists (weaker than `we have') a path $p:x =y$
+($\Trunc{x=y}$, explain). Notation: $T_{(t)} \defeq \sum_{x:T}\Trunc{t=x}$, 
+the connected component of $T$ at $t:T$.}
+groupoid $(BG,\sh_G)$
 \item Underlying set of $G$ is $UG \defeq (\sh_G  = \sh_G)$ (`symmetries')
 \item Group operation on $UG$ is path composition, unit is $\refl_{\sh_G}$
-\item AIM: develop group theory on the level of the pointed 1-types,
-called `classifying types'
+\item AIM: develop group theory on the level of the pointed groupoids,
+called `classifying types'.
+\item Examples of univalent groups
+ \begin{itemize}[<+->]
+\item $(\Set_{(S)},(S,!))$, the symmetric group of $S:\Set$ (we omit "!")
+\item $((\sum_{X:\Set}(X\simeq X))_{(\Zet,\Ss)},(\Zet,\Ss))$, 
+the group $\ZZ$ of the integers
+\item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{m},\Ss_m)},(\mathbf{m},\Ss))$,
+the cyclic group $C_m$ %, $m>0$
+\item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{4},\pi)},(\mathbf{4},\pi))$ 
+with $\pi=(01)(23)$, group?
 \end{itemize}
-Notation: $T_{(t)} \defeq \sum_{x:T}\Trunc{t=x}$, the
-component of $T$ at $t:T$
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -203,90 +203,8 @@ the cyclic group $C_m$ %, $m>0$
 \item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{4},\pi)},(\mathbf{4},\pi))$ 
 with $\pi=(01)(23)$, group?
 \end{itemize}
-Definitions ($X$ is a non-empty set):
-\begin{itemize}[<+->]
-\item a \emph{cycle} is a pair $(X,\pi)$ 
-with $\pi:X\simeq X$ `connecting everything'
-\item a \emph{bicycle} is a pair $(X,\pi,\rho)$ 
-with $\pi,\rho:X\simeq X$ `together connecting everything'
-\item a \emph{tricycle} is a pair $(X,\pi,\rho,\sigma)$ 
-with $\pi,\rho,\sigma:X\simeq X$ `together connecting everything'
-\end{itemize}
-\end{frame}
-
-\def\existsa{\exists\ar[ur,draw=red]\ar[dr,draw=blue,bend left]}
-\def\stsixea{\stsixe\ar[dl,draw=red]\ar[ul,draw=blue,bend left]}
-\def\mydotu{\mydot\ar[ur,draw=red]\ar[dr,draw=blue,bend left]}
-\def\mydotd{\mydot\ar[dl,draw=red]\ar[ul,draw=blue,bend left]}
-
-\begin{frame}
-\frametitle{Grid with red and blue permutations (ignore $\exists,\stsixe$)}
-\[
-\begin{tikzcd}[ampersand replacement=\&, 
-               column sep={0.8cm, between origins}, 
-                  row sep={0.8cm, between origins}]
-\mydot\&\&\mydot\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\&\& \mydot\\
-\&\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
-\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydot\\
-\&\mydotu\&\&\stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydotd\\
-\mydot\&\&\stsixea\&\& \existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
-\&\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\&\stsixea\&\&\mydot\\
-\mydot\&\&\mydot\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\&\& \mydot\\
-\end{tikzcd}
-\]
-Which symmetries commute with red and blue? The ones we want,
-but way more, and the graph is not connected.
 
 \end{frame}
-
-\def\drg{\ar[dr,draw=green,bend left]}
-\def\ulg{\ar[ul,draw=green,bend left]}
-\def\existsa{\exists\ar[ur,draw=red]\ar[dr,draw=blue,bend left]\ulg}
-\def\stsixea{\stsixe\ar[dl,draw=red]\ar[ul,draw=blue,bend left]\drg}
-
-\begin{frame}
-\frametitle{Grid with three permutations (ignore $\exists,\stsixe$)}
-\[
-\begin{tikzcd}[ampersand replacement=\&, 
-               column sep={0.8cm, between origins}, 
-                  row sep={0.8cm, between origins}]
-\mydot\&\&\mydot\drg\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\drg\&\& \mydot\ar[dr,draw=blue,bend left]\&\&\mydot\&\& \mydot\\
-\&\mydot\drg\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
-\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydot\\
-\&\mydotu\&\&\stsixea\&\&\existsa\&\& \stsixea\&\&\existsa\&\& \mydotd\\
-\mydot\&\&\stsixea\&\& \existsa\&\& \stsixea\&\&\existsa\&\& \stsixea\&\&\mydot\\
-\&\mydot\&\&\existsa\&\& \stsixea\&\&\existsa\&\&\stsixea\&\&\mydot\ulg\\
-\mydot\&\&\mydot\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\ulg\&\& \mydot\ar[ul,draw=blue,bend left]\&\&\mydot\ulg\&\& \mydot\\
-\end{tikzcd}
-\]
-Which symmetries commute with red and blue and green?
-\end{frame}
-
-\begin{frame}%[fragile]
-\frametitle{A different presentation (Ulrik Buchholtz)}
-
-Presentation U of the group of symmetries of the carpet:
-\[
-\langle a,b,c \mid 1=aa=bb=cc=(abc)^2\rangle
-\]
-Presentation M was:
-\[
-\langle d,\aa,r \mid d\aa=\aa d, 1=rr=(rd)^2=(r\aa)^2\rangle
-\]
-\vspace*{-0.5cm}
-\begin{itemize}[<+->]
-\item Why are these isomorphic?
-\item NB This decision problem is in general undecidable
-\item From U to M: $a\mapsto r\aa, ~ b\mapsto rd, ~ c\mapsto r$,
-only non-trivial case: $(r\aa rd r)^2 = r\aa r(d \aa) rd r
-= r\aa r(\aa d) r d r = drdr=rrdrdr=1$
-\item From M to U: $d\mapsto cb, ~ \aa\mapsto ac, ~ r\mapsto c$,
-only non-trivial case: $(cb)(ac)=(cba)c=(abc)c=(ac)(cb)$
-\item Round trips conjugate $a\mapsto cac$ and $\aa\mapsto r\aa r$,
-do them twice
-\end{itemize}
-\end{frame}
-
 
 \end{document}
 
@@ -296,7 +214,14 @@ do them twice
 {NOTsvn/PXL_20250522_183644987.jpg}
 \end{frame}
 
-The Lagrange construction in univalent group theory - excerpt from the Symmetry book
+\begin{frame}%[fragile]
+\frametitle{One generator suffices, group presentation}
+ \begin{itemize}[<+->]
+\item 
+\end{itemize}
+%\vspace*{1cm}
+\end{frame}
+
 
 Marc Bezem (jww Ulrik Buchholts, Pierre Cagne, Bjørn Ian Dundas, Dan Grayson)
                
