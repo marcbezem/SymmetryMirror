@@ -66,11 +66,11 @@
 \newcommand*{\vectype}[2]{\typeformer{vec}~#1~#2}
 
 
-\title{Symmetry}
+\title{Univalent Group Theory}
 
 \author{\url{https://unimath.github.io/SymmetryBook/book.pdf}
 }
-\date{March 2026}
+\date{Dagstuhl, March 2026}
 
 \begin{document}
 
@@ -103,7 +103,7 @@ Useful:
 (dependent) types can represent propositions
 in logic, with $\to,\times,\prod$ for $\to,\land,\forall$. 
 With some effort one also gets $\neg,\lor,\exists$.\\ 
-This has led to (AUT,MLTT),Coq(Rocq),Agda,Lean.
+This has led to (AUT,MLTT), Coq(Rocq), Agda, Lean.
 \item The tower of $\Id$-types: $p,p':\Id_A(a,a')$; 
 $s,s':\Id_{\Id_A(a,a')}(p,p')$; etc. 
 This has led to a new interpretation of equality, based on
@@ -125,13 +125,13 @@ based on the complexity of the identity types.
 \item Groupoid: a type in which all identity types are sets
 \item and so on
 \end{itemize}
-Examples (often you need some axiom or result to prove it):
+Examples (often you need something extra to prove it):
 \begin{itemize}[<+->]
 \item Propositions: $\bn{0},~\bn{1}~(\text{not}~\bn{2})$, 
 $\sum_{x:T} t=x$, $T\to\bn0$ \quad(any $T$).
 \item Sets: any prop, $\NN$, $T\to\NN$, $\prod_{n:\NN} \vectype n S$ 
 \quad(any $T$, set $S$)
-\item Groupoid: any set, now what ??
+\item Groupoid: any set, and now what?  Univalence!
 \end{itemize}
 
 \end{frame}
@@ -295,6 +295,71 @@ do them twice
 \includegraphics[height=8cm]%, angle=90, origin=c]
 {NOTsvn/PXL_20250522_183644987.jpg}
 \end{frame}
+
+The Lagrange construction in univalent group theory - excerpt from the Symmetry book
+
+Marc Bezem (jww Ulrik Buchholts, Pierre Cagne, Bjørn Ian Dundas, Dan Grayson)
+               
+Setting:  HoTT ≈ MLTT + univalence + some HITs (propositional truncation).
+
+1. Group G is given by a pointed connected 1-type, BG, and a point sh_G (the shape).
+Underlying set of group G: UG :≡ (sh_G  = sh_G), the set of symmetries of the shape.
+Group operation: path composition.
+BUT: we develop group theory as much as possible on the level of the pointed 1-types.
+
+2. Examples: (S^1 , base); (Set_(S) , S), eg. S={0,..,n}; ((ΣS:Set (S=S))_ , (Z,s));
+((ΣS:Set (S=S))_ , ({0,..,n-1},s mod n)).
+
+3. Homomorphism is given by a pointed map (f,p) : (BG,sh_G) → (BH,sh_H).
+Monomorphism is a homomorphism such that f is a set bundle (ap_f  is injective).
+Subgroup H of G is given by a monomorphism (m,p) : (BH,sh_H) → (BG,sh_G).
+
+4. Example: c: (1,*) → (S^1 , base), c(*):≡base, gives trivial subgroup of Z
+5. Example (k>0): m: (S^1 , base) → (S^1 , base), m(base):≡base, m(loop):≡loop^k, gives kZ
+
+6. Why not take the set bundle itself as subgroup? Indeed, alternatively:
+Subgroup of (BG,sh)  is given by a (transitive) H : BG → Set, plus a point pt:H(sh),
+such that Σz:BG H(z) is connected, underlying (sub)group is defined by (Σz:BG H(z),(sh,pt)).
+Note that (sh,pt) = (sh,pt) consists of the symmetries of sh that keep pt:H(sh) fixed,
+called the stabilizers of pt.
+
+7. Example:  U: S^1 → Set: U(base):≡Zet, U(loop):≡s, point -17, gives trivial subgroup of Z
+8. Example:  H: S^1 → Set: H(base):≡{0,..,k}, H(loop):≡ (s mod (k+1)), point 0, gives (k+1)Z.
+
+9. Lagrange's Theorem: given group G and subgroup by (tr.) H : BG → Set, pt:H(sh),
+ both G and H finite (??), then #(G) = #(H(sh)) x #(H).   (Is H(sh) the set of cosets ??)
+
+10. Explanation finiteness. A type T is finite if there exists an n:N such that T is equivalent to the standard n-elt set (n unique, #(T), T set).  Group G is finite if UG is finite. G-set X is finite if X(sh) is finite (so are all X(z), with same #, as BG is connected).
+ 
+11. Explanation H(sh). G-set H : BG → Set defines action H(g) : H(u) → H(v) for g: u = v,
+denoted (g._), an equivalence. For x:H(sh), consider Cos(x):≡ {g:UG | g.pt = x}.
+Then Cos(pt)=UH, and x=y if Cos(x) and Cos(y) overlap, and any g : Cos(x) determines an
+equivalence (g_) between Cos(pt) and Cos(x), so any Cos(g.pt)=gCos(pt), indeed (g??).
+
+12? Proof of Lagrange's Theorem: since the goal is a proposition, we may assume we have an equivalence to some standard n-elt set {0,...,n-1} for every finite set at hand. Then the
+usual combinatorial argument (≈ 11 above) can be carried out in MLTT.
+
+13? Infinite example:  H: S^1 → Set: H(base):≡{0,..,k}, H(loop):≡ (s mod k+1), pt=13, as above.
+Now we have an equivalence from UG to H(base) x UH given by mod and div.
+However, UG = H(sh) x UH cannot be obtained in general by elementary means (AC).
+Yet we want to have a more general result that also works for infinite groups.
+
+14. Lagrange's Construction: given group G and G-set H : BG → Set, pt:H(sh),
+we have a function L_H: (Πx: H(sh) Σg:UG (g.pt = x))  →  UG = (H(sh) x UH).
+
+Implementation.
+Define [_] : UG → H(sh) by [g]:≡g.pt, then UG is sum of fibs of [_].
+Thus UG is Σx: H(sh) Σg:UG x=g.pt is Σx:H(sh) ((sh,pt)=(sh,x)).
+Finally, each ((sh,pt)=(sh,x)) is UH by f in L_H(f), using a=b → ((a=c)=(b=c)).
+
+Remark: can be further generalised to pointed types BG: U and H: BG → U, 
+but premise may be hard to fulfill.
+
+
+Α α, Β β, Γ γ, Δ δ, Ε ε, Ζ ζ, Η η, Θ θ, Ι ι, Κ κ, Λ λ, Μ μ, Ν ν, Ξ ξ, Ο
+ο, Π π, Ρ ρ, c σ/ς, Τ τ, Υ υ, Φ φ, Χ χ, Ψ ψ, Ω ω, Σ
+≃ 〚 〛 ∧   & ∨ ¬   ~  →  ⊃  ≡  |  ∀  ∃  ⊤  ⊥  ⊢  ⊨
+
 
 
 
