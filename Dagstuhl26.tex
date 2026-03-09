@@ -36,9 +36,6 @@
 \newcommand\set[1]{\{#1\}}
 \newcommand\Ninf{\N^\infty}
 \newcommand\N{\mathbb{N}}
-\newcommand\Dwn[1]{{\downarrow}(#1)}
-\newcommand\M{\mathsf{Maxgain}}
-\newcommand\upS[1]{\overline{S_{#1}}}
 \newcommand{\FYI}[1]{{\color{red}#1}}
 \newcommand\forw{\mathit{forward}}
 \newcommand\simp{\mathit{simplify}}
@@ -47,10 +44,6 @@
 \newcommand\main{\mathit{thm32}}
 \newcommand\inner{\mathit{lem33}}
 \newcommand\calls{\rightsquigarrow}
-%\newcommand\simp{\mathit{simplify}}
-\newcommand\mydot{\cdot}
-\newcommand\stsixe{\rotatebox[origin=c]{180}{$\exists$}}
-\renewcommand\aa{\mathring{a}}
 \newcommand{\defeq}{:\equiv}
 \newcommand{\sh}{\mathrm{sh}}
 \newcommand{\refl}{\mathrm{refl}}
@@ -64,9 +57,15 @@
 \newcommand{\bn}[1]{{{#1\!\!\!#1}}}
 \newcommand{\Id}{\mathrm{Id}}
 \newcommand{\id}{\mathrm{id}}
+\newcommand{\im}{\mathrm{Im}}
 \newcommand{\vectype}[2]{\mathrm{vec}~#1~#2}
-\newcommand*{\jdeq}{\equiv}
-\newcommand*{\defequi}{\mathrel{:{\jdeq}}}
+\newcommand{\jdeq}{\equiv}
+\newcommand{\defequi}{\mathrel{:{\jdeq}}}
+\newcommand{\ptdto}{\to_\ast}
+\newcommand{\pt}{\mathrm{pt}}
+\newcommand{\ap}[1]{\mathrm{ap}_{#1}}
+\newcommand{\Symm}{\mathrm{Sym}}
+\newcommand{\PrT}{\mathrm{Pr}}
 
 
 \title{Univalent Group Theory}
@@ -84,18 +83,18 @@
 \frametitle{Crash course in Type Theory}
 Types:
  \begin{itemize}[<+->]
-\item $\bn{0},~\bn{1},~\bn2,~\ldots,\NN$(inductive types)
-\item $\prod_{x:A}B(x),\ \sum_{x:A}B(x)$ (nondep: $\to,\times$)
-\item $\UU_0 : \UU_1 : \UU_2 : \cdots$ (universe types)
-\item $\Id_A(a,a')$ (inductive with constructor $\refl_a:\Id_A(a,a)$)
+\item $\bn{0},~\bn{1},~\bn2,~\ldots,\NN$\quad inductive types
+\item $\prod_{x:A}B(x),\ \sum_{x:A}B(x)$\quad dependent types (nondep: $\to,\times$)
+\item $\UU_0 : \UU_1 : \UU_2 : \cdots$\quad universe types
+\item $\Id_A(a,a')$\quad identity with constructors $\refl_a:\Id_A(a,a)$
 \end{itemize}
 %\vspace*{1cm}               
 Useful:
 \begin{itemize}[<+->]
-\item $A\to(B\to C)$ (higher-order function type)
-\item $\vectype n A$ (type of vectors of $n$ elements of $A$)
-\item $(A:\UU)\mapsto ((x:A) \mapsto x) : \prod_{A:\UU}(A\to A)$ (polymorphism)
-%\item $\Id_A(a,a')$ (inductive with constructor $\refl_a:\Id_A(a,a)$)
+\item $A\to(B\to C)$,\quad higher-order function type
+\item $\vectype n A$,\quad type of vectors of $n$ elements of $A$
+\item $\bigl(A\mapsto (x \mapsto x)\bigr):\prod_{A:\UU_\ell}(A\to A):\UU_{\ell+1}$,\quad polymorphism
+\item NB One can abstract from $\ell$ also: universe polymorphism 
 \end{itemize}
 \end{frame}
 
@@ -105,13 +104,17 @@ Useful:
 \item Propositions-as-types (Curry, Howard, de Bruin): 
 (dependent) types can represent propositions
 in logic, with $\to,\times,\prod$ for $\to,\land,\forall$. 
-With some effort one also gets $\neg,\lor,\exists$.\\ 
-This has led to (AUT,MLTT), Coq(Rocq), Agda, Lean.
-\item The tower of $\Id$-types: $p,p':\Id_A(a,a')$; 
-$s,s':\Id_{\Id_A(a,a')}(p,p')$; etc. 
-This has led to a new interpretation of equality, based on
-homotopy theory, (Voevodsky, Awodey, Warren): HoTT.
-AKA Univalent Foundations, or univalent mathematics. 
+With some effort one also gets $\neg,\lor,\exists$.
+\begin{itemize}[<+->]
+\item A computational interpretation of proofs
+\item Proof assistants: (AUT,MLTT), Coq(Rocq), Agda, Lean, ...
+\end{itemize}
+\item Tower of $\Id$-types: $p,p':\Id_A(a,a')$; 
+$s,s':\Id_{\Id_A(a,a')}(p,p')$; etc.
+\begin{itemize}[<+->]
+\item a homotopy interpretation of equality (Voevodsky, Awodey, Warren)
+\item HoTT, HITs, synthetic homotopy theory, univalent mathematics
+\end{itemize} 
 \end{itemize}
 \vspace*{1cm}
 Notation: $a=_A a'$ for $\Id_A(a,a')$, subscript $A$ may be omitted.\\
@@ -153,7 +156,7 @@ is a bijection, $S\simeq S'$ is the type of bijections $S\to S'$.
 \item the action of $i$ on paths equips $S=S$ with a group structure.
 \item Elements of $S=S$ are called \emph{symmetries} of $S$ in $\Set$.
 \end{itemize}
-\item $\UA$: for all types $A,B$, the map
+\item $\UA_\UU$: for all $A,B:\UU$, the map
 $$i: (A=B) \to (A\simeq B): \refl_A\mapsto \id_A$$ is an equivalence,
 where $A\simeq B$ is the type of equivalences $A\to B$.\footnote{%
 The notion of \emph{equivalence} generalizes that of a bijection of sets 
@@ -161,7 +164,7 @@ to types. Given types $X,Y$, a map $f:X\to Y$ is an equivalence if for
 all $y:Y$ the inverse image (fiber) 
 $f^{-1}(y)\defeq\sum_{x:X}(y=f(x)$ is a true proposition
 (a \emph{contractible} type), that is, a proposition such that 
-we have an element (proof, center of contraction).}
+we have an element (proof, center).}
 \end{itemize}
 \vspace*{1cm}          
 \end{frame}
@@ -169,7 +172,7 @@ we have an element (proof, center of contraction).}
 \begin{frame}
 \frametitle{Univalent group theory}
  \begin{itemize}[<+->]
-\item Group $G$ is given by a pointed connected\footnote{%
+\item Group $G$: pointed connected\footnote{%
 A type $T$ is \emph{connected} if it is non-empty and for every
 $x,y:T$ there exists (weaker than `we have') a path $p:x =y$
 ($\Trunc{x=y}$, explain). Notation: $T_{(t)} \defeq \sum_{x:T}\Trunc{t=x}$, 
@@ -177,7 +180,7 @@ the connected component of $T$ at $t:T$.}
 groupoid $(BG,\sh_G)$
 \item Underlying set of $G$ is $UG \defeq (\sh_G  = \sh_G)$ (`symmetries')
 \item Group operation on $UG$ is path composition, unit is $\refl_{\sh_G}$
-\item AIM: develop group theory on the level of the pointed groupoids,
+\item Aim: develop group theory on the level of the pointed groupoids,
 called `classifying types'.
 \item Examples of univalent groups
  \begin{itemize}[<+->]
@@ -187,23 +190,59 @@ the group $\ZZ$ of the integers
 \item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{m},\Ss_m)},(\mathbf{m},\Ss))$,
 the cyclic group $C_m$ %, $m>0$
 \item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{4},\pi)},(\mathbf{4},\pi))$ 
-with $\pi=(01)(23)$, group?
+with $\pi=(01)(23)$, ?
 \end{itemize}
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Examples of univalent groups}
+\frametitle{Univalent group theory (ctnd)}
  \begin{itemize}[<+->]
-\item $(\Set_{(S)},(S,!))$, the symmetric group of $S:\Set$ (we omit "!")
-\item $((\sum_{X:\Set}(X\simeq X))_{(\Zet,\Ss)},(\Zet,\Ss))$, 
-the group $\ZZ$ of the integers
-\item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{m},\Ss_m)},(\mathbf{m},\Ss))$,
-the cyclic group $C_m$ %, $m>0$
-\item $((\sum_{X:\Set}(X\simeq X))_{(\mathbf{4},\pi)},(\mathbf{4},\pi))$ 
-with $\pi=(01)(23)$, group?
+\item Homomorphism: $f: (BG,\sh_G)\ptdto(BH,\sh_H)$,\\
+action on symmetries $(g:BG)\mapsto f_\pt^{-1}\cdot \ap{f}(g)\cdot f_\pt$
+\item $G$-set: $X: BG\to\Set$, indeed a homomorphism 
+$$(X,\refl_{X(\sh_G)}): (BG,\sh_G)\ptdto(\Set_{(X(\sh_G))},X(\sh_G))$$
+\item Two equivalent notions of a subgroup of a group $G$:
+\begin{itemize}[<+->]
+\item $((BH,\sh_H),m)$ with $m:(BH,\sh_H)\ptdto (BG,\sh_G)$ a monomorphism
+(set bundle, or injection on symmetries)
+\item $(X,x)$ with $X$ a $G$-set, $\sum_{z:BG} X(z)$ connected, and $x:X(\sh_G)$
+\end{itemize} 
+\item Now, what group is the subgroup in each case?
+\begin{itemize}[<+->]
+\item $\im(m)\defeq\sum_{z:BG}m^{-1}(z)\simeq\sum_{z:BG,w:BH}(z=m(w))\simeq BH$\\
+(as $m$ mono, $m^{-1}(z)$ is a set),
+with shape $\sh_H$\footnote{Good or bad: $(BH,\sh_H)$ doesn't depend on $m$?}
+\item $(\sum_{z:BG} X(z), (\sh_G,x))$, symmetries of $\sh_G$ stabilizing $x$\\
+(picture)
+\end{itemize} 
 \end{itemize}
+\end{frame}
 
+\begin{frame}
+\frametitle{Cayley' Theorem}
+ \begin{itemize}[<+->]
+\item ``Every group $\mathcal G$ is isomorphic to a 
+subgroup of $\Symm(|\mathcal G|)$''
+\item $G$-set: $\PrT: BG\to\Set : z\mapsto (sh_G=z)$, with
+action mapping $g:UG$ to $(s\mapsto g\cdot s):UG=UG$,
+indeed a monomorphism
+$$(\PrT,\refl_{UG}): (BG,\sh_G)\ptdto(\Set_{(UG)},UG)$$
+\item Two equivalent notions of a subgroup of a group $G$:
+\begin{itemize}[<+->]
+\item $((BH,\sh_H),m)$ with $m:(BH,\sh_H)\ptdto (BG,\sh_G)$ a monomorphism
+(set bundle, or injection on symmetries)
+\item $(X,x)$ with $X$ a $G$-set, $\sum_{z:BG} X(z)$ connected, and $x:X(\sh_G)$
+\end{itemize} 
+\item Now, what group is the subgroup in each case?
+\begin{itemize}[<+->]
+\item $\im(m)\defeq\sum_{z:BG}m^{-1}(z)\simeq\sum_{z:BG,w:BH}(z=m(w))\simeq BH$\\
+(as $m$ mono, $m^{-1}(z)$ is a set),
+with shape $\sh_H$\footnote{Good or bad: $(BH,\sh_H)$ doesn't depend on $m$?}
+\item $(\sum_{z:BG} X(z), (\sh_G,x))$, symmetries of $\sh_G$ stabilizing $x$\\
+(picture)
+\end{itemize} 
+\end{itemize}
 \end{frame}
 
 \end{document}
