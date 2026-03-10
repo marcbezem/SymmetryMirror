@@ -7,7 +7,7 @@
 \setbeamertemplate{headline}{}
 %\setbeamertemplate{navigation symbols}{}
 
-\usepackage[english,norsk]{babel}
+%\usepackage[english,norsk]{babel} % problem with labels in tikz
 \usepackage[utf8]{inputenc}
 \usepackage{times}
 %\usepackage[T1]{fontenc}
@@ -20,7 +20,6 @@
 
 
 \hyphenation{in-ter-pretation}
-
 %\usepackage[all]{xy}
 \usepackage{amssymb,amsmath}
 \usepackage{algorithmic}
@@ -57,7 +56,7 @@
 \newcommand{\bn}[1]{{{#1\!\!\!#1}}}
 \newcommand{\Id}{\mathrm{Id}}
 \newcommand{\id}{\mathrm{id}}
-\newcommand{\im}{\mathrm{Im}}
+\newcommand{\im}{\mathrm{Im}_0}
 \newcommand{\vectype}[2]{\mathrm{vec}~#1~#2}
 \newcommand{\jdeq}{\equiv}
 \newcommand{\defequi}{\mathrel{:{\jdeq}}}
@@ -148,7 +147,7 @@ $\sum_{x:T} t=x$, $T\to\bn0$ \quad(any $T$).
 \begin{itemize}[<+->]
 \item $\UA_{\Set}$: for all sets $S,S'$, $S=S'$ is a set, and the map
 $$i: (S=S') \to (S\simeq S'): \refl_S\mapsto \id_S$$
-is a bijection, $S\simeq S'$ is the type of bijections $S\to S'$.
+is a bijection, where $S\simeq S'$ is the type of bijections $S\to S'$.
 \item Assuming $\UA_{\Set}$,
 \begin{itemize}[<+->]
 \item $\Set$ is a groupoid and not a set: $(\bn2=\bn2)=\bn2$
@@ -220,7 +219,7 @@ with shape $\sh_H$\footnote{Good or bad: $(BH,\sh_H)$ doesn't depend on $m$?}
 \end{frame}
 
 \begin{frame}
-\frametitle{Cayley' Theorem}
+\frametitle{Cayley's Theorem}
  \begin{itemize}[<+->]
 \item ``Every group $\mathcal G$ is isomorphic to a 
 subgroup of $\Symm(|\mathcal G|)$''
@@ -228,20 +227,17 @@ subgroup of $\Symm(|\mathcal G|)$''
 action mapping $g:UG$ to $(s\mapsto g\cdot s):UG=UG$,
 indeed a monomorphism
 $$(\PrT,\refl_{UG}): (BG,\sh_G)\ptdto(\Set_{(UG)},UG)$$
-\item Two equivalent notions of a subgroup of a group $G$:
-\begin{itemize}[<+->]
-\item $((BH,\sh_H),m)$ with $m:(BH,\sh_H)\ptdto (BG,\sh_G)$ a monomorphism
-(set bundle, or injection on symmetries)
-\item $(X,x)$ with $X$ a $G$-set, $\sum_{z:BG} X(z)$ connected, and $x:X(\sh_G)$
-\end{itemize} 
-\item Now, what group is the subgroup in each case?
-\begin{itemize}[<+->]
-\item $\im(m)\defeq\sum_{z:BG}m^{-1}(z)\simeq\sum_{z:BG,w:BH}(z=m(w))\simeq BH$\\
-(as $m$ mono, $m^{-1}(z)$ is a set),
-with shape $\sh_H$\footnote{Good or bad: $(BH,\sh_H)$ doesn't depend on $m$?}
-\item $(\sum_{z:BG} X(z), (\sh_G,x))$, symmetries of $\sh_G$ stabilizing $x$\\
-(picture)
-\end{itemize} 
+\item Happy? More insight: \emph{partially elaborate}
+$\im(\PrT)\jdeq\sum_{X:\Set_{(UG)}}\PrT^{-1}(X)
+          \jdeq\sum_{X:\Set_{(UG)}}\sum_{z:BG}(X=(\sh_G=z))$\\
+\item The shape of this connected groupoid is $(UG,\sh_G,\refl_{UG})$ 
+\item The type $(UG,\sh_G,\refl_{UG})=(UG,\sh_G,\refl_{UG})$ of 
+symmetries of this shape is equivalent to (see diagram)
+$$\sum_{\pi:UG=UG}\sum_{g:UG} \pi = (s\mapsto g\cdot s)$$
+\[\begin{tikzcd}[ampersand replacement=\&, column sep={1cm, between origins}]
+UG\arrow[d,"\pi"']\&\jdeq\&(\sh_G\&=\arrow[d,"g\cdot\_"']\&\sh_G)\arrow[d,"g"]\\
+UG\&\jdeq\&(\sh_G\&=\&\sh_G)
+\end{tikzcd}\]
 \end{itemize}
 \end{frame}
 
