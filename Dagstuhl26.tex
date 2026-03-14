@@ -111,7 +111,8 @@ With some effort one also gets $\neg,\lor,\exists$.
 \item Tower of $\Id$-types: $p,p':\Id_A(a,a')$; 
 $s,s':\Id_{\Id_A(a,a')}(p,p')$; etc.
 \begin{itemize}[<+->]
-\item a homotopy interpretation of equality (Voevodsky, Awodey, Warren)
+\item a homotopy interpretation of equality (Voevodsky, Awodey, Warren),
+isomorphy is equality
 \item HoTT, HITs, synthetic homotopy theory, univalent mathematics
 \end{itemize} 
 \end{itemize}
@@ -232,11 +233,13 @@ $\im(\PrT)\jdeq\sum_{X:\Set_{(UG)}}\PrT^{-1}(X)
           \jdeq\sum_{X:\Set_{(UG)}}\sum_{z:BG}(X=(\sh_G=z))$\\
 \item The shape of this connected groupoid is $(UG,\sh_G,\refl_{UG})$ 
 \item The type $(UG,\sh_G,\refl_{UG})=(UG,\sh_G,\refl_{UG})$ of 
-symmetries of this shape is equivalent to (see diagram)
-$$\sum_{\pi:UG=UG}\sum_{g:UG} \pi = (s\mapsto g\cdot s)$$
+symmetries of this shape is equivalent to (see diagram below)
+$$\sum_{\pi:UG\simeq UG}\Bigl(\sum_{g:UG} \pi = (s\mapsto g\cdot s)\Bigr)$$
 \[\begin{tikzcd}[ampersand replacement=\&, column sep={1cm, between origins}]
-UG\arrow[d,"\pi"']\&\jdeq\&(\sh_G\&=\arrow[d,"g\cdot\_"']\&\sh_G)\arrow[d,"g"]\\
-UG\&\jdeq\&(\sh_G\&=\&\sh_G)
+UG\arrow[d,"\simeq","\pi"']\arrow[rr,"\simeq"',"\id"]
+ \&\&(\sh_G\&=\arrow[d,"\simeq","g\cdot\_"']
+ \&\sh_G)\arrow[d,dotted,"g","="']\\
+UG\arrow[rr,"\simeq","\id"']\&\&(\sh_G\&=\&\sh_G)
 \end{tikzcd}\]
 \end{itemize}
 \end{frame}
