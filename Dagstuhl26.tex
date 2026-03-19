@@ -92,8 +92,8 @@ Useful:
 \begin{itemize}[<+->]
 \item $A\to(B\to C)$,\quad higher-order function type
 \item $\vectype n A$,\quad type of vectors of $n$ elements of $A$
-\item $\bigl(A\mapsto (x \mapsto x)\bigr):\prod_{A:\UU_\ell}(A\to A):\UU_{\ell+1}$,\quad polymorphism
-\item NB One can abstract from $\ell$ also: universe polymorphism 
+\item $\bigl(A\mapsto (x \mapsto x)\bigr):\prod_{A:\UU_\ell}(A\to A):\UU_{\ell+1}$,\quad polymorphism (!?)
+\item NB One can also abstract from $\ell$ : universe polymorphism 
 \end{itemize}
 \end{frame}
 
@@ -111,14 +111,15 @@ With some effort one also gets $\neg,\lor,\exists$.
 \item Tower of $\Id$-types: $p,p':\Id_A(a,a')$; 
 $s,s':\Id_{\Id_A(a,a')}(p,p')$; etc.
 \begin{itemize}[<+->]
-\item a homotopy interpretation of equality (Voevodsky, Awodey, Warren),
+\item a homotopy interpretation of equality (Awodey\&Warren, Voevodsky),
 isomorphy is equality
 \item HoTT, HITs, synthetic homotopy theory, univalent mathematics
 \end{itemize} 
 \end{itemize}
 \vspace*{1cm}
 Notation: $a=_A a'$ for $\Id_A(a,a')$, subscript $A$ may be omitted.\\
-Terminology: and element of $a= a'$ is called a \emph{path} from $a$ to $a'$.  
+Terminology: elements of $a= a'$ are called a \emph{paths} from $a$ to $a'$.
+Path composition denoted like function composition %($\neq$ HoTT book).  
 \end{frame}
 
 
@@ -126,11 +127,13 @@ Terminology: and element of $a= a'$ is called a \emph{path} from $a$ to $a'$.
 \frametitle{Homotopy levels}
 \begin{itemize}[<+->]
 \item Cumulative and non-exhaustive hierarchy of types,
-based on the complexity of the identity types.
-\item Proposition: a type in which all elements are equal
-\item Set: a type in which all identity types are propositions
-\item Groupoid: a type in which all identity types are sets
+based on the complexity of the identity types:
+\begin{itemize}[<+->]
+\item proposition: a type in which all elements are equal
+\item set: a type in which all identity types are propositions
+\item groupoid: a type in which all identity types are sets
 \item and so on
+\end{itemize}
 \end{itemize}
 Examples (often you need something extra to prove it):
 \begin{itemize}[<+->]
