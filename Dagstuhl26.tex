@@ -119,7 +119,7 @@ isomorphy is equality
 \vspace*{1cm}
 Notation: $a=_A a'$ for $\Id_A(a,a')$, subscript $A$ may be omitted.\\
 Terminology: elements of $a= a'$ are called a \emph{paths} from $a$ to $a'$.
-Path composition denoted like function composition %($\neq$ HoTT book).  
+Path composition denoted like function composition! 
 \end{frame}
 
 
@@ -127,21 +127,21 @@ Path composition denoted like function composition %($\neq$ HoTT book).
 \frametitle{Homotopy levels}
 \begin{itemize}[<+->]
 \item Cumulative and non-exhaustive hierarchy of types,
-based on the complexity of the identity types:
-\begin{itemize}[<+->]
+based on the complexity of the identity types:\begin{itemize}[<+->]
 \item proposition: a type in which all elements are equal
 \item set: a type in which all identity types are propositions
 \item groupoid: a type in which all identity types are sets
 \item and so on
 \end{itemize}
-\end{itemize}
+\item
 Examples (often you need something extra to prove it):
 \begin{itemize}[<+->]
-\item Propositions: $\bn{0},~\bn{1}~(\text{not}~\bn{2})$, 
+\item propositions: $\bn{0},~\bn{1}~(\text{not}~\bn{2})$, 
 $\sum_{x:T} t=x$, $T\to\bn0$ \quad(any $T$).
-\item Sets: any prop, $\NN$, $T\to\NN$, $\prod_{n:\NN} \vectype n S$ 
+\item sets: any prop, $\NN$, $T\to\NN$, $\prod_{n:\NN} \vectype n S$ 
 \quad(any $T$, set $S$)
-\item Groupoid: any set, and now what?  Univalence!
+\item groupoids: any set, and now what?  Univalence!
+\end{itemize}
 \end{itemize}
 
 \end{frame}
@@ -183,7 +183,7 @@ the connected component of $T$ at $t:T$.}
 groupoid $(BG,\sh_G)$
 \item Underlying set of $G$ is $UG \defeq (\sh_G  = \sh_G)$ (`symmetries')
 \item Group operation on $UG$ is path composition, unit is $\refl_{\sh_G}$
-\item Aim: develop group theory on the level of the pointed groupoids,
+\item Aim: develop group theory on the level of the pointed connected groupoids,
 called `classifying types'.
 \item Examples of univalent groups
  \begin{itemize}[<+->]
@@ -202,7 +202,7 @@ with $\pi=(01)(23)$, ?
 \frametitle{Univalent group theory (ctnd)}
  \begin{itemize}[<+->]
 \item Homomorphism: $f: (BG,\sh_G)\ptdto(BH,\sh_H)$,\\
-action on symmetries $(g:BG)\mapsto f_\pt^{-1}\cdot \ap{f}(g)\cdot f_\pt$
+action on symmetries $(g:UG)\mapsto f_\pt^{-1}\cdot \ap{f}(g)\cdot f_\pt$
 \item $G$-set: $X: BG\to\Set$, indeed a homomorphism 
 $$(X,\refl_{X(\sh_G)}): (BG,\sh_G)\ptdto(\Set_{(X(\sh_G))},X(\sh_G))$$
 \item Two equivalent notions of a subgroup of a group $G$:
@@ -247,6 +247,12 @@ UG\arrow[rr,"\simeq","\id"']\&\&(\sh_G\&=\&\sh_G)
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Summary}
+We discuss Cayley's Theorem as presented in the book-in-progress "Symmetry" (authors: Bezem, Buchholtz, Cagne, Dundas and Grayson).
+This book is written in the univalent style, in which the symmetries of an object are expressed as identifications of that object with itself. These symmetries are determined by the type of the object and have a group structure induced by the ambient type theory. The approach has advantages and disadvantages,
+open to active debate.
+\end{frame}
 \end{document}
 
 \begin{frame}
@@ -262,7 +268,6 @@ UG\arrow[rr,"\simeq","\id"']\&\&(\sh_G\&=\&\sh_G)
 \end{itemize}
 %\vspace*{1cm}
 \end{frame}
-
 
 Marc Bezem (jww Ulrik Buchholts, Pierre Cagne, Bjørn Ian Dundas, Dan Grayson)
                
