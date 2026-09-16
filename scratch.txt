@@ -1,3 +1,53 @@
+
+
+
+
+\begin{figure}
+\[
+\begin{tikzcd}[ampersand replacement=\&, column sep={0.9cm, between origins}]
+X_0\ar[rrrr,"{f_1}"]\&\&\&\&
+X_1\ar[rrrr,"{f_2}"]\&\&\&\&
+X_2\\
+\ar[d,dotted,no head]\&\&\&\&
+\ar[dd,dotted,no head]\&\&\&\&
+\ar[ddd,dotted,no head] \\
+\ar[rrrrd]\ar[dd,no head]\&\&\&\&
+\&\&\&\&
+\\
+\ar[rrrrd]\ar[dashed,no head,casred,bend right=30,"{f_1^{-1}(x_1)}"']{dd}\&\&\&\&
+\ar[rrrrd]\ar[d,no head]\ar[dashed,no head,bend left=30,"{f_2^{-1}(x_2)}"]{dd}\&\&\&\&
+\\
+x_0\&\&\&\&
+x_1\&\&\&\&
+x_2\\
+\ar[rrrru]\&\&\&\&
+\ar[rrrru]\ar[u,no head]\&\&\&\&
+\\
+\ar[rrrru]
+\ar[uu,no head]\ar[dashed,no head,casblue,bend left=60,"{(f_2f_1)^{-1}(x_2)}"]{uuuu}
+\&\&\&\&
+\&\&\&\&
+\\
+\ar[u,dotted,no head]\&\&\&\&
+\ar[uu,dotted,no head]\&\&\&\&
+\ar[uuu,dotted,no head]
+\end{tikzcd}
+\]
+\caption{Ice cream illustrating \cref{lem:fibersofcomposites}.
+Vertical lines represent the types, dotted parts play no role.
+Only the first projections of the fibers are shown.
+$F_1$ goes from the blue fiber to the black one, defined
+as $f_1$ on first components. 
+$F_2$ goes from the red fiber to the blue one, defined as
+the identity on first components. 
+Note that $f_2^{-1}(x_2)$ may contain elements not in the
+image of $F_1$.}
+\end{figure}
+
+
+--------------------------
+
+
 \begin{figure}
   \begin{tikzcd}[ampersand replacement=\&,column sep=small]
   (\Sc\ptdto A)\ar[rr,"\ev_A"]
