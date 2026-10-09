@@ -148,13 +148,13 @@ For every $g:\base\eqto\base$, let $\ell_g$ be the homomorphism
 classified by the map $\B\ell_g(\base)\defeq\base$, 
 $\B\ell_g(\Sloop)\defis g$, and pointed by reflexivity.\footnote{%
 The reader may recognize the degree $m$
-map from \cref{def:mfoldS1cover} as a special case.}
+map from \cref{def:dgm-map} as a special case.}
 Take $r\defeq\ell$. Now the unit laws, the coherence law and
 the associativity law can easily be verified. It follows that
 $(\ZZ,1_\ZZ,\ell,!)$ is a non-trivial commutative ring.
 \end{example}
 
-\DELETE{\begin{definition}\label{def:typemixring}
+\begin{definition}\label{def:typemixring}
 The type of rings is defined as
 \[
 \typering\defeq\sum_{R:\typegroup}\sum_{1_R:\USymR}\sum_{\ell,r:\USymR\to\Hom(R,R)} \RingProps(R,1_R,\ell,r).
@@ -162,7 +162,7 @@ The type of rings is defined as
 The type $\typecommring$ of commutative rings is similar to the type
 of rings but with $\RingProps(R,1_R,\ell,r) \times(\ell=r)$. 
 \end{definition}
-}% end DELETE
+% end wip
 
 \begin{xca}\label{xca:Rmixring->URabstring}
 Let $(R,1_r,\ell,r)$ be an mixed ring. 
@@ -199,8 +199,11 @@ $k': H(g,h)$. In line with the notation for pointed maps,
 we denote the pair $k$ by $(k_\div,k_\pt)$, an likewise for $k'$. 
 Define the \emph{pointwise composition}
 $(k'\cdot_{\ptw} k)$ of $k'$ and $k$ by\footnote{%
-We'll use the notation ``$\cdot_{\ptw}$'' also for $k'_\div$ and $k_\div$.
-As we do for pointed maps, we will often drop the subscript ``$\div$''.}
+We use $k_\div$ to denote the first component of $k$,
+as we do for non-dependent pointed maps, but we will often drop
+this subscript ``$\div$''.
+We use the notation ``$\cdot_{\ptw}$'' for pointwise composition
+of $k$ and $k'$, as well as of $k_\div$ and $k'_\div$.}
 \begin{align*}
 \bigl(k'\cdot_{\ptw} k\bigr)&\defeq
 \bigl(k'_\div\cdot_{\ptw} k_\div ~,~ 
@@ -238,6 +241,654 @@ that $\refl{g(x)}\cdot r$ is definitionally equal to $r$,
 for all $x:X$ and $r:f(x)\eqto g(x)$.
 \end{implementation}
 
+\begin{definition}\label{def:cst-ptd}
+Let $A$ and $B$ be pointed types.
+For any $b:B$ and $p:\pt_B\eqto b$, 
+define the \emph{pointed constant map} $\cst{\ast}^A(b,p) : A\ptdto B$
+\emph{at} $(b,p)$ by setting $\cst{\ast}^A(b,p)\defeq (\cst{b}^A,p)$.\footnote{%
+Here $\cst{b}^A$ is from \cref{def:cst-map}.
+We may omit superscripts $A$ if $A$ is clear from the context.}
+Thus $\cst{\ast}^A$ is a function from $\sum_{x:B}(\pt_B\eqto x)$ to
+$A\ptdto B$.\footnote{%
+Of course, $\sum_{x:B}(\pt_B\eqto x)$ is contractible.
+In \cref{def:O-functor} we will see why $\cst{\ast}^A$ is useful.}
+\end{definition}
+
+\begin{remark}\label{rem:loops-at-ptd-cst}
+In case $f$ and $g$ in \cref{con:identity-ptd-maps} are both the point of
+$X\ptdto Y$, \ie $f\jdeq g\jdeq\pt_{X\ptdto Y}\jdeq(\cst{\pt_Y},\refl{\pt_Y})$,
+it is convenient to work with a minor variant of $\ptw_*$ of type 
+$\loops({X\ptdto Y}) \equivto (X\ptdto\loops Y)$.
+The latter type is obtained by definitional simplifications
+and replacing $(h(\pt_X)\cdot \refl{\pt_Y})\eqto \refl{\pt_Y}$
+in $H(\pt_{X\ptdto Y},\pt_{X\ptdto Y})$ from \cref{def:ptd-homotopy-compo}
+by an equivalent type:\footnote{By laws of symmetry and right unit.}
+\[ 
+H(\pt_{X\ptdto Y},\pt_{X\ptdto Y}) \equivto 
+\Bigl(\sum_{h:X\to\loops Y}(\refl{\pt_Y}\eqto h(\pt_X))\Bigr) \jdeq
+(X\ptdto\loops Y).
+\]
+Abusing notations, we denote this variant also by $\ptw_*$.
+\end{remark}
+
+
+The following construction is useful since it
+will allow us to simplify identifying two pointed maps
+to identifying their underlying unpointed maps
+in some important cases. The construction is based on BCFR which
+in turn uses a result by Cavallo.
+
+\begin{construction}\label{con:Id-(B->*A)}
+Let $A$ be a pointed type and let $\ev: (\id_A\eqto\id_A)\to(\pt_A\eqto\pt_A)$
+be the evaluation map that sends identifications $i:(\id_A\eqto\id_A)$ 
+to paths $\ptw(i)(\pt_A) : (\pt_A\eqto\pt_A)$.
+Furthermore, let  $s: (\pt_A\eqto\pt_A)\to(\id_A\eqto\id_A)$
+be a section of $\ev$, that is, we are given
+identifications $\ev(s(p))\eqto p$ for all $p:(\pt_A\eqto\pt_A)$.
+Let also $B$ be a pointed type and consider pointed
+maps $f,f' : B\ptdto A$ with underlying unpointed maps
+$f_\div,f'_\div : B\to A$.
+
+Then we have a map $(f_\div\eqto f'_\div)\to(f\eqto f')$.
+\end{construction}
+
+\begin{implementation}{con:Id-(B->*A)}
+By path induction on $f_\div\eqto f'_\div$ we may take
+$f_\div\jdeq f'_\div$, so that the goal is to identify\footnote{%
+Henceforth we simply write $f$ for $f_\div$.}
+$(f,f_\pt)$ with $(f,f'_\pt)$, 
+for two paths $f_\pt,f'_\pt: (\pt_A\eqto f(\pt_B))$.
+
+Define $r\defeq (f'_\pt\cdot\inv{f}_\pt) : (f(\pt_B)\eqto f(\pt_B))$.
+By \cref{con:identity-ptd-maps}, it suffices to give
+an element $h: \prod_{b:B}(f(b)\eqto f(b))$ and an identification
+of $h(\pt_B)$ with $r$.
+By path induction on $f_\pt$ we may take $\pt_A\jdeq f(\pt_B)$,
+so that the domain of $s$ is $f(\pt_B)\eqto f(\pt_B)$,
+and so $r$ is an element of this domain. 
+Now take $h(b)\defeq \ptw(s(r))(f(b))$ for any $b:B$.
+Then indeed $h(b):(f(b)\eqto f(b))$, and we can identify
+$h(\pt_B)\jdeq \ptw(s(r))(f(\pt_B))\jdeq\ev(s(r))$ with $r$ 
+since $s$ is a section of $\ev$.
+\end{implementation}
+
+\begin{construction}\label{con:ev-section-loopsA}
+Let $A$ be a pointed type and $\loops A$ its pointed loop type.
+We use $\pt$ for $\pt_A$ and $\rfl$ for $\refl{\pt_A}$.
+Let $\ev: (\id_{\loops A}\eqto\id_{\loops A})\to (\rfl\eqto\rfl)$ 
+be the evaluation map that sends $i:(\id_{\loops A}\eqto\id_{\loops A})$
+to $\ptw(i)(\rfl)$. 
+Then $\ev$ has a section, that is, a 
+map $s: (\rfl\eqto\rfl)\to(\id_{\loops A}\eqto\id_{\loops A})$
+with identifications $\ev(s(\alpha))\eqto\alpha$ for 
+all $\alpha: (\rfl\eqto\rfl)$.
+\end{construction}
+
+\begin{implementation}{con:ev-section-loopsA}
+Recall from \cref{def:funext} the equivalence $\ptw$ identifying
+$\id_{\loops A}\eqto\id_{\loops A}$ with $\prod_{p:\loops A}(p\eqto p)$.
+Since $(\rfl\cdot p)$ and $p$ are definitionally equal for any $p:\loops A$,
+any $\alpha: (\rfl\eqto\rfl)$ gives a path 
+$\ap{\blank\cdot p}(\alpha): (p\eqto p)$.\footnote{%
+In a picture:
+\[
+  \begin{tikzcd}[ampersand replacement=\&,column sep=large]
+  \rfl \ar[r,mapsto,"{\blank\cdot p}"]\ar[d,eql,"\alpha"']
+  \& (\rfl\cdot p)  \ar[d,eqr,shift right=1em,"{\ap{\blank\cdot p}(\alpha)}"] \jdeq p
+\\
+  \rfl \ar[r,mapsto,"{\blank\cdot p}"]
+  \& (\rfl\cdot p) \jdeq p
+  \end{tikzcd}
+\]
+}
+Taking $\rfl$ for $p$, $\ap{\blank\cdot \rfl}(\alpha)$
+can be identified with $\alpha$.\footnote{%
+As obvious as this may seem, it requires a generalization of
+the type of $\alpha$ to enable path induction, and we delegate
+this to \cref{xca:ev-section-loopsA}.} 
+For any $\alpha: (\rfl\eqto\rfl)$ and $p:\loops A$,
+define $s_\alpha$ by $s_\alpha(p)\defeq\ap{\blank\cdot p}(\alpha)$.
+Then $\inv{\ptw}(s_\alpha):(\id_{\loops A}\eqto\id_{\loops A})$.
+Hence 
+\[
+s\defeq(\alpha\mapsto\inv{\ptw}(s_\alpha)) : 
+(\rfl\eqto\rfl)\to(\id_{\loops A}\eqto\id_{\loops A}),
+\]
+and we have 
+$\ev(s(\alpha)) \jdeq \ptw(\inv{\ptw}(s_\alpha))(\rfl) \eqto \alpha$ 
+by \cref{def:funext} and \cref{xca:ev-section-loopsA}.
+\end{implementation}
+
+\begin{exercise}\label{xca:ev-section-loopsA}
+Given a type $A$ with elements $a,x:A$ and a path $q:a\eqto x$,
+define $\rho_{q} : (q\cdot\refl{a}) \eqto q$ by induction on $q$.
+For any $p:a\eqto a$ and $\beta:(p\eqto \refl{a})$,
+define $i(\beta): \ap{\blank\cdot\refl{a}}(\beta) \eqto
+\beta\cdot\rho_{p} $ by induction on $\beta$.
+Now, give an identification of $\ap{\blank\cdot\refl{a}}(\alpha)$ and 
+$\alpha$ for any $\alpha:(\refl{a}\eqto \refl{a})$.
+\end{exercise}
+
+\begin{corollary}\label{cor:Id-(B->*loopsA)}
+The combination of \cref{con:Id-(B->*A)} and \cref{con:ev-section-loopsA}
+yields a function from $(f_\div\eqto f'_\div)$ to $(f\eqto f')$ for all pointed
+maps $f,f' : B\ptdto \loops A$.
+\end{corollary}
+
+Recall $\loops$ from \cref{def:looptype} and \cref{def:loops-map},
+which together form a wild functor $\UUp\to\UUp$, \cf \cref{sec:naturality}. 
+In the following we will define a closely related
+wild functor that is sometimes easier to use.
+
+\begin{definition}\label{def:O-functor}
+For any pointed type $A$, define $\OO A \defeq (\Sc\ptdto A)$.
+Let $A$ and $B$ be pointed types and let $f: A\ptdto B$ be a pointed map.
+Define $\OO(f):\OO A\ptdto \OO B$ to be composition with $f$,
+that is, for $g:(\Sc\ptdto A)$, $\OO(f)(g)\defeq(f\circ g):(\Sc\ptdto B)$.%
+\footnote{Here we mean composition as pointed maps,
+so that the pointing path $\OO(f)(g)_\pt$ is defined in 
+\cref{def:pointedtypes} as $f(g_\pt)\cdot f_\pt$.}
+We point $\OO(f)$ as follows. First, observe that
+$\pt_{\OO B}\jdeq\pt_{\Sc\ptdto B}\jdeq(\cst{\pt_B},\refl{\pt_B})$ and
+$\OO(\pt_{\OO A})\jdeq f\circ\pt_{\OO A}\jdeq (\cst{f(\pt_A)},f_\pt)$.
+So both $\pt_{\OO B}$ and $\OO(\pt_{\OO A})$ are images of
+$\cst{\ast}^\Sc$, and we can obtain a path between them 
+by applying $\cst{\ast}^\Sc$ to the unique path $(f_\pt,\rho_{f_\pt})$
+between $(\pt_B,\refl{\pt_B})$ and $(f(\pt_A),f_\pt)$ 
+in the contractible type $\sum_{x:B}(\pt_B\eqto x)$.\footnote{%
+Here $\rho_{f_\pt} : f_\pt \cdot \refl{\pt_B} \eqto f_\pt$
+is defined by induction on $f_\pt$, 
+setting $\rho_{\refl{\pt_B}}\defeq\refl{\refl{\pt_B}}$.
+}
+The situation is illustrated in the diagram below and we define 
+$\OO(f)_\pt\defeq\ap{\cst{\ast}}(f_\pt,\rho_{f_\pt})$.
+\end{definition}
+\[
+\begin{tikzcd}[ampersand replacement=\&,column sep=small]
+   (\pt_B,\refl{\pt_B})
+    \ar[r,mapsto,"{\cst{\ast}}"]
+    \ar[d,eql,"{(f_\pt,\rho_{f_\pt})}"']
+  \& (\cst{\pt_B},\refl{\pt_B})\jdeq\pt_{\OO B}
+    \ar[d,eqr,"{\ap{\cst{\ast}}(f_\pt,\rho_{f_\pt})}"]
+\\
+  (f(\pt_A),f_\pt)
+    \ar[r,mapsto,"{\cst{\ast}}"] 
+  \& (\cst{f(\pt_A)},f_\pt)\jdeq\OO(\pt_{\OO A})
+  \end{tikzcd}
+\]
+Note that $\OO(f)_\pt$ is a reflexivity path if $f_\pt\jdeq\refl{\pt_B}$.
+\begin{xca}\label{xca:O-functor}
+Complete the structure of $\OO$ as a wild functor, \cf \cref{sec:naturality}.
+Identify $\OO(f)_\pt$ with $\inv{\ptw_*}(\cst{f_\pt},\rho_{f_\pt})$.
+\end{xca}
+
+
+\begin{remark}\label{rem:pointing-ev}
+Given a pointed type $A$, recall from \cref{cor:circle-loopspace}
+the equivalence $\ev_A$ from $\Sc\ptdto A$ to $\loops{A}$.
+This equivalence sends $f:\Sc\ptdto A$ to $\loops(f)(\Sloop)\jdeq
+\inv{f_\pt}\cdot f(\Sloop)\cdot f_\pt$, and the
+inverse $\inv{\ev}_A$ sends $p:\loops{A}$ to the pointed map
+$f:\Sc\ptdto A$ defined by  $f(\base)\defeq\pt_A$ and $f(\Sloop)\defis p$,
+pointed by reflexivity.\footnote{When $A$ is clear from the context 
+we may simply write $\ev$. Similarly for $\varepsilon_A$ defined next.}
+
+The equivalence $\ev_A$ can itself be
+pointed as follows. The point of $\Sc\ptdto A$ is the constant map 
+$\cst{\pt_A}$, pointed by reflexivity, which is sent by $\ev_A$ 
+to $\cst{\pt_A}(\Sloop)\cdot \refl{\pt_A}$.\footnote{%
+Recall that reflexivity paths cancel definitionally on the left.} Define 
+$\varepsilon_A(p): \refl{\pt_A} \eqto (\cst{\pt_A}(p)\cdot\refl{\pt_A})$,
+for any $z:\Sc$, $p:\base\eqto z$, by path induction, setting
+$\varepsilon_A(\refl{\base})\defeq \refl{\refl{\pt_A}}$.\footnote{%
+Note that $\cst{\pt_A}(p):\loops A$ for any $p$.} 
+Now we define $(\ev_A)_\pt \defeq \varepsilon_A(\Sloop)$.
+\end{remark}
+
+The following construction shows that $\loops$
+corresponds to $\OO$ from \cref{def:O-functor} under the equivalences $\ev$,
+as illustrated in \cref{fig:Omega-O}.\footnote{\MB{$\ev_\blank$ is an example
+of a wild natural equivalence between the wild functors
+$\loops, \Sc\blank : \UUp\ptdto\UUp$, cf.\ \cref{ch:cats}.}}
+
+
+\begin{marginfigure}
+  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
+  \OO A\ar[rr,"\OO(f)"]\ar[dd,equivl,"\ev_A"']
+  \& \&\OO B  \ar[dd,equivr,"\ev_B"]
+  \\ \& \mbox{} \& \\
+  \loops{A}\ar[rr,"\loops(f)"'] \& \& \loops{B}
+  \end{tikzcd}
+  \caption{\label{fig:Omega-O} $\loops(f)$ and $\protect\OO(f)$ correspond.} 
+\end{marginfigure}
+
+
+\begin{construction}\label{con:Omega-O}
+Let $A$ and $B$ be pointed types and 
+let $f: A\ptdto B$ be a pointed map.
+Then we have an identification of $\loops(f)\circ \ev_A$ 
+and ${\ev_B} \circ {\OO(f)}$, as represented by \cref{fig:Omega-O}.
+Consequently, we have that $e\defeq(\inv{\ev_B}\circ{{\blank}\circ\ev_A})$
+is an equivalence of type 
+$(\loops A\ptdto\loops B)\equivto(\OO A\ptdto\OO B)$,
+and $\OO \eqto (e\circ \loops)$. 
+\end{construction}
+
+\begin{figure}
+  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
+  (\Sc\ptdto A)\ar[rr,"\ev_A"]
+  \& \& \loops A \ar[rr,"{\loops(f)}"]
+  \& \& \loops B 
+  \\ 
+  (p,p_\pt)\ar[rr,mapsto]
+  \& \& \inv{p_\pt}\cdot p(\Sloop)\cdot p_\pt \ar[rr,mapsto]
+  \& \& \inv{f_\pt}\cdot f(\inv{p_\pt}\cdot p(\Sloop)\cdot p_\pt)\cdot f_\pt
+   \quad (1)
+  \\
+  (\Sc\ptdto A)\ar[rr,"\OO(f)"]
+  \& \& (\Sc\ptdto B) \ar[rr,"{\ev_B}"]
+  \& \& \loops B
+  \\ 
+  (p,p_\pt)\ar[rr,mapsto]
+  \& \& (f\circ p,f(p_\pt)\cdot f_\pt) \ar[rr,mapsto]
+  \& \& \inv{(f(p_\pt)\cdot f_\pt)}\cdot (f\circ p)(\Sloop)
+  \cdot (f(p_\pt)\cdot f_\pt)  \quad (2)
+  \end{tikzcd}
+  \caption{\label{fig:Omega-O-elab} 
+  Elaborating the two composites $(\Sc\ptdto A)\to\loops B$.} 
+\end{figure}
+
+
+\begin{implementation}{con:Omega-O}
+We will apply \cref{con:identity-ptd-maps}.
+Elaborating the situation in \cref{fig:Omega-O-elab}, we have to identify
+$(1)\jdeq \inv{f_\pt}\cdot f(\inv{p_\pt}\cdot p(\Sloop)\cdot p_\pt)\cdot f_\pt$
+and $(2)\jdeq \inv{(f(p_\pt)\cdot f_\pt)}\cdot (f\circ p)(\Sloop)
+\cdot (f(p_\pt)\cdot f_\pt)$ by a path $i(f,f_\pt)(p,p_\pt)$, 
+for all $(p,p_\pt)$.\footnote{We often leave out the ``$\ap{\blank}$'s''.}
+Moreover, we must fill the following triangle:
+\[
+\begin{tikzcd}[ampersand replacement=\&,row sep=tiny]
+  \& \&\inv{f_\pt}\cdot f(\cst{\pt_A}(\Sloop)\cdot \refl{\pt_A})\cdot f_\pt  \ar[dddd,eqr,"{i(f,f_\pt)(\cst{\pt_A},\refl{\pt_A})}"]
+\\
+  \&\inv{f_\pt}\cdot f_\pt
+   \ar[ru,eqr,"{\loops(f)((\ev_A)_\pt)}"]
+\\
+  \refl{\pt_B}
+  \ar[rd,eql,"{(\ev_B)_\pt}"'] 
+  \ar[ru,eqr,"{\loops(f)_{\pt}}"]
+\\
+ \&\cst{\pt_B}(\Sloop)\cdot\refl{\pt_B}
+    \ar[rd,eql,"{\ev_B(\OO(f)_\pt)}"']  
+\\
+ \& \&\inv{f_\pt}\cdot \cst{f(\pt_A)}(\Sloop)\cdot f_\pt 
+\end{tikzcd}
+\]
+For defining $i(f)(p,p_\pt)$ we apply path induction on $p_\pt$ and on $f_\pt$,
+setting $\pt_A\jdeq p(\base)$ and $p_\pt\jdeq \refl{p(\base)}$,
+as well as  $\pt_B\jdeq f(\pt_A)\jdeq f(p(\base))$ and
+$f_\pt\jdeq \refl{f(p(\base))}$. Then identifying (1) and (2)
+reduces to the task of identifying 
+$f(p(\Sloop)\cdot \refl{p(\base)})\cdot \refl{f(p(\base))}$ and 
+$(f\circ p)(\Sloop)\cdot \refl{f(p(\base))}$.
+
+The latter identity type stays well typed when we replace
+$\Sloop$ by an arbitrary $g:\base\eqto z$, $z:\Sc$. 
+By induction on $g$, we define an element
+\[
+\iota(f,p,g) :
+\bigl((f(p(g)\cdot \refl{p(\base)})\cdot \refl{f(p(\base))})
+\eqto %_{f(p(\base)) \eqto f(p(z))}
+((f\circ p)(g)\cdot \refl{f(p(\base))})\bigr),
+\]
+setting $\iota(f,p,\refl{\base})\defeq\refl{\refl{f(p(\base))}}$.
+We complete the definition of $i(f,f_\pt)(p,p_\pt)$ by setting
+$i(f,\refl{f(p(\base))})(p,\refl{p(\base)})\defeq\iota(f,p,\Sloop)$.
+
+Again applying path induction on $f_\pt$, assuming 
+that $\pt_B\jdeq f(\pt_A)$ and $f_\pt \jdeq \refl{\pt_B}$, 
+the triangle above reduces to the following triangle:
+\[
+\begin{tikzcd}[ampersand replacement=\&,row sep=tiny]
+  \& \&f(\cst{\pt_A}(\Sloop)\cdot \refl{\pt_A})\cdot \refl{\pt_B}  
+   \ar[dddd,eqr,"{i(f,\refl{f(\pt_A)})(\cst{\pt_A},\refl{\pt_A})}"]
+\\
+  \& \refl{\pt_B}
+   \ar[ru,eqr,"{\loops(f)((\ev_A)_\pt)}"]
+\\
+  \refl{\pt_B}
+   \ar[rd,eql,"{(\ev_B)_\pt}"'] 
+   \ar[ru,eqr,"{\refl{\refl{\pt_B}}}"]
+\\
+ \&\cst{\pt_B}(\Sloop)\cdot\refl{\pt_B}
+    \ar[rd,eql,"{\ev_B(\OO(f)_\pt)}"']  
+\\
+ \& \&\cst{\pt_B}(\Sloop)\cdot \refl{\pt_B} 
+\end{tikzcd}
+\]
+Note that $i(f,\refl{f(\pt_A)})(\cst{\pt_A},\refl{\pt_A})\jdeq
+\iota(f,\cst{\pt_A},\Sloop)$. By \cref{def:O-functor}, as $f_\pt$ is
+a reflexivity path, we get that $\OO(f)_\pt$ and $\ev_B(\OO(f)_\pt)$ are
+also reflexivity paths. Hence, recalling \cref{rem:pointing-ev} for 
+the pointing paths $(\ev_A)_\pt$, $(\ev_B)_\pt$, 
+we have to fill the following triangle:
+\[
+\begin{tikzcd}[ampersand replacement=\&,row sep=small,column sep=large]
+  \&f(\cst{\pt_A}(\Sloop)\cdot \refl{\pt_A})\cdot \refl{\pt_B}  
+  \ar[dd,eqr,"{\iota(f,\cst{\pt_A},\Sloop)}"]
+ \\
+\refl{\pt_B}
+   \ar[ru,eqr,"{\loops(f)(\varepsilon_A(\Sloop))}"]
+   \ar[rd,eql,"{\varepsilon_B(\Sloop)}"'] 
+\\
+  \&\cst{\pt_B}(\Sloop)\cdot \refl{\pt_B} 
+\end{tikzcd}
+\]
+This last triangle stays well typed when we replace
+$\Sloop$ by an arbitrary $g:\base\eqto z$, $z:\Sc$.\footnote{
+$\varepsilon_A(g) : \refl{\pt_A}\eqto \cst{\pt_A}(g)\cdot\refl{\pt_A}$,
+so $\loops(f)(\varepsilon_A(g))$ is a path from 
+$\loops(f)(\refl{\pt_A})\jdeq \refl{\pt_B}$ to 
+$\loops(f)(\cst{\pt_A}(g)\cdot\refl{\pt_A}) \jdeq
+f(\cst{\pt_A}(g)\cdot \refl{\pt_A})\cdot \refl{\pt_B}$, by the induction
+on $f_\pt$. Also, $\iota(f,\cst{\pt_A},g)$ has the right type.} 
+Then apply induction on $g$, setting $g\jdeq\refl{\base}$,
+which boils down to the same triangle with $\Sloop$ replaced by $\refl{\base}$.
+The whole diagram has now become a reflexivity diagram,
+as also $\iota(f,\cst{\pt_A},\refl{\base})$ is reflexivity by definition, 
+and we are done.
+\end{implementation}
+
+
+Composition with $\OO$, \ie $(\OO\circ\blank)\defeq(q\mapsto \OO\circ q)$,
+gives the map\footnote{
+This map corresponds to a map of type
+$\loops(X\ptdto Y) \to \loops(\loops X\ptdto \loops Y)$.} 
+\[
+(\OO\circ\blank): (\Sc\ptdto(A\ptdto B))\to
+(\Sc\to((\Sc\ptdto A)\ptdto(\Sc\ptdto B)).
+\]
+
+\begin{construction}\label{con:swap-ptd-doms}
+Let $X$, $Y$ and $Z$ be pointed types. We use $T_\div$ to
+denote the underlying type of a pointed type $T$.
+Then we have a pointed equivalence 
+\[
+\swap: (X\ptdto (Y\ptdto Z)) \ptdto (Y\ptdto (X\ptdto Z))
+\] 
+such that the totally unpointed map $\swap_{\div\div}$, defined by
+\begin{align*}
+\swap_{\div\div}&\defeq (f\mapsto(y\mapsto (x\mapsto f(x)(y)))) \\
+ &:~(X_\div\to (Y_\div\to Z_\div))\to(Y_\div\to (X_\div\to Z_\div))
+\end{align*}
+can be identified with the map swapping the two arguments of any input map. 
+\end{construction}
+\begin{implementation}{con:swap-ptd-doms}
+\MB{TBD} (Do first the equivalence of $(X\ptdto (Y\ptdto Z))$
+with the sum type of totally unpointed maps with additional structure,
+including coherence.)
+\end{implementation}
+
+\begin{xca}\label{xca:allptd-S1-contractible}
+Let $X,Y,Z$ be pointed types and let $X,Y$ be connected
+and $Z$ a $1$-type.
+Show that $X\ptdto(Y\ptdto Z)$ is contractible.
+\end{xca}
+
+\begin{example}\label{exa:allS1*-swap}
+In this example we will explore the type $$M\defeq(\Sc\ptdto(\Sc\ptdto\BB\ZZ)),$$
+where $\BB\ZZ$ is the simply connected $2$-type $\sum_{X:\UU}\setTrunc{\Sc\eqto X}$
+from \cref{sec:abelian-groups}, pointed at 
+$\pt\defeq(\Sc,\settrunc{\refl{\Sc}})$. 
+
+There are several ways to see that $\loops(\BB\ZZ) \jdeq (\pt=\pt,\refl{\pt})$
+is equivalent to $\B\ZZ \jdeq \Sc$. One is to use
+\cref{thm:abelian-groups-weq-sc2types}, as $\ZZ$ is abelian.
+Another is to
+recall from the proof of
+\cref{lemma:universal-cover-simply-connected} the equivalence
+between $\pt\eqto\pt$ and the component of $\Sc\eqto\Sc$ at $\id_\Sc$.%
+\footnote{We use $\refl{\pt}$ and $\id_\Sc$ interchangeably.}
+The latter component is equivalent to $\Sc$ by 
+\cref{xca:(S1->S1)_(f)-eqv-S1}. Using $\ev$ from \cref{rem:pointing-ev},
+it follows that $M$ is equivalent to $\loops\loops(\BB\ZZ)$ 
+and hence to $\zet$.
+
+Via the above equivalence between $\loops(\BB\ZZ)$ and $\Sc$, 
+combined with the equivalence $\ptw_*$ from \cref{con:identity-ptd-maps},
+we get an equivalence between $\loops(\Sc\ptdto\BB\ZZ)$ and $\Sc\ptdto\Sc$.
+This means that we have maps corresponding to the degree $k$ map $\dg{k}$
+in $\loops(\Sc\ptdto\BB\ZZ)$, for any $k>0$. We will need such maps for
+all $k:\zet$ and define them explicitly in the following paragraph.
+
+
+For any $k:\zet$, define $\dg{k}': \Sc\ptdto\loops(\BB\ZZ)$ by 
+$\dg{k}'(\base)\defeq\id_\Sc$, taking for $\dg{k}'(\Sloop)$
+the $k$-loop around $\id_\Sc$ given by function extensionality and
+$\Sloop^k:\base\eqto\base$ (the loop case is a true proposition).
+We point $\dg{k}'$ by reflexivity.
+
+Now let $k:\zet$ and define $m_k:M$ as follows:
+\begin{align*}
+m_k(\base) &\defeq\pt_{\Sc\ptdto\BB\ZZ}\jdeq(\cst{\pt},\refl{\pt}) \\
+m_k(\Sloop) &\defis\ptw_*^{-1} (\dg{k}') :\loops(\Sc\ptdto\BB\ZZ)\\
+(m_k)_\pt &\defeq\refl{\pt_{\Sc\ptdto\BB\ZZ}}
+\end{align*}
+We see that applying $\ptw_*(m_k(\Sloop))=\dg{k}'$ to $\Sloop^j$ 
+gives the $jk$-loop around $\id_\Sc$.
+Also, using \cref{con:ptd-homotopy-compo}, 
+applying $\ptw_*(m_k(\Sloop^i))$ to $\Sloop^j$ 
+gives the $ijk$-loop around $\id_\Sc$.
+
+\MB{TBD1}: clarify the relation between $m_k$ and multiplication of
+its arguments by $k$ ($m_1$ is useful for the concrete ring of the integers).
+
+\MB{TBD2}: Find out if $\swap(m_k)$ is equal to $m_k$ or to $m_{-k}$.
+\end{example}
+
+Swapping the arguments
+of an untyped (curried) function of two arguments has
+the following effect on the application on paths.
+
+\begin{construction}\label{con:swap-on-paths}
+Let $A,B,C$ be types and $f:A\to(B\to C)$ a map.
+Define the map $g:B\to(A\to C)$ by swapping the arguments of $f$,
+\ie $g(b)(a)\defeq f(a)(b)$ for all $a:A$ and $b:B$. 
+Let $q:b\eqto b'$ be a path in $B$. 
+Then we have an identification of the dependent functions
+$f(\blank)(q)$ and $\ptw(g(q))$.\footnote{%
+$f(\blank)(q)$ is short for the function mapping $a:A$ to the
+path $\ap{f(a)}(q): (f(a)(b)\eqto f(a)(b'))$.
+Also, $\ptw(g(q))$ is the function mapping $a:A$ to the path
+$\ptw(\ap{g}(q))(a): (g(b)(a) \eqto g(b')(a))$.
+By the definition of $g$, the types $f(a)(b)\eqto f(a)(b')$
+and $g(b)(a) \eqto g(b')(a)$ are definitionally equal.}  
+\end{construction}
+\begin{implementation}{con:swap-on-paths}
+We use induction of $q$, taking $b'\jdeq b$ and $q\jdeq\refl{b}$.
+Using function extensionality, let $a:A$.
+Then $f(a)(\refl{b})\jdeq\refl{f(a)(b)}\jdeq\refl{g(b)(a)}
+\jdeq\ptw(\refl{g(b)})(a)\jdeq\ptw(g(\refl{b}))(a)$.
+\end{implementation}
+
+\begin{remark}\label{rem:grpHomOK}
+\newcommand{\redloops}[1]{\inred{\loops{#1}}}
+In \cref{fig:ulrik}, $X$ and $Y$ are pointed types,
+and $\ptw_*$ is from \cref{rem:loops-at-ptd-cst}.
+%Recall \cref{def:looptype} for $\loops$ applied to types.
+The three occurrences of $\loops$ in the labels of the
+downward arrows are all instances of \cref{def:loops-map}.
+In \cref{fig:ulrik}, we have colored occurrences of 
+$\loops$ that come from the $\loops$ in the left upper corner.
+Note that $\redloops{}$ shifts position from first to 
+second along the arrow labelled $(i\circ\blank)$,
+where $i\defeq (q:\loops{}^2 Y \mapsto \inv q)$.
+
+\begin{marginfigure}
+  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
+  \redloops(X\ptdto Y)\ar[rr,equivr,"{\ptw_*}"]\ar[dd,"{\redloops{}(\loops)}"']
+  \& \& X\ptdto \redloops{} Y  \ar[dd,"{\loops{}}"]
+  \\ \& \mbox{} \& \\
+  \redloops{}(\loops X\ptdto \loops Y) \ar[dd,equivl,"{\ptw_*}"']   
+  \& \mbox{} \& \loops X\ptdto \loops \redloops{} Y
+                 \ar[lldd,equivr,"{(i\circ\blank)}"]
+  \\ \& \mbox{} \& \\
+  \loops X\ptdto \redloops{}\loops Y  
+  \end{tikzcd}
+  \caption{\label{fig:ulrik}Fill ($i$ is path reversal)!} 
+\end{marginfigure}
+
+In order to formally define $\redloops(\loops)$, we need
+to define the pointing path $\loops_\pt$ of $\loops$.
+Note that $\pt_{X\ptdto Y} \jdeq (\cst{\pt_Y},\refl{\pt_Y})$,
+\ie the point of $X\ptdto Y$ is the constant map 
+$x\mapsto\pt_Y$ pointed by reflexivity.
+Likewise, the point of $\loops X\ptdto \loops Y$ is the pointed constant 
+map $(\cst{\refl{\pt_Y}},\refl{\refl{\pt_Y}})$.
+We want a path $\loops_\pt$ of type
+$(\cst{\refl{\pt_Y}},\refl{\refl{\pt_Y}}) \eqto 
+\loops(\cst{\pt_Y},\refl{\pt_Y})$, where\footnote{%
+Recall that $\loops(f)$ is pointed by path algebra
+identifying $\refl{\pt_Y}$ with $\inv f_\pt\cdot\refl{\pt_Y}\cdot f_\pt$, by
+induction on $f_\pt$.}
+\[
+\loops(\cst{\pt_Y},\refl{\pt_Y}) \jdeq
+(p\mapsto \ap{\cst{\pt_Y}}(p) \cdot \refl{\pt_Y},\refl{\refl{\pt_Y}}).
+\]
+By induction on $p:(\pt_X\eqto x)$, define
+$h(p): \refl{\pt_Y} \eqto (\ap{\cst{\pt_Y}}(p)\cdot \refl{\pt_Y})$
+setting $h(\refl{\pt_X})\defeq \refl{\refl{\pt_Y}}$.
+Applying $\ptw_*$ we can now define
+\[
+\loops_\pt \defeq \inv{\ptw}_*(h,\refl{\refl{\refl{\pt_Y}}}):
+\bigl((\cst{\refl{\pt_Y}},\refl{\refl{\pt_Y}}) \eqto 
+\loops(\cst{\pt_Y},\refl{\pt_Y})\bigr).
+\]
+Now we can state the definition of $\redloops{}(\loops)$:
+\[
+\redloops{}(\loops)(q) \jdeq
+\inv{\loops{}}_\pt \cdot \ap{\loops}(q) \cdot \loops_\pt
+\quad\text{for all $q:\loops(X\ptdto Y)$}.
+\]
+ 
+We want to fill the diagram in \cref{fig:ulrik}
+in full generality, even though we will only need it
+for $X$ a pointed $1$-type and $Y$ a pointed $2$-type.\footnote{%
+Then $p=_{\loops X}p'$ and $q=_{{\loops}^2 Y}q'$ are proof-irrelevant.}
+\MB{TODO: Elaborate the composites,
+and identify their first components, then using \cref{cor:Id-(B->*loopsA)}.}
+\end{remark}
+
+\begin{definition}\label{def:O'}
+Let $A$ and $B$ be pointed types. Define the map
+map $O'_{A,B}: ((A\ptdto B)\ptdto((\Sc\ptdto A)\ptdto(\Sc\ptdto B))$
+by $O'_{A,B}\defeq (\OO_{A,B} \circ\inv{\swap}\circ\blank)$.\footnote{%
+Again, we often write $O'$ for $O'_{A,B}$.} 
+ \end{definition}
+
+\begin{marginfigure}
+  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
+  \OO(X\ptdto Y)\ar[rr,equivr,"\swap"] \ar[dd,equivl,"{\ev}"']
+  \& \& X\ptdto \OO Y \ar[dd,equivr,"{{\ev}\circ{\blank}}"]
+  \\ \& \mbox{} \& \\
+  \loops(X\ptdto Y)\ar[rr,equivl,"\ptw_*"'] \& \& X\ptdto \loops Y 
+  \end{tikzcd}
+  \caption{\label{fig:ptw-swap-ptd-doms} 
+  $\swap$ and $\protect\ptw_*$ correspond.} 
+\end{marginfigure}
+
+\begin{construction}\label{con:ptw-swap-ptd-doms}
+Let $X$ and $Y$ be pointed types and 
+consider the equivalences $\ptw_*: \loops(X\ptdto Y) \to (X\ptdto \loops Y)$
+from \cref{rem:loops-at-ptd-cst}, $\swap$ from \cref{con:swap-ptd-doms},
+and $\ev$ from \cref{rem:pointing-ev}. 
+Then we have an identification of $\ev\circ\swap(\blank)$ 
+and $(\ptw_*\circ\ev)$, as represented by \cref{fig:ptw-swap-ptd-doms}.
+\end{construction}
+\begin{implementation}{con:ptw-swap-ptd-doms}
+Using function extensionality, it suffices to identify ${\ev}\circ{\swap(f)}$
+and $(\ptw_*\circ\ev)(f)$ for every $f:\Sc\ptdto(X\ptdto Y)$. The latter
+identification is in the type $X\ptdto\loops Y$, which means that we only 
+have to identify the underlying functions, due to \cref{cor:Id-(B->*loopsA)}.
+This greatly simplifies our task: given $f:\Sc\ptdto(X\ptdto Y)$,
+the pointing path of $\swap(f)$ plays no role in 
+the underlying function of $\ev\circ{\swap(f)}$.
+In contrast, the pointing path $f_\pt: \pt_{X\ptdto Y} \eqto f(\base)$
+is important, but only in so far it applies to the underlying functions
+of $\pt_{X\ptdto Y}$ and $f(\base)$. Therefore we abbreviate
+$f'_\pt \defeq \ptw(\fst(f_\pt))$, so that 
+$f'_\pt(x): (\pt_Y \eqto f(\base)(x))$ for $x:X$.
+
+The underlying function of $\swap(f)$ maps any $x:X$ to the 
+function $(z:\Sc)\mapsto f(z)(x)$, pointed by $f'_\pt(x)$.
+Evaluating this pointed map at $\Sloop$ gives
+$({\ev}\circ{\swap(f)})(x) \jdeq 
+\inv{f'_\pt(x)}\cdot f(\Sloop)(x)\cdot f'_\pt(x)$.\footnote{%
+Here $f(\Sloop)(x)$ is short for $\ap{z\mapsto\fst(f_\div(z))(x)}(\Sloop)$.}
+This is the result of going first right and then down in
+\cref{fig:ptw-swap-ptd-doms}, applied to $x:X$.
+
+Now we go first down and then right in \cref{fig:ptw-swap-ptd-doms}.
+Evaluating $f$ as above at $\Sloop$ gives
+$\ev(f) \jdeq \inv{f}_\pt\cdot f(\Sloop)\cdot f_\pt$.
+Applying $\ptw_*$ and taking the underlying function gives
+$\ptw(\fst(\inv{f}_\pt\cdot f(\Sloop)\cdot f_\pt))$.
+Applying the latter function to $x:X$ gives a result
+that is easily identified with 
+$\inv{f'_\pt(x)}\cdot \ptw(\fst(f(\Sloop)))(x)\cdot f'_\pt(x)$,
+as both $\fst$ and $\ptw$ preserve composition.\footnote{%
+Here $\ptw(\fst(f(\Sloop)))(x)$ is in fact 
+$\ptw(\fst(\ap{f_\div}(\Sloop)))(x)$.}
+
+Finally, we complete the construction by identifying the results
+of the last two paragraphs, for which it suffices to identify
+the elements as given in the footnotes. We generalize them from $\Sloop$
+to an arbitrary $p:\base\eqto z$, $z:\Sc$, and note that both
+$\ap{z\mapsto\fst(f_\div(z))(x)}(p)$ and
+$\ptw(\fst(\ap{f_\div}(p)))(x)$ have type
+$\fst(f_\div(\base))(x) \eqto \fst(f_\div(z))(x)$,
+and are readily identified by induction on $p$. 
+\end{implementation}
+
+\def\Scc{\inred{\Sc}}
+\begin{figure}[h]
+  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
+  \USym{\grpHom(H,G)}\ar[dd,equivl,"{\inv{\ev}}"']
+  \\ \& \mbox{} \& \\
+  \Scc(X\ptdto Y)
+    \ar[rr,equivr,"{\swap_{\Scc,X}}"]
+    \ar[dd,"{\OO\circ\blank}"']
+  \& \& X\ptdto \Scc Y  
+    \ar[dd,"{O'}"] \ar[drr,equivl,"{\OO}"']
+    %\ar[rr,equivr,"{(\ev\circ\blank)}"]
+  %\& \& \BHom(H,G) 
+  \\ 
+  \&\&\&\& \sum_{f:\Sc X \ptdto \Sc (\Scc Y)} P(f)
+    \ar[rr,equivl]
+    \ar[d,"{\fst}"]
+  \& \& \absHom(\abstr(H),\abstr(G))
+  \\
+  \Scc(\Sc X\ptdto \Sc Y) 
+    \ar[rr,equivl,"{\swap_{\Scc,\Sc X}}"']   
+  \& \& \Sc X \ptdto \Scc (\Sc Y) 
+    \ar[rr,equivl,"{(\swap\circ\blank)}"']
+  \& \& \Sc X \ptdto \Sc (\Scc Y) 
+  \end{tikzcd}
+  \caption{\label{fig:bjørn}
+  Legenda:
+  $X\defeq\BH$;
+  $Y\defeq\protect\BB G$;
+  $\protect\ev$ is from \cref{cor:circle-loopspace};
+  $\swap$ is from \cref{con:ptw-swap-ptd-doms};
+  $\protect\OO$ is from \cref{def:O-functor};
+  $O'$ is from \cref{def:O'};
+  $P(f)$ expresses that $\protect\ev\circ f\circ \inv{\protect\ev}$
+  classifies a homomorphism.
+  Moreover, the colors track
+  related occurrences of $\Sc$.
+  }
+\end{figure}
+
 Recall from \cref{thm:abelian-groups-weq-sc2types} the equivalence
 $\BB$ from the type of abelian groups to the type of pointed
 simply connected $2$-types. Let $H:\Group$ be a group and let
@@ -253,33 +904,37 @@ Let $H:\Group$ be a group and let $G:\AbGroup$ be an abelian group.
 Define the group $\grpHom(H,G)$ of homomorphisms from $H$ to $G$ by 
 \[
 \grpHom(H,G) \defeq \Aut_{\BH\ptdto\BB G}
-((w \mapsto \pt_{\BB G}),\refl{\pt_{\BB G}}).\qedhere
+(\cst{\pt_{\BB G}},\refl{\pt_{\BB G}}).\qedhere
 \]
 \end{definition}
 
-The above definition of $\grpHom(H,G)$ is indeed serving its purpose:
+The following lemma identifies the group $\grpHom(H,G)$ as the 
+delooping of $\absHom_{\ptw}(\abstr(H),\abstr(G))$, 
+the abelian abstract group of abstract homomorphisms with
+pointwise operations, as given by
+\cref{xca:abs-homgroup} and \cref{xca:abstract-group-of-maps}.
+Consequently, $\grpHom(H,G)$ is an abelian group.
+
 
 \begin{lemma}\label{lem:grpHomOK}
 Let conditions be as in \cref{def:AbHomgroup}. Abbreviate the shape
-$((w\mapsto \pt_{\BB G}),\refl{\pt_{\BB G}})$ of $\grpHom(H,G)$ by $\sh$. 
-Consider the following chain of equivalences\footnote{%
-The first is $\ptw_*$ from \cref{con:identity-ptd-maps} 
-(with path inverted). 
-The second is composition with $\ev_{\sh_G}$
-from \cref{sec:center-group}, which is an equivalence since $G$ is abelian.
-The third is essentially $\abstr$ from \cref{def:abstrisfunctor}.}
+$(\cst{\pt_{\BB G}},\refl{\pt_{\BB G}})$ of $\grpHom(H,G)$ by $\sh$. 
+The composite of the following chain of equivalences 
+defines an abstract isomorphism from $\abstr(\grpHom(H,G))$ 
+to the abstract group $\absHom_{\ptw}(\abstr(H),\abstr(G))$.
 \begin{align*}
 (\sh\eqto\sh) &\equivto 
 \sum_{h:\BH_\div\to(\pt_{\BB G}\eqto\pt_{\BB G})} 
-  (\refl{\pt_{\BB G}}\eqto h(\sh_H)) \\
+  (\refl{\pt_{\BB G}}\eqto h(\sh_H)) \quad\text{(by $\ptw_*$)}\\
               &~\jdeq \qquad \bigl(\BH\ptdto((\pt_{\BB G}\eqto\pt_{\BB G}),\refl{\pt_{\BB G}})\bigr)\\
- &\equivto \qquad\! \bigl(\BH\ptdto\BG\bigr)\\
+ &\equivto \qquad\! \bigl(\BH\ptdto\BG\bigr) 
+ \quad\text{(by $\ev\circ\blank$)}\\
 % &\jdeq\qquad~\BHom(G,G)\\
- &\equivto \qquad \absHom(\abstr(H),\abstr(G)).
+ &\equivto \qquad \absHom(\abstr(H),\abstr(G))
+ \quad\text{(by $\abstr$)}.
 \end{align*}
-Then the composite of the above chain defines an abstract isomorphism
-from $\abstr(\grpHom(H,G))$ to $\absHom_{\ptw}(\abstr(H),\abstr(G))$.
 \end{lemma}
+
 \begin{proof}
 %$\pathpair{h}{h_\pt}:\sh\eqto\sh$
 Given $p:(\sh\eqto\sh)$, the equivalence $\ptw_*$ from 
@@ -446,139 +1101,6 @@ $q_\pt: (\id_{\BG_\div}\eqto\ptoe q(\sh_H))$.
 \MB{W.i.p.}
 
 \end{proof}
-
-\begin{remark}\label{rem:grpHomOK}
-We explore two alternative approaches to the lemma above,
-generalizing from $\BG$ and $\BB G$.
-Assume that $X$ is a pointed $1$-type and $Y$ a
-pointed $2$-type.\footnote{This should not be needed, but intends to
-simplify by making $p=_{\loops X}q$ and $p=_{{\loops}^2 Y}q$
-proof-irrelevant.}
-\begin{marginfigure}
-  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
-  \loops(X\ptdto Y)\ar[rr,eqr,"{\ptw_*}"]\ar[dd,"{\loops(\loops)}"']
-  \& \& X\ptdto \loops Y  \ar[dd,"{\loops}"]
-  \\ \& \mbox{} \& \\
-  \loops(\loops X\ptdto \loops Y) \ar[rr,eql,"{\ptw_*}"']   
-  \& \mbox{} \& \loops X\ptdto {\loops}^2 Y
-  \end{tikzcd}
-  \caption{\label{fig:ulrik}
-  Fill!} 
-\end{marginfigure}
-
-First approach. We start by constructing the function 
-denoted by ${\loops(\loops)}$ in \cref{fig:ulrik}, with type 
-$$\loops(X\ptdto Y) \to \loops(\loops X\ptdto \loops Y).$$
-Recall the map $\loops : ((X\ptdto Y)\to(\loops X\ptdto \loops Y))$
-sending  a pointed map $f:X\ptdto Y$ to $\loops(f)$ defined by 
-\[
-\loops(f)(p) \defeq \inv{f_\pt}\cdot \ap{f_\div}(p) \cdot f_\pt
-\quad\text{for any $p:\pt_X\eqto\pt_X $,}
-\]
-pointed by an element $\loops(f)_\pt$ of 
-$\refl{\pt_Y} \eqto \inv{f_\pt}\cdot \ap{f_\div}(\refl{\pt_X}) \cdot f_\pt$.%
-\footnote{
-Obtained by path algebra, not in general a reflexivity path.}
-Before we can apply ${\loops}$ to this map we have to point it.
-The point of $X\ptdto Y$ is the constant 
-map $x\mapsto\pt_Y$ pointed by reflexivity.
-The point of $\loops X\ptdto \loops Y$ is the constant 
-map $p\mapsto\refl{\pt_Y}$ pointed by reflexivity.
-We have
-\[
-\loops(x\mapsto\pt_Y)(p) \defeq 
-\inv{\refl{\pt_Y}}\cdot \ap{x\mapsto\pt_Y}(p) \cdot \refl{\pt_Y}.
-\]
-Now, since $\ap{x\mapsto\pt_Y}(p) \eqto \refl{\pt_Y}$ 
-for all $p: \loops(X)$, by path algebra and function extensionality, 
-we get a pointing path
-$\pi: (p\mapsto \refl{\pt_Y})\eqto \loops(x\mapsto\pt_Y)$.
-
-The desired map is now $\loops(\loops)$, which is short for
-$\loops((f:X\ptdto Y) \mapsto \loops(f))$ of type $\loops(X\ptdto Y) \to \loops(\loops X\ptdto \loops Y)$, defined by
-\[
-(\loops(\loops))(q)\defeq\inv\pi\cdot\ap{f\mapsto\loops(f)}(q)\cdot\pi
-\quad\text{for any $q:\loops(X\ptdto Y)$}.
-\]
-Note that the type of $q$ is 
-$(x\mapsto\pt_Y,\refl{\pt_Y})\eqto(x\mapsto\pt_Y,\refl{\pt_Y}))$.
-The type of $\ap{f\mapsto\loops(f)}(q)$ is
-$\loops(x\mapsto\pt_Y,\refl{\pt_Y})\eqto\loops(x\mapsto\pt_Y,\refl{\pt_Y}))$,
-which is (by the above) equivalent to 
-$(p\mapsto \refl{\pt_Y})\eqto(p\mapsto \refl{\pt_Y})$,
-so by function extensionality equivalent to 
-$\loops(X)\to\loops(\loops(Y))$. Under this equivalence,
-$\ap{f\mapsto\loops(f)}(q)$ corresponds to $\ptw(\fst(q))$. 
-\MB{TODO: use $\snd(q)$ to get a pointing path and check everything!}
-
-Second approach. This approach uses the equivalence
-between pointed maps from $\Sc\ptdto A$ and loops $\pt_A\eqto\pt_A$
-from \cref{cor:circle-loopspace}.
-\def\Scc{\wip{\Sc}}
-\begin{figure}[h]
-  \begin{tikzcd}[ampersand replacement=\&,column sep=small]
-  \Sc(X\ptdto Y)\ar[rr,eqr,"{e_{X,Y}}"]\ar[dd,"{O\circ\blank}"']
-  \& \& X\ptdto \Sc Y  \ar[dd,"{O'}"] \ar[ddrr,"{O}"]
-  \\ \& \mbox{} \& \\
-  \Sc(\Scc X\ptdto \Scc Y) \ar[rr,eql,"{e_{\Scc X,\Scc Y}}"']   
-  \& \mbox{} \& \Scc X \ptdto \Sc (\Scc Y) \ar[rr,eql,"{\text{swap}}"']
-  \&\&  \Scc X \ptdto \Scc (\Sc Y) 
-  \end{tikzcd}
-  \caption{\label{fig:bjørn}
-  Fill! Here $\Sc A$ means $\Sc\ptdto A$ and the colors track
-  related occurrences of $\Sc$. \MB{Perhaps}
-  we must use the equivalence $-\id_\Sc : \Sc\ptdto\Scc$ defined by
-  $\base\mapsto\base$ and $\Sloop\mapsto{\Sloop}^{-1}$
-  for the pointing paths?} 
-\end{figure}
-
-The map $O: ((X\ptdto Y)\ptdto((\wip{\Sc}\ptdto X)\ptdto(\wip{\Sc}\ptdto Y))$
-is easy: $O(f)\defeq (p\mapsto (f\circ p))$ for any $f:X\ptdto Y$.\footnote{%
-We write $O$ for $O_{X,Y}$, and also for $O_{X,\Sc Y}$.
-Name $p$ since $(\Sc\ptdto X)\we\loops(X)$.
-Similarly for $q:\Sc\ptdto (X \ptdto Y)$.}
-We have to point $O$ and hence calculate 
-\begin{align*}
-O(x\mapsto\pt_Y,\refl{\pt_Y})
-&\jdeq (p\mapsto(x\mapsto\pt_Y,\refl{\pt_Y})\circ p)\\
-&\eqto (p\mapsto (z\mapsto\pt_Y,\refl{\pt_Y}))
- \jdeq\pt_{(\wip{\Sc}\ptdto X)\ptdto(\wip{\Sc}\ptdto Y)},
-\end{align*}
-with the identity in the middle by function extensionality,
-composition of pointed maps and path algebra.
-Hence we can point $O$ by the inverse identification which we denote $\tau$.
-Composition with $O$, \ie $(O\circ\blank)\defeq(q\mapsto O\circ q)$,
-gives the map\footnote{
-This map corresponds to the map of type
-$\loops(X\ptdto Y) \to \loops(\loops X\ptdto \loops Y)$
-constructed in the first approach.} 
-along the left down arrow in \cref{fig:bjørn}:
-\[
-(O\circ\blank): (\Sc\ptdto(X\ptdto Y))\to
-(\Sc\to((\Scc\ptdto X)\ptdto(\Scc\ptdto Y)).
-\]
-
-The middle down arrow in \cref{fig:bjørn} maps
-$g:X\ptdto(\Sc\ptdto Y)$ to $O'(g)$ defined by $O'(g)(p) \defeq
-((z:\Sc) \mapsto ((w:\Scc) \mapsto g(p(w),z)))$.
-This is to be compared to $O(g)(p) \defeq
-((z:\Sc) \mapsto ((w:\Scc) \mapsto g(p(z),w)))$ in the right down arrow. 
-
-Next are the horizontal equivalences, which are easy. The lower left one
-is a special case of the upper one, which we call $e_{X,Y}$ and 
-define by $e_{X,Y}(f) \defeq ((x:X) \mapsto ((z:\Sc) \mapsto f(z,x)))$ for
-any $f:\Sc\ptdto (X\ptdto Y)$.
-The lower right one makes up for the difference between $O$ and $O'$
-so that the right triangle commutes definitionally:\footnote{%
-As unpointed maps. \MB{TODOs:}
-Pointing paths. Check that $O$ corresponds to $\loops$
-and that $e$ corresponds to $\ptw_*$ (should be easy).}
-\[
-\text{swap} \defeq (h\mapsto (p:\Scc X, z:\Sc,w:\Scc) \mapsto h(p,w,z)).
-\]
-The left square in \cref{fig:bjørn} also commutes definitionally,
-as unpointed maps. \MB{W.i.p.}
-\end{remark}
 
 
 \subsection{Concrete rings}\label{sec:concrings}

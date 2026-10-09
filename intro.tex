@@ -457,12 +457,16 @@ Throughout this book we will use the following coercions to make the text more r
 \item If $e$ is a pair of a function and a proof, we also use $e$ for the function.
 \item If $e$ is an equivalence between types $A$ and $B$, we use $\etop e$ for the
 identification of $A$ and $B$ induced by univalence.
-\item If $p: A= B$ with $A$ and $B$ types, then we use $\ptoe p$ for the canonical
+\item If $p: A\eqto B$ with $A$ and $B$ types, then we use $\ptoe p$ for the canonical
 equivalence from $A$ to $B$ (also only as function).
 %\item If $G$ is the group $(A,a,p,q)$, then $g:G$ means $g: a=_A a$. %TODO: El
 \item If $X$ is $(A,a,\ldots)$ with $a:A$, then $\pt_X$ and even just $\pt$ mean $a$.
+\item In phrases like ``a function of type $A\to B$'' we may leave out ``of type'' and
+say ``a function $A\to B$'', for brevity. 
+Likewise for other situations (equivalences, paths, etc.), as long as no ambiguity can occur.
 \end{itemize}
 
+ 
 \section*{How to read this book}
 
 \noindent\emph{A word of warning.}\enspace
@@ -475,7 +479,7 @@ Don't just believe us: Think about it!
 The same goes for the proofs: When we say that something \emph{clearly} follows,
 it should be \emph{clear to you}.
 So clear, in fact, that you could go and convince a proof assistant,
-should you so desire.
+should you so desire. 
 
 \section*{Acknowledgement}
 

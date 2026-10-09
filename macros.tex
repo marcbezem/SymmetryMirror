@@ -23,18 +23,26 @@
 \renewcommand*{\openbox}{\pxopenbox}
 \usepackage{mathtools}          %to get \vcentcolon
 \usepackage{thmtools}
+% https://github.com/muzimuzhi/thmtools/issues/75
+\makeatletter
+\@ifundefined{newcounteralias}{}{%
+  \renewcommand\thmt@autorefsetup{\@xa\def\csname\thmt@envname autorefname\@xa\endcsname\@xa{\thmt@thmname}}%
+}
+\makeatletter
 \usepackage{xspace}
 \usepackage{booktabs}
 \usepackage{ragged2e}           % to hyphenate marginals
 \usepackage{marginfix}          % to get \mparshift
 \usepackage{scalerel}           % to scale \div
-\usepackage[all]{xy}
+\usepackage[all,cmtip]{xy}
 \usepackage{pgfplots,tikz,tikz-cd,tikz-3dplot}
 \pgfplotsset{compat=1.11}
 \usepackage{enumitem}
 \usepackage{xifthen}
 
 \input tikzsetup
+
+\newcommand*{\pbcorner}[1][dr]{\ar[#1,phantom,"\lrcorner" , very near start]}
 
 %% mathtools does not define an extensible equal sign, so we do so here:
 \makeatletter
@@ -155,6 +163,10 @@
 \newcommand{\casrus}[1]{\foreignlanguage{russian}{%
     \fontfamily{Tempora-TLF}\selectfont #1}}
 
+%%% And yo from hiragana
+\font\maljapanese=dmjhira at 2ex % you can change this "2ex" value
+\newcommand*{\yo}{\textrm{\maljapanese\char"48}\!}
+
 %%% Tufte font size
 %%
 % Set the font sizes and baselines to match Tufte's books
@@ -235,6 +247,8 @@
   \captiontitlefont{\footnotesize}\captionstyle{\mpjustification}}
 \sidecapmargin{right}
 \setsidecappos{t}
+\setlength{\sidecapwidth}{\marginparwidth}
+\setlength{\sidecapsep}{\marginparsep}
 \renewcommand*{\sidecapstyle}{\captionnamefont{\footnotesize\scshape}%
   \captiontitlefont{\footnotesize}\captionstyle{\mpjustification}}
 
@@ -507,7 +521,11 @@
 \newcommand*{\false}{\typeformer{False}}
 \newcommand*{\Prop}{\typeformer{Prop}}
 \newcommand*{\Set}{\typeformer{Set}}
-\newcommand*{\Groupoid}{\typeformer{Groupoid}}
+\newcommand*{\PreCat}{\typeformer{PreCat}}
+\newcommand*{\FlCat}{\typeformer{FlCat}}
+\newcommand*{\Cat}{\typeformer{Cat}}
+\newcommand*{\Groupoid}{\typeformer{Groupoid}}% type of 1-types
+\newcommand*{\Gpd}{\typeformer{Gpd}}% cat of groupoids
 \newcommand*{\FinSet}{\typeformer{FinSet}}
 \newcommand*{\Cyc}{\typeformer{Cyc}}% cycles
 \newcommand*{\InfCyc}{\typeformer{InfCyc}}% infinite ditto
@@ -518,6 +536,7 @@
 \newcommand*{\GSet}[1][G]{\mathord{#1\textrm{-}\Set}}
 \newcommand*{\absGSet}[1][{\agp G}]{\mathord{#1\textrm{-}\Set^{\abstr}}}
 \newcommand*{\Group}{\typeformer{Group}}
+\newcommand*{\absGroup}{\Group^{\abstr}}% category of abstract groups
 \newcommand*{\AbGroup}{\typeformer{AbGroup}}
 \newcommand*{\Ring}{\typeformer{Ring}}
 \newcommand*{\RingProps}{\typeformer{RingProperties}}
@@ -554,6 +573,7 @@
 \newcommand*{\no}{\constructor{no}}
 \newcommand*{\triv}{\constructor{triv}}
 \newcommand*{\refl}[1]{\constructor{refl}_{#1}}
+\newcommand*{\rfl}{\refl{}}
 \newcommand*{\rrfl}{\constructor{rrfl}}
 \newcommand*{\inl}[1]{\casop{\constructor{inl}}_{#1}}
 \newcommand*{\inr}[1]{\casop{\constructor{inr}}_{#1}}
@@ -565,7 +585,9 @@
 \newcommand*{\fact}{\casop{\constant{fact}}}
 \newcommand*{\id}{\mathord{\constant{id}}}
 \newcommand*{\pt}{\constant{pt}}
-\newcommand*{\shape}{\constant{sh}} % the basepoint of the classifying type of a group G, referred to as the designated shape of G.  Note: "\sh" is already in use.
+\newcommand*{\shape}{\constant{sh}} % the basepoint of the classifying type of a group G, referred to as the designated shape of G.
+% Note: "\sh" is already defined by russian babel
+% We'll overwrite after \begin{document}
 \newcommand*{\ad}{\constant{ad}}
 \newcommand*{\symm}{\casop{\constant{symm}}}
 \newcommand*{\trans}{\casop{\constant{trans}}}
@@ -607,26 +629,32 @@
 \newcommand*{\cst}[1]{\casop{\constant{cst}}_{#1}} % constant function at
 \newcommand*{\N}{\constant{N}} % normalizer
 \renewcommand*{\ker}{\casop{\constant{ker}}}
+\newcommand*{\kermap}[1]{\casop{\constant{in}}_{\ker(#1)}}
+\newcommand*{\dom}{{\casop{\constant{dom}}}}
+\newcommand*{\cod}{{\casop{\constant{cod}}}}
 \newcommand*{\lcm}{{\casop{\constant{lcm}}}}
 \newcommand*{\typekernel}{{\constant{Ker}}}
 \newcommand*{\Img}{\casop{\constant{Im}}}
 \newcommand*{\img}{\casop{\constant{im}}}
 \newcommand*{\image}{\Img}
+\newcommand*{\Ob}{\casop{\constant{Ob}}}% objects of a category
 \newcommand*{\Fact}{\casop{\constant{Fact}}}
+\newcommand*{\Imfact}{\casop{\constant{fact}}}
 \newcommand{\prj}{\constant{pr}}
 \newcommand{\prjim}{\prj^{\img}}
 \newcommand*{\incl}{\constant{in}}%the homomorphism in an element #1 in \Mono_G
 \newcommand*{\Order}{\constant{Order}}
+\newcommand*{\OO}{\casop{\constant{O}}}
 \newcommand*{\ord}{\casop{\constant{ord}}}% order of cycle/group element
 \newcommand*{\Sub}{\casop{\constant{Sub}}}% subtype through predicates
 \newcommand*{\Inj}{\casop{\constant{Inj}}}% subtype through injections
 \newcommand*{\Coker}{\casop{\constant{Coker}}}
 \newcommand*{\coker}{\casop{\constant{coker}}}
 \newcommand*{\Nor}{\constant{Nor}}
-\newcommand{\nor}{{\casop{\constant{nor}}}}
+\newcommand*{\nor}{{\casop{\constant{nor}}}}
 \newcommand*{\Sym}{\casop{\constant{Sym}}}
-\newcommand*{\USym}{\constant{U}} % underlying symmetries (no space!) formerly \sh_G=\hs_G
-\newcommand*{\US}[1]{\USym #1}%changes e.g f^\abstr changed to to Uf
+\newcommand*{\USym}{\constant{U}} % underlying symmetries (no space!)
+\newcommand*{\US}[1]{\USym #1}% prefixes a roman U (redundant?)
 \newcommand*{\ISym}{\constant{I}} % underlying identities
 \newcommand*{\Card}{\casop{\constant{\#}}}
 \newcommand*{\Cay}{\casop{\constant{Cay}}}
@@ -653,6 +681,7 @@
 \newcommand*{\isgrpd}{\casop{\mathrm{isGrpd}}}
 \newcommand*{\isfinset}{\casop{\mathrm{isFinSet}}}
 \newcommand*{\isEq}{\casop{\mathrm{isEquiv}}}
+\newcommand*{\isIso}{\casop{\mathrm{isIso}}}
 \newcommand*{\isAb}{\casop{\mathrm{isAb}}}
 \newcommand*{\isonetype}{\casop{\mathrm{is1Type}}}
 \newcommand*{\isconn}{\casop{\mathrm{isConn}}}
@@ -719,10 +748,13 @@
 \newBcommand{SU} % special unitary group
 \newBcommand[\Sigma]{SG} % symmetric group
 \newBcommand{Q} % quaternion group
+\newcommand*{\TG}{{\bn 1}} % trivial group
+\newcommand*{\BTG}{{\B\bn 1}} % trivial group
 
 % Common multi-letter variables
 % A bit of a hack. If we use \var{...} we get a big box
 % with the wrong sub-/super-script positions
+\newBvariable{F}
 \newBvariable{G}
 \newBvariable{H}
 \newBvariable{K}
@@ -733,6 +765,7 @@
 \newBvariable{W}
 \newBvariable{A}
 \newBvariable{f}
+\newcommand*{\Bfpt}{B\!f_\pt}
 \newBvariable{g}
 \newBvariable{h}
 \newBvariable{i}
@@ -766,6 +799,8 @@
 \newcommand*{\casredname}{{\color{casred}amaranth}\xspace}
 \newcommand*{\casbluename}{{\color{casblue}bluebell}\xspace}
 \newcommand*{\casgreenname}{{\color{casgreen}citrine}\xspace}
+\newcommand*{\inred}[1]{{\color{casred}#1}}
+\newcommand*{\inblue}[1]{{\color{casblue}#1}}
 
 % relations
 \let\oldequiv\equiv
@@ -787,7 +822,7 @@
 }}}
 \newtocommand{eq}{\ordinaryequals}
 \newtocommand{equiv}{\simeq}
-\newtocommand{isom}{\cong}
+\newtocommand{iso}{\cong}
 \newtocommand{sim}{\simeq}
 \newcommand*{\we}{\simto}
 \newcommand*{\isom}{\cong}
@@ -821,20 +856,18 @@
 % paired delimiters (can change size via optional argument)
 \DeclarePairedDelimiter\Trunc{\lVert}{\rVert} % truncated type
 \DeclarePairedDelimiter\trunc{\lvert}{\rvert} % truncation constructor
+\DeclarePairedDelimiter\setTrunc{\lVert}{\rVert_0} % set truncated type
+\DeclarePairedDelimiter\settrunc{\lvert}{\rvert_0} % set truncation constructor
+\DeclarePairedDelimiter\gpdTrunc{\lVert}{\rVert_1} % gpd truncated type
+\DeclarePairedDelimiter\gpdtrunc{\lvert}{\rvert_1} % gpd truncation constructor
 \DeclarePairedDelimiter\merely{\lVert}{\rVert_{-1}}
 \DeclarePairedDelimiter\angled{\langle}{\rangle}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 \DeclarePairedDelimiter\FinOrd[] % constructor for nonempty finite ordinals
 \DeclarePairedDelimiter\set\lbrace\rbrace
 \DeclarePairedDelimiter\sem\llbracket\rrbracket % semantic interpretation
 \DeclarePairedDelimiterX\setof[2]\lbrace\rbrace{\, #1 \,\delimsize\vert\, #2 \,}
-
-% special truncations and truncation constructors
-\newcommand*{\myTrunc}[2]{{\Trunc{#1}}{}_{#2}}
-\newcommand*{\mytrunc}[2]{{\trunc{#1}}{}_{#2}}
-\newcommand*{\setTrunc}[1]{{\Trunc{#1}}_0}
-\newcommand*{\settrunc}[1]{{\trunc{#1}}_0}
-\newcommand*{\grpdTrunc}[1]{{\Trunc{#1}}_1}
-\newcommand*{\grpdtrunc}[1]{{\trunc{#1}}_1}
 
 % footnote without number, no star: may contain \par
 \newcommand\blfootnote[1]{%
@@ -854,6 +887,8 @@
 \newcommand*{\uc}[1]{{\pathsp{#1}}}%universal set bundle
 \newcommand*{\abstr}{\casop{\constant{abs}}}
 \newcommand*{\deloop}{\casop{\constant{deloop}}}
+\newcommand*{\concr}{\casop{\constant{concr}}}
+\newcommand*{\Bconcr}{\casop{\constant{Bconcr}}}
 \newcommand*{\agp}[1]{\mathcal #1} %generic abstract group
 \newcommand*{\grpcenterinc}[1]{\mathrm z_{{#1}}} %
 
@@ -861,10 +896,8 @@
 \newcommand*{\preinv}{\constant{preinv}}
 \newcommand*{\post}{\constant{post}}
 \newcommand*{\adjoint}{\ad}
-\newcommand*{\concr}{\constant{concr}}
 
 %some special types
-\newcommand*{\TG}{{1\!\!1}} % trivial group, no B symbol, experimental MAB
 \newcommand*{\SetBundle}{\constant{SetBundle}}
 \newcommand*{\typegroup}{\Group}
 \newcommand*{\typeabgroup}{\AbGroup}

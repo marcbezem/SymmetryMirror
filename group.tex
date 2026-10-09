@@ -530,6 +530,9 @@ but in this text we have chosen to focus on other matters.
   Note that all of these can be obtained from $1$ under addition.
   With $\Cyc,\,\Cyc_m$ from \cref{def:Cyc}, \ref{def:Cyc-components},
   the \emph{cyclic group of order $m$} is thus defined to be
+  \glossary(C){$\protect\CG_m$}{cyclic group of degree $m$,
+      \cref{ex:cyclicgroups}}\index{cyclic group}%
+    \index{group!cyclic group}
   \[
     \CG_m \defeq \Aut_\Cyc(\bn m,\zs),
   \]
@@ -546,9 +549,9 @@ but in this text we have chosen to focus on other matters.
   By using univalence on the equivalences of~\cref{thm:coveringsofS1perms}, we get a chain of identifications
   \[
     \begin{tikzcd}
-      \CG_m \rar[eqtol] & \Aut_{\sum_{X:\Set}(X\to X)}(\bn m,\zs) \dar[eqtol] &
+      \CG_m \ar[r,eql] & \Aut_{\sum_{X:\Set}(X\to X)}(\bn m,\zs) \ar[d,eql] &
       \\
-      & \Aut_{\SetBundle(\Sc)}(\Sc,\dg{m}) \rar[eqtol] & \Aut_{\Sc\to\Set}(R_m),
+      & \Aut_{\SetBundle(\Sc)}(\Sc,\dg{m}) \ar[r,eql] & \Aut_{\Sc\to\Set}(R_m),
     \end{tikzcd}
   \]
   where $\dg{m} : \Sc \to \Sc$ is the degree $m$ map,
@@ -903,13 +906,18 @@ be turned into examples of abstract groups. The following exercise
 provides a different source of examples.
 
 \begin{xca}\label{xca:abstract-group-of-maps}
-Let $\agp G$ be an abstract group with underlying set $S$.
-Let $X$ be a set. Show that the set $X\to S$ of functions
-from $X$ to $S$, together with pointwise operations induced by
-$\agp G$, forms and abstract group which is abelian if and only
-if $\agp G$ is.
+  Let $\agp G$ be an abstract group with underlying set $S$
+  and neutral element $e$.
+  Let $X$ be a set. Show that the set $X\to S$ of functions
+  from $X$ to $S$, together with the ``pointwise operations''
+  inherited from $\agp G$,
+  \begin{alignat*}2
+    \cst{e} &\jdeq (x \mapsto e) &\qquad &\text{(neutral element)}\\
+    f \cdot g &\defeq (x \mapsto f(x) \cdot g(x)) &\qquad &\text{(multiplication)},
+  \end{alignat*}
+  forms an abstract group, which furthermore is abelian if and only
+  if $\agp G$ is.
 \end{xca}
-
 
 We leave the study of abstract groups for now;
 in~\cref{ch:absgroup} we'll
@@ -986,18 +994,20 @@ So we should first study how pointed maps affect loops:\marginnote{%
   Given pointed types $X$ and $Y$ and a pointed function $k : X\ptdto Y$ (as defined in \cref{def:pointedtypes}),
   we define a function $\loops k : \loops X \to \loops Y$ by setting\footnote{%
     Recall~\cref{def:ap} for $\ap{}$, and that we may abbreviate
-    $\ap{f}(p)$ by $f(p)$. Note also that $\loops k$ is pointed: 
-    we can identify $\loops k(\refl{\pt_X})$ with $\refl{\pt_Y}$.}
+    $\ap{f}(p)$ by $f(p)$.}
   \[
-    \loops k(p) \defeq k_\pt^{-1} \cdot \ap{k_\div}(p) \cdot k_\pt
-    \text{,\quad for all $p: \pt_X \eqto \pt_X$.}\qedhere
+    \loops k(p) \defeq \inv{k_\pt} \cdot \ap{k_\div}(p) \cdot k_\pt
+    \text{,\quad for all $p: \pt_X \eqto \pt_X$.}
   \]
+  Later we will need that $\loops k$ is a pointed map and define 
+  $(\loops k)_\pt: \refl{\pt_Y}\eqto \inv{k_\pt}\cdot k_\pt$ by
+  the inverse law of path algebra, \cref{xca:path-groupoid-laws}.
   \glossary(924Omega){$\protect\loops k$}%
   {loop map of pointed map, \cref{def:loops-map}}
 \end{definition}
 
 \begin{remark}\label{rem:loops-map}
-  If $k : X \ptdto Y$ has the reflexivity path $\refl{Y_\pt}$ as its
+  If $k : X \ptdto Y$ has the reflexivity path $\refl{\pt_Y}$ as its
   pointing path, then we have an identification $\loops k \eqto \ap{k_\div}$.
 \end{remark}
 
@@ -1172,12 +1182,20 @@ but it is instructive to give a direct proof of the following.
   give rise to group homomorphisms between $G\times H$ and $G$ and $H$,
   namely projections $G\gets G\times H\to H$ and inclusions
   $G\to G\times H\gets H$.
-\item In \cref{ex:cyclicgroups} we gave an example of an isomorphism, 
+\item\label{it:mod_m}
+  In \cref{ex:cyclicgroups} we gave an example of an isomorphism, 
   namely one from the cyclic group $\CG_m$ to $\ZZ/m\ZZ$,
   and in~\cref{ex:Cm} we looked at $R_m : \B\ZZ \ptdto \BSG_m$,
-  pointed by $\refl{\bn m}$,
-  which induces a homomorphism $(\blank\mod m) : \ZZ \to \SG_m$
-  factoring through $\ZZ/m\ZZ$ (and, equivalently, through $\CG_m$).\qedhere
+  which, pointed by $\refl{\bn m}$,
+  classifies a homomorphism $\ZZ \to \SG_m$. This homomorphism
+  factors through $\CG_m$ (equivalently through $\ZZ/m\ZZ$)
+  via a homomorphism $\mathrm{mod}_m : \ZZ \to \CG_m$ classified by 
+  $\B\mathrm{mod}_m:\B\ZZ \ptdto \BCG_m$ sending $\base$ to $(\bn m,\zs)$
+  and $\Sloop$ to $\zs$,\footnote{%
+  The function $\zs$ here is the successor function modulo $m$.} 
+  and pointed by reflexivity.
+  The homomorphism $\CG_m \to \SG_m$ forgets the
+  cycle structure.\qedhere
   \end{enumerate}
 \end{example}
 
@@ -1263,7 +1281,7 @@ The following example expresses that $\ZZ$ is a ``free group with one generator'
     \quad
     \ev_{\BG}(f_\div,f_\pt)\defeq\loops(f_\div,f_\pt)(\Sloop).
   \]
-  The domain of this equivalence is equivalent to $\Hom(\ZZ,G)$.
+  The domain of this equivalence classifies $\Hom(\ZZ,G)$.
   Hence, $\ev_{\BG}$ provides a way to
   identify $\Hom(\ZZ,G)$ with the underlying set $\USymG$.
   Like in \cref{lem:freeloopspace}, the inverse of $\ev_{\BG}$
@@ -1279,13 +1297,13 @@ Let $G$ and $H$ be groups and $f: \Hom(G,H)$.
 Then the following diagram commutes,
 \[
   \begin{tikzcd}
-    \Hom(\ZZ,G) \arrow[r, eqr, "\ev"] \arrow[d, "f\circ{\blank}"'] &
+    \Hom(\ZZ,G) \arrow[r, equivr, "\ev"] \arrow[d, "f\circ{\blank}"'] &
     \USymG \arrow[d, "\USymf"]\\
-    \Hom(\ZZ,H) \arrow[r, eqr, "\ev"] & \USymH,
+    \Hom(\ZZ,H) \arrow[r, equivr, "\ev"] & \USymH,
   \end{tikzcd}
 \]
 where the horizontal maps evaluate
-the map on underlying symmetries at the loop
+the classifying maps of the homomorphisms from $\ZZ$ at the loop
 $\Sloop : \USym\ZZ$.
 \end{lemma}
 
@@ -1320,6 +1338,7 @@ $\Sloop : \USym\ZZ$.
   \end{enumerate}
 \end{xca}
 
+\begin{remark}\label{rem:first-abs-hom}
 The definition of group homomorphism in \cref{def:grouphomomorphism} should be contrasted with the usual -- and somewhat more cumbersome -- notion of a group homomorphism
 $f: \mathcal G\to \mathcal H$ of abstract groups where we must ask of a function of the underlying sets that it in addition preserves the neutral element,
 multiplication, and inverse operation.
@@ -1337,6 +1356,7 @@ as
   && \text{for all $g : \USymG$.}
 \end{alignat*}
 We come back to abstract homomorphisms in \cref{sec:abshom}.
+\end{remark}
 
 \begin{example}
 \label{exa:conj-concrete}
@@ -1873,7 +1893,7 @@ as follows:
   Elements of $\Bicyc$ are called \emph{bicycles}.
 \end{definition}
 
-\begin{remark}
+\begin{remark}\label{rem:F2-first-look}
   In~\cref{sec:freegroups} we shall see that
   just like cycles are equivalently described as connected
   \coverings over the circle $\Sc$,
@@ -2269,7 +2289,7 @@ from $\sem{\ell}(x_0)$, rather than the other way round.
   to $x_0$, then it would be the geometrically local operations $a$ and $b$
   that would correspond to inserting $\inv T$ and $\inv R$ at the end.
   For example, $a(T^{-2}R(x_0)) = T^{-2}RT^{-1}(x_0)$.
-  In fact, see already saw one manifestation of this
+  In fact, we already saw one manifestation of this
   in~\cref{fig:plus-minus-one} back in~\cref{sec:S1isC},
   and we'll return to this phenomenon several times throughout the book.
   We'll discuss friezes and other geometrical objects in

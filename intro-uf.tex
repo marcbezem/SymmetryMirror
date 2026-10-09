@@ -142,6 +142,17 @@ called a \emph{function type} and will be denoted by $X \to T$\glossary(2fun){$\
 we mean that $f$ is an element of the type $X \to T$, and we are saying that $f$ is a function from $X$ to $T$.  The type $X$ may be called the
 \emph{domain} of $f$, and the type $T$ may be called the \emph{codomain} of $f$.
 
+Given an element $t$ of $T$, we can consider the function $x\mapsto t$
+mapping all elements of $X$ to $t$. Such functions are called
+constant functions, and they occur so often that we introduce a special
+notation for them.
+\begin{definition}\label{def:cst-map}
+Let $X$ and $T$ be types, and $t$ an element of $T$. Define
+$\cst{t}^X : X\to T$ to be $x\mapsto t$, the \emph{constant function at $t$}.
+\index{function!constant}
+\glossary(const){$\protect\cst{t}^X$}{constant function at $t:T$}
+\end{definition}
+
 An example of a function is the function $n \mapsto \sqrt n$ of type $\NN \to \RR$.
 
 Another example of a function is the function $n \mapsto p_n$ of type $\prod_{n:\NN} P_n$, where $P_n$ is the type of polygons introduced above,
@@ -800,12 +811,13 @@ $X$, we may produce an identification of type $f(x) \eqto g(x)$, which can be co
 
 \begin{definition}\label{def:ptw}
   Let $f,g:\prod_{x:X} Y(x)$. Define the function
+\glossary(ptw){$\protect\ptw_{f,g}$}{equivalence from $f\protect\eqto g$ to pointwise equality, \cref{def:ptw}}
   \[
     {\ptw}_{f,g}: ( f \eqto g ) \to \left( \prod_{x:X} f(x) \eqto g(x) \right),
   \]
   by induction by setting ${\ptw}_{f,f}(\refl{f}) \defeq x \mapsto \refl{f(x)}$.
-  \footnote{The notation $\ptw$ is chosen to remind the reader of the word ``point-wise'', because the identifications are provided just for each
-  point $x$.   An alternative approach goes by considering, for any $x:X$, the evaluation function $\ev_x : \big(\prod_{x:X} Y(x)\bigr) \to Y(x)$ defined by
+  \footnote{The notation $\ptw$ is chosen to remind the reader of the word ``point-wise'', 
+  because the identifications are provided just for each point $x$. An alternative approach goes by considering, for any $x:X$, the evaluation function $\ev_x : \big(\prod_{x:X} Y(x)\bigr) \to Y(x)$ defined by
     $\ev_x(f) \defeq f(x)$.  Then one could define ${\ptw}_{f,g}(p,x) \defeq \ap{\ev_x}(p)$.  The functions provided by these two definitions
   are not equal by definition, but they can be identified, and one can easily be used in place of the other.}
 \end{definition}
@@ -825,20 +837,24 @@ We construct an identification
 \[
   \ns(h,p): \left(h(x')\cdot \ap{f}(p) \eqto \ap{g}(p)\cdot h(x)\right),
 \]
-between them by induction, by setting $\ns(h,\refl{x})$ to be some
-element of $h(x) \cdot \refl{f(x)} \eqto h(x)$, which can be constructed by induction, as in Exercise \ref{xca:path-groupoid-laws}.%
+between them by induction on $p$, by setting $\ns(h,\refl{x})$ to be an
+element of $h(x) \cdot \refl{f(x)} \eqto h(x)$, which can be constructed by
+induction on $h(x)$, as in Exercise \ref{xca:path-groupoid-laws}.%
 \glossary(ns){$\protect\ns$}{naturality square, \cref{def:naturality-square}}
-The type of $\ns(h,p)$ can be depicted as a square\footnote{%
-  \begin{displaymath}
+We depict the type of $\ns(h,p)$ in \cref{fig:nat-sq}
+and call $\ns(h,p)$ a \emph{naturality square}.
+\end{definition}
+\index{naturality square}
+\begin{marginfigure}
     \begin{tikzcd}[column sep=large,row sep=large,ampersand replacement=\&]
+%     x\ar[r,"="',"p"]\& x'\\
       f(x) \ar[r,"="',"\ap f(p)"] \ar[d,"=","h(x)"'] \& f(x') \ar[d,"="',"h(x')"] \\
       g(x) \ar[r,"=","\ap g(p)"']                    \& g(x')
     \end{tikzcd}
-  \end{displaymath}%
-} and $\ns(h,p)$ is called a \emph{naturality square}.%
-\index{naturality square}
+\caption{\label{fig:nat-sq}Illustration of \cref{def:naturality-square}.} 
+\end{marginfigure}
 %\footnote{This terminology comes from category theory.}
-\end{definition}
+
 
 \section{Identifying elements in members of families of types}
 
@@ -1192,10 +1208,12 @@ an identification of type $(a,\refl{a}) \eqto (a,\refl{a})$; reflexivity provide
 \label{def:fiber}
 Given a function $f : X \to Y$ and an element $y:Y$,
 the \emph{fiber} (or \emph{preimage}) $f^{-1}(y)$
-\index{fiber}\index{preimage}
+\index{fiber}\index{preimage}\index{fiber sequence}
 is encoded by defining $$f^{-1}(y) \defeq \sum_{x:X}(y \eqto f(x)).$$
 In other words, an element of the fiber $f^{-1}(y)$ is a pair consisting
 of an element $x$ of $X$ and an identification of type $y \eqto f(x)$.
+A \emph{fiber sequence} presents this data in the form
+of a sequence  $f^{-1}(y)\xrightarrow{\fst} X \xrightarrow{f} Y$.
 \end{definition}
 
 In set theory, a function $f : X \to Y$ is a bijection if and only if
@@ -1348,31 +1366,30 @@ $B(x)$ be a type parameterized by $x:X$.
 Give an equivalence between $\prod_{x:X} ((a \eqto x)\to B(x))$ and $B(a)$.
 \end{xca}
 
-We proceed now to define the notion of fiberwise equivalence.
+We proceed now to define the notion of equivalences in families.
 
 \begin{definition}\label{def:fiberwise}
 Let $X$ be a type, and let $Y(x),Z(x)$ be families of types parametrized
 by $x:X$. A map $f$ of type $\prod_{x:X}(Y(x)\to Z(x))$
 can be viewed as a family of maps $f(x): Y(x)\to Z(x)$ and is called a
-\emph{fiberwise} map. The \emph{totalization} of $f$ is defined by
+map of families. The \emph{totalization} of $f$ is defined by
 $\tot(f)(x,y)\defeq (x,f(x)(y))$.
 \index{totalization}
 \glossary(totalization){$\protect\tot(f)$}{totalization of $\protect f$}
 Using the denotation $\Tot(\blank)$ for the total type of
 a type family we thus have
 \[
-  \tot(f) : \Tot(Y) \to \Tot(Z)).\qedhere
+  \tot(f) : \Tot(Y) \to \Tot(Z).\qedhere
 \]
 \end{definition}
 
 \begin{lemma}\label{lem:fiberwise}
 Let conditions be as in \cref{def:fiberwise}.
 If $f(x): Y(x) \to Z(x)$ is an equivalence for every $x:X$
-(we say that $f$ is a \emph{fiberwise} equivalence),
+(we say that $f$ is an equivalence of families),
 %in which case we also call the family $f$ an equivalence,
 then $\tot(f)$ is an equivalence.
 \end{lemma}
-\marginnote{We will allow ourselves to drop the ``fiberwise'' and talk simply about maps and equivalences between type families.}
 \begin{proof}
 If $f(x): Y(x) \to Z(x)$ is an equivalence for all $x$ in $X$,
 then the same is true of all $f(x)^{-1}: Z(x) \to Y(x)$.
@@ -1388,7 +1405,7 @@ Complete the details of the proof of \cref{lem:fiberwise}.
 The converse to \cref{lem:fiberwise} also holds.
 \begin{lemma}\label{lem:fiberwise-equiv-from-tot}
   Continuing with the setup of \cref{def:fiberwise},
-  if $\tot(f)$ is an equivalence, then $f$ is a fiberwise equivalence.
+  if $\tot(f)$ is an equivalence, then $f$ is a equivalence of families.
 \end{lemma}
 For a proof see~Theorem~4.7.7 of the HoTT Book\footcite{hottbook}.
 
@@ -1397,6 +1414,7 @@ Yet another application of the notion of equivalence is to postulate axioms.
 \begin{principle}\label{def:funext}
 The axiom of \emph{function extensionality} postulates that the function
 $\ptw_{f,g}: (f \eqto g) \to \prod_{x:X} f(x) \eqto g(x)$ in \cref{def:ptw} is an equivalence.
+\index{function extensionality!principle of}
 Formally, we postulate the existence of an element $\funext : \isEq(\ptw_{f,g})$.
 From that we can construct the corresponding inverse function
 \[
@@ -2133,8 +2151,8 @@ Define $Y\to Z$ to be the type family
 with $(Y\to Z)(x) \defeq Y(x)\to Z(x)$.
 \end{definition}
 Recall from \cref{def:fiberwise} that an element $f : \prod_{x:X}(Y\to Z)(x)$
-is called a fiberwise map,
-and $f$ is called a fiberwise equivalence,
+is called a map of families,
+and $f$ is called an equivalence of families,
 if $f(x): Y(x)\to Z(x)$ is an equivalence for all $x:X$.
 
 \begin{construction}\label{lem:trp-in-function-type}
@@ -2586,13 +2604,18 @@ The following exercise shows that the inductive definition of $n$-types can
 indeed start with $n$ as $-2$, where we have the contractible types.
 
 \begin{xca}\label{xca:prop-contractible=}
-Given a type $P$, show that $P$ is a proposition if and only if $p \eqto q$ is contractible,
-for any $p, q: P$.
+Given a type $P$, show that $P$ is a proposition if and only if $p \eqto q$ 
+is contractible, for any $p, q: P$.
 \end{xca}
 
 \begin{remark}\label{rem:diagram}
-We now present the notion of a \emph{diagram}\index{diagram}.  A diagram is a graph
-whose vertices are types and whose edges are functions.  Here is an example.
+We now present the notion of a \emph{diagram}. A diagram is a graph
+whose vertices are types and whose edges are functions or identifications. 
+This means the edges have a direction. Usually there
+is one vertex with only outgoing edges, called the \emph{source},
+and one with only incoming edges, called the \emph{sink}. 
+Here is an example.
+\index{diagram}\index{source!of a diagram}\index{sink!of a diagram}
 \[
 \begin{tikzcd}
   X \ar[r,"f"] \ar[d,"p"] & Y \ar[d,"q"] \\
@@ -2600,7 +2623,8 @@ whose vertices are types and whose edges are functions.  Here is an example.
 \end{tikzcd}
 \]
 The information conveyed by this diagram to the reader is that $X$, $Y$, $S$, and $T$ are types, and that $f$, $g$, $p$, and $q$
-are functions; moreover, $f$ is of type $X \to Y$, $g$ is of type $S \to T$, $p$ is of type $X \to S$, and $q$ is of type $Y \to T$.
+are functions; moreover, $f$ is of type $X \to Y$, $g$ is of type $S \to T$, $p$ is of type $X \to S$, and $q$ is of type $Y \to T$. The source is the left upper vertex $X$ and
+the sink is the lower right vertex $T$. 
 
 Observe that we can travel through the diagram from $X$ to $T$ by following first the arrow labeled $f$ and then the arrow labelled $q$.
 Consequently, the composite function $q \circ f$ is of type $X \to T$.
@@ -2612,15 +2636,18 @@ We say that a diagram \emph{is commutative by definition}\index{diagram!commutat
 vertex to another, the corresponding composite functions are equal by definition.  For example, in the diagram above, the condition would be that
 $g \circ p \jdeq q \circ f$.
 
-When the function type from any vertex of a diagram to any other vertex of the diagram is a set, then equality of functions is a proposition,
-and we may consider whether two functions are equal.  In that case, we say that a diagram \emph{is commutative}\index{diagram!commutative} if,
+When the sink of the diagram is a set, then equality of functions into the sink is a 
+proposition, and we may consider whether two such functions are equal.  In that case, we say that a diagram \emph{is commutative}\index{diagram!commutative} if,
 whenever there are two routes from one vertex to another, the corresponding composite functions are equal.  For example, in the diagram above,
 the condition would be that $g \circ p \eq q \circ f$.
 
 In general, a diagram is a visual way to represent identity types.
-For example, if in the above diagram the type $X\to T$ is not
+For example, if in the above diagram the type $T$ is not
 a set, then the diagram represents the identity type
-$g \circ p \eqto q \circ f$.
+$g \circ p \eqto q \circ f$. To give an element of such an identity type
+(which may or may not be possible) is called to \emph{fill} the diagram,
+and such an element is then called a \emph{filler} of the diagram.
+\index{diagram!to fill a}\index{filler!of a diagram}  
 
 
 There are other sorts of diagrams.  For example, identifications may be composed, and thus we may have a diagram of identifications between
@@ -2636,14 +2663,15 @@ It indicates that $f$ is of type $x \eqto y$, $g$ is of type $s \eqto t$,
 $p$ is of type $x \eqto s$, and $q$ is of type $y \eqto t$.  We may
 also consider whether such a diagram is commutative by definition, or,
 in the case where all the identity types are sets, is commutative.
-Such diagrams are again a visual way to represent identity types.
+Such diagrams are again a visual way to represent identity types.%
 \footnote{When diagrams get more complicated, the information
 they convey is not always sufficient to find out which identity
 type(s) they represent. In such cases additional information will
 be provided.}%
 For example, the above diagram represents the identity type
-$g \circ p \eqto q \circ f$. For a concrete example, see
-the naturality square in \cref{def:naturality-square}.
+$g \circ p \eqto q \circ f$, and we also speak of \emph{filling}
+diagrams of identifications. For a concrete example of filling
+such a diagram, see the naturality square in \cref{def:naturality-square}.
 \end{remark}
 
 \section{Propositional truncation and logic}
@@ -2802,18 +2830,20 @@ identifications of elements.
   for any $x,y:A$ with $\Trunc {x=y}$.
 \end{xca}
 
-\begin{xca}\label{xca:connected-trivia-2}
-  Show that any connected set is contractible.
-\end{xca}
-
 \begin{xca}\label{xca:connected-trivia}
-Let $A$ be a connected type, and suppose that $a \eqto a$ is a proposition for every $a:A$.
-Show that $A$ is contractible.
+Let $A$ be a connected type, and suppose that $a \eqto a$ is a proposition for every $a:A$. Show that $A$ is contractible.
+Show that any connected set is contractible.
 \end{xca}
 
 \begin{xca}\label{xca:connected-trivia-1}
+  Let $A$ be a type and $B:A\to\UU$ a type family.
   Show that $\sum_{x:A}B(x)$ is connected when $A$ is connected
   and $B(x)$ is connected for any $x:A$.
+\end{xca}
+
+\begin{xca}\label{xca:connected-trivia-2}\wip{New: }
+Let $A$ be a type and $B:A\to\UU$ a type family. Show: if
+$\sum_{a:A}B(a)$ is connected, then so is $\sum_{a:A}\Trunc{B(a)}$. 
 \end{xca}
 
 In the following definition we introduce the adverb \emph{merely}, which serves as a quicker way to say \emph{the propositional truncation of}
@@ -2872,9 +2902,10 @@ that is, $\exists_{a:A} (b \eqto f(a))$.\footnote{%
 \end{definition}
 
 \begin{xca}\label{xca:inj-sets}
-  Show that if $A,B$ are sets, then a function
-  $f : A \to B$ is injective if and only if
-  $f(a) \eqto f(a')$ implies $a \eqto a'$ for all $a,a'$.
+  Let $A$ be a type and $B$ a set and $f : A \to B$ a function. 
+  Give maps in both directions between the proposition $\isinj(f)$
+  and the type $\prod_{a,a':A}((f(a) \eqto f(a'))\to (a\eqto a'))$.
+  Give a function $f:\true\to\Set$ that is not injective.
 \end{xca}
 
 \begin{lemma}\label{lem:inj+surj}
@@ -3190,9 +3221,9 @@ and any essentially $\UU$-small type is locally $\UU$-small.
 
 To show that a type is locally $\UU$-small
 we have to give a reflexive relation
-$\mathrm{Eq}_A : A \to A \to \UU$
+$\constant{Eq}_A : A \to A \to \UU$
 that induces, by path induction, a family of equivalences
-$(x \eqto y) \equivto \mathrm{Eq}_A(x,y)$.
+$(x \eqto y) \equivto \constant{Eq}_A(x,y)$.
 
 \begin{xca}
   Show that $\UU$ is locally $\UU$-small, and investigate
@@ -3470,7 +3501,8 @@ $\setof{t:T}{P(t)}$.\footnotemark
     Recall that an \emph{partial order} on a set $S$ is a relation $R$ that is
     (1)~\emph{reflexive}: $R(x,x)$,
     (2)~\emph{transitive}: $R(x,y) \to R(y,z) \to R(x,z)$, and
-    (3)~\emph{antisymmetric}: $R(x,y) \to R(y,x) \to x\eq y$.}
+    (3)~\emph{antisymmetric}: $R(x,y) \to R(y,x) \to x\eq y$.
+    See also~\cref{ex:poset}.}
   with a least and a greatest element (even if $T$ is the empty type).
 \end{xca}
 
@@ -3581,8 +3613,8 @@ Since $\UUp$ and $X\ptdto Y$ are sum types, the results on identifying pairs
 in \cref{sec:pairpaths} apply to pointed types and pointed maps as well.
 
 \begin{definition}\label{def:pointedequiv}
-  If $X$ and $Y$ are pointed types, we define the type of pointed equivalences
-  from $X$ to $Y$ as:
+Given pointed types $X$ and $Y$, we define the type of pointed
+equivalences from $X$ to $Y$ as:
   \[
     X \ptdweto Y \defeq \sum_{f : X \ptdto Y}\isEq(f_\div)\qedhere
   \]
@@ -3595,7 +3627,7 @@ in \cref{sec:pairpaths} apply to pointed types and pointed maps as well.
   \[
     (X \eqto Y) \to (X \ptdweto Y).
   \]
-  Show that this is an equivalence.
+  Show that this map is an equivalence.
 \end{xca}
 
 The following result gives a useful characterization of 
@@ -3604,6 +3636,7 @@ identity types of pointed maps, extending \cref{def:funext}.
 \begin{construction}\label{con:identity-ptd-maps}
 Let $X$ and $Y$ be pointed types and
 $f,g: X\ptdto Y$ pointed maps from $X$ to $Y$.
+\glossary(ptw*){$\protect\ptw_*$}{extension of $\protect\ptw$ to pointed maps, \cref{con:identity-ptd-maps}}
 Then we have an equivalence $\ptw_*$ of type 
 \[
 (f\eqto g) \equivto
@@ -3622,7 +3655,7 @@ chain of known equivalences:
                                 \&\& f_\div(\pt_X) \ar[d,eqr,"h(\pt_X)"] \\
   \pt_Y\ar[urr,eqr,"f_\pt"] \ar[rr,eql,"g_\pt"']\&\& g_\div(\pt_X) 
   \end{tikzcd}
-  \caption{Transport in $T$ \MB{font}} 
+  \caption{Transport in $T$.} 
 \end{marginfigure}
 \begin{align*}
 (f\eqto g) &\equivto 
@@ -3644,6 +3677,44 @@ Here (*) uses pointwise transport from \cref{xca:trp-in-y=_(x)},
  \] 
 and (**) uses that $\ptw$ is an equivalence.
 \end{implementation}
+
+\begin{xca}\label{xca:identity-ptd-maps}
+Implement the function $\ptw_*$ by induction on $f\eqto g$.
+(You would then still have to prove that it is an equivalence.)
+\end{xca}
+
+\begin{xca}\label{xca:filler-ptd-sum-of-fibers}\wip{New: }
+Given pointed types $X,Y$, and a pointed map $f: X \ptdto Y$,
+recall \cref{lem:sum-of-fibers} for the equivalence
+$e: (\sum_{y:Y} \inv f(y)) \equivto X$. With $\sum_{y:Y} \inv f(y)$
+pointed at $(\pt_Y,(\pt_X,f_\pt))$ we point $e$ by reflexivity.
+We also have $\fst: (\sum_{y:Y} \inv f(y)) \equivto Y$ pointed
+by reflexivity. Identify $\fst$ and $fe$ as pointed maps.\footnote{%
+This identification is a filler of the following diagram
+of pointed maps: %(see \cref{rem:diagram}) 
+\[\begin{tikzcd}[column sep=large,ampersand replacement=\&]
+    \sum_{y:Y} \inv f(y) \ar[r,equivr,"e"] \ar[d,"{\fst}"'] \& 
+    X \ar[dl,"f"]\\
+    Y 
+  \end{tikzcd}
+\]}
+\end{xca}
+
+\begin{xca}\label{xca:ptd-equiv-inv}\wip{New: }
+Given pointed types $X,Y$, and a pointed equivalence
+$f: X \ptdweto Y$, we define $\inv f: Y \ptdweto X$
+as the (unpointed) inverse equivalence of $f$, pointed
+by the data included in $f$, \ie
+%NB $\inv f_\pt$ versus $(\inv f)_\pt$!}
+\[
+(\inv f)_\pt \defeq \inv{\bigl(\ptw(h)(\pt_X)\cdot\inv f(f_\pt)\bigr)} :
+ \bigl(\pt_X\eqto\inv f(\pt_Y)\bigr),
+\]
+where $h: \inv f f \eqto \id_X$.
+Give identifications of $\inv f f$ with $(\id_X,\refl{\pt_X})$ and of
+$f\inv f$ with $(\id_Y,\refl{\pt_Y})$.
+Hint: See Theorem~4.2.3 of the HoTT Book.\footcite{hottbook}
+\end{xca}
 
 \section{Operations that produce sets}
  \label{sec:operations-on-sets}
@@ -3819,6 +3890,25 @@ constructor $\trunc{t}_{-2}\defeq\triv$.
   \]
   Prove that $A$ is connected iff $\Trunc{A}_0$ is contractible.
 \end{xca}
+
+\begin{xca}\label{xca:subset-of-set-trunc}\wip{New: } 
+Let $A$ be a type and $P:\setTrunc{A}\to\Prop$ a subset of
+its set truncation. Give an 
+equivalence from $\setTrunc{\sum_{a:A}P(\settrunc{a})}$ to
+$\sum_{b:\setTrunc{A}}P(b)$.
+\end{xca}
+\DELETE{Solution: $(a,p) \mapsto (\settrunc{a},p)$ defines a map $e$ 
+with $e(\settrunc{(a,p)})\jdeq(\settrunc{a},p)$. 
+We show that all fibers
+of $e$ are contractible. Let $(b,p):\sum_{b:\setTrunc{A}}P(b)$. Then 
+$\inv e(b,p)\jdeq \sum_{c:\setTrunc{\sum_{a:A}P(\settrunc{a})}}((b,p)=e(c))$.
+For proving that this fiber is a proposition, consider
+$c\jdeq\settrunc{(a,p)}$ and $c'\jdeq\settrunc{(a',p')}$ with 
+$(b,p)=e(c)=e(c')$, so $(\settrunc{a},p)=(\settrunc{a'},p')$,
+so $\Trunc{a\eqto a'}$. It follows that $c=c'$ and hence $\inv e(b,p)$
+is a proposition. For proving $\inv e(b,p)$ we may take $b\jdeq\settrunc{a}$
+for some $a:A$, and then for $c\defeq\settrunc{(a,p)}$ we have $e(c)\jdeq(b,p)$.}
+
 
 \subsection{Weakly constant maps}
 
@@ -4105,25 +4195,18 @@ $f(\trunc{x}_0)\jdeq g(x)$ for all $x:A$, as desired.\footnote{%
 Let $A$ and $B$ be types and $f:A\to B$ a function.
 Consider the \emph{equivalence relation on $A$ induced by} $f$ 
 \index{equivalence relation!induced by map}
-given by 
+given by\footnote{%
+If $f$ is injective, then $\ap{f}$ is an equivalence by \cref{lem:inj-ap}, 
+so that $A/{\eq_f}$ is essentially given by \cref{rem:set-trunc-as-quotient}.} 
 \[
-(a\mapsto(a'\mapsto\Trunc{f(a)\eqto f(a')})) : A\to (A\to\Prop).
+{\eq_f} \defeq (a\mapsto(a'\mapsto\Trunc{f(a)\eqto f(a')})) : 
+A\to (A\to\Prop).
 \]
-The corresponding \emph{quotient of $A$ induced by} $f$ is denoted by $A/f$.
-\index{quotient!induced by map}
-\glossary[A/f]{$A/f$}{quotient induced by $f:A\to B$}
-Now:
-\begin{enumerate}
-\item\label{it:inj-ind-settrunc=domain}
-If $f$ is injective, give an equivalence from $A/f$ to $\setTrunc{A}$;
-%If $f$ is injective, then $\ap{f}$ is an equivalence, 
-%so we can take $f\jdeq\id$ and \cref{rem:set-trunc-as-quotient} applies.
-\item\label{it:surj-ind-quot=codomain}
-If $B$ is a set and $f$ surjective, give an equivalence from $A/f$ to $B$.
-\qedhere
-%By the induction principle for quotients, $f$ factors through $A/f$
-%with a $g$ such that $g([a])\jdeq f(a)$, which is surjective and injective.
-\end{enumerate}
+Let the quotient set $A/{\eq_f}$ be defined as in \cref{def:quotient-set}.
+Show that the map $(\settrunc\blank \circ p) : A\to\setTrunc{\im(f)}$,
+with $p$ from \cref{xca:unique-fact-image}, induces a unique 
+equivalence $e_f:A/{\eq_f}\to\setTrunc{\im(f)}$ 
+with $\settrunc{\blank}\circ p = e_f\circ[\blank]$.
 \end{xca}
 
 \section{More on natural numbers}

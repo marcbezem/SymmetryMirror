@@ -549,7 +549,7 @@ then $f$ is a \covering. Hint: apply \cref{cor:fib-vs-path} to
 $\ap{g}: (b\eqto f(a))\to(g(b)\eqto g(f(a)))$.
 \item If $A$ is connected, $a\eqto_A a$ is connected for some $a:A$,
 $B$ is a groupoid, and $f: A\to B$ is a \covering, then $A$ is contractible.
-Hint: use \cref{cor:fib-vs-path} and \cref{xca:connected-trivia-2}.
+Hint: use \cref{cor:fib-vs-path} and \cref{xca:connected-trivia}.
 \item \label{it:cover-n-type}
 If $f: A\to B$ is a \covering and $B$ is an $n$-type with $n\geq 0$,
 then $A$ is also an $n$-type.\qedhere
@@ -930,7 +930,7 @@ with $\Sloop^{-1}$.\marginnote{%
   It follows directly that \emph{addition} of integers corresponds
   to \emph{composition} of loops.}
 
-The first step is to identify the exponential \covering \cref{def:RtoS1}
+The first step is to identify the exponential \covering in \cref{def:RtoS1}
 with the universal \covering in \cref{def:universalcover},
 \ie identify the type family
 \[
@@ -1545,14 +1545,14 @@ Since $\bn 1$ is contractible, this just amounts to the identity type
 $\base\eqto z$, and $\sum_{z:\Sc}(\base\eqto z)$ is indeed contractible.
 
 \begin{xca}\label{xca:TTYoneda}
-This exercise is about results that go by the name "the type-theoretic
-Yoneda Lemma". See the book by Riehl\footcite{RiehlContext} 
+This exercise is about results that go by the name ``the type-theoretic
+Yoneda Lemma.'' See the book by Riehl\footcite{RiehlContext}
 for the Yoneda lemma in category theory.
 
 Let $X$ be a type and $F: X\to\UU$ a function. Use transport
-to give an equivalence $e_x$ from the type $F(x)$ to the type 
-$\prod_{y:X} ((x\eqto y) \to F(y))$, for any $x:X$. 
-The functions $(x\eqto y) \to F(y)$ 
+to give an equivalence $e_x$ from the type $F(x)$ to the type
+$\prod_{y:X} ((x\eqto y) \to F(y))$, for any $x:X$.
+The functions $(x\eqto y) \to F(y)$
 thus obtained need not be equivalences, but sometimes they are.
 
 Next, for $X:\UU$, show that the map sending
@@ -1801,7 +1801,7 @@ Eventually we'll show -- assuming a weak form
 of the Law of the Excluded Middle -- that these (with the universal \covering)
 are all the decidable connected \coverings over the circle.
 
-\begin{definition}\label{def:mfoldS1cover}\index{degree!function}\index{function!degree $m$}
+\begin{definition}\label{def:dgm-map}\index{degree!function}\index{function!degree $m$}
 For $m:\NN$ positive, define the \emph{degree $m$ function} by circle induction
 \[
 \dg{m}:\Sc\to \Sc, \text{~~setting~}
@@ -1851,7 +1851,7 @@ we will now define the \covering $R_m$ corresponding to
 standard finite $m$-element cycle.
 
 \begin{definition}\label{def:RmtoS1}
-  Fix $m:\NN$ positive. Define the \covering $R_m : \Sc\to\Set$
+  Fix $m:\NN$ positive. Define the ($m$-fold) \covering $R_m : \Sc\to\Set$
   by $R_m(\base) \defeq \bn m$ and
   $R_m(\Sloop) \defis \etop\zs$.  Recall
   $\Tot(R_m)\jdeq\sum_{z:\Sc}R_m(z)$ and point $\Tot(R_m)$
@@ -2848,7 +2848,7 @@ In particular, this holds for the standard infinite cycle $(\zet,\zs):\Cyc_0$
 and the standard $n$-cycle $(\bn n,\zs):\Cyc_n$.
 
 Why does $\cdg{m}:\Cyc_0\to\Cyc_0$
-correspond to the $m$-fold \covering we defined in \cref{def:mfoldS1cover}?
+correspond to the $m$-fold \covering we defined in \cref{def:dgm-map}?
 Recall the equivalence $c:\Sc\to C$ from \cref{def:S1toC}.
 For the two $m$-fold \coverings to correspond under this equivalence
 we need an element in the identity type represented by
@@ -3166,7 +3166,10 @@ can go through $B$ and be identified with $f \eqto \id_B f$.}
 The map $i$ is $n$-truncated, because, for any $b:B$,
 the fiber $\inv i (b)$ is equivalent to $\Trunc{\inv f (b)}_n$.
 Furthermore, by \cref{lem:sum-of-fibers} and the following lemma,
-$p$ is $n$-connected.
+$p$ is $n$-connected.\footnote{For $T:B\to\UU$ and $p'$ a map sending
+$(b,t):\sum_{b:B}T(b)$ to $(b,\trunc{t}_n)$, the fiber of $p'$ at
+any $(b,t'):\sum_{b:B}\Trunc{T(b)}_n$ is equivalent to the
+fiber of $\trunc{\blank}_n$ at $t'$, by \cref{lem:contract-away}.}
 
 \begin{lemma}\label{lem:trunc-n-connected}
 For every type $A$, the constructor $\trunc{\blank}_n : A\to \Trunc{A}_n$
@@ -3221,7 +3224,7 @@ In particular, prove that $e$ is a fiberwise equivalence.
 Alternatively, construct your own $e$ by using \cref{cor:contract-away} (twice!).
 \end{xca}
 
-\begin{xca}\label{xca:pullout-base-type}
+\begin{xca}\label{xca:trunc-sum-type+fam}
 Let $X$ be a type and let $Y(x)$ be a type for all $x:X$.
 Construct an equivalence between
 $\Trunc{\sum_{x:X} Y(x)}_n$ and $\Trunc{\sum_{x:X} \Trunc{Y(x)}_n}_n$.
@@ -3347,7 +3350,7 @@ Now let $b:B$. We have $\Trunc{R(b)}_n \jdeq \Trunc{\sum_{y:P(b)} Q(b,y)}_n$.
 Since $P(b)$ is an $n$-type by assumption, we have the canonical equivalence
 of type $\Trunc{\sum_{y:P(b)} Q(b,y)}_n\to\sum_{y:P(b)}\Trunc{Q(b,y)}_n$ defined
 by mapping $\trunc{(y,q)}_n$ to $(y,\trunc{q}_n)$
-(\cf \cref{xca:pullout-base-type}).
+(\cf \cref{xca:trunc-sum-type+fam}).
 Since $Q(y,b)$ is $n$-connected for each $y:P(b)$ by assumption,
 so that $\Trunc{Q(b,y)}_n$ is contractible,
 we also have the canonical equivalence
@@ -3362,9 +3365,9 @@ $e_b \trunc{\blank}_n \jdeq \fst$ for the left triangle,
 and the right triangle commutes trivially.
 \end{proof}
 
-\begin{xca}\label{xca:im_preserves_coh}
-Let $A$ be a coherent type, $B$ a type, and $f:A\to B$ a function.
-Then all $n$-images of $f$ ($n\geq-2$) are coherent.
+\begin{xca}\label{xca:im_preserves_conn}
+Let $A$ be a connected type, $B$ a type, and $f:A\to B$ a function.
+Then all $n$-images of $f$ ($n\geq-1$) are connected.
 \end{xca}
 
 For the rest of this section, fix some natural number $m>0$. As for our
