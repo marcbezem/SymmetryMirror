@@ -1,0 +1,5 @@
+-R . SymmetryMirror
+-arg -noinit
+-arg -indices-matter
+
+IntroUF.v
