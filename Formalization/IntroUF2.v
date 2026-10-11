@@ -583,7 +583,7 @@ Section IdentifyingPairs.
   (** [fst(pair^=(p,q)) = p], [snd(pair^=(p,q)) = q] (combined in
       [pathsplit_pathpair] above), and [r = pair^=(fst(r), snd(r))]
       (this is [pathpair_pathsplit]). *)
-  Definition ap_pr1_pathpair {x x' : X} {y : Y x} {y' : Y x'}
+  Definition ap_fst_pathpair {x x' : X} {y : Y x} {y' : Y x'}
     (p : x = x') (q : PathOver Y p y y')
     : ap fst (pathpair p q) = p.
   Proof. destruct p. cbn in q. destruct q. exact refl. Defined.
