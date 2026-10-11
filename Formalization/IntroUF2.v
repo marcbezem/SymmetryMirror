@@ -799,3 +799,24 @@ Proof.
   - exact idpath.
   - exact (ap (cons x) IH).
 Defined.
+
+(** ** Summary of this formalization
+
+I've formalized §§2.7–2.12 in a new file, [Formalization/IntroUF2.v], which builds on [IntroUF.v] and is added to [_CoqProject]. It compiles cleanly. [Print Assumptions] shows that only the function-extensionality results depend on Coq-HoTT's [Funext] axiom. The other results I checked use no axioms.
+
+How the definitions follow the book
+- Book definitions are kept literally: [PathOver] (the type of paths over [p], defined by path induction), [iscontr], [fiber f y := Σ x, (y = f x)], [isEq], and the type of equivalences [X ≃ Y].
+- Cases where the book cites the HoTT Book for a proof: these are the converse direction of [lem:weq-iso] and [lem:fiberwise-equiv-from-tot] (Thm 4.7.7). For these I use Coq-HoTT's [isequiv_adjointify] and [isequiv_from_functor_sigma], via conversion lemmas in both directions between the book's [isEq] and Coq-HoTT's [IsEquiv].
+- Function extensionality: it is the book's principle that [ptw] is an equivalence, derived from Coq-HoTT's [Funext] axiom. Only the exercises that need it assume it: substitute-away, [(𝟙 → X) ≃ X], and the universal properties of 𝟙, Bool-indexed products and binary sums.
+- Sums: Coq-HoTT's Σ-types have definitional η. As a result, AC-in-TT, currying, Σ-associativity, Σ-commutation and Σ-distributivity are equivalences whose round trips hold by definition.
+- Binary product: [X × Y] is the Σ-type over a constant family, as in the book. I also show it is equivalent to Coq-HoTT's built-in product type.
+
+Where the formalization differs from the text
+- Exercise [xca:cp]: I stated and proved four laws for paths over paths: left unit, right unit, inverse, and double inverse. Where the paths underneath are only propositionally equal, the law is stated by transporting along the corresponding law from §2.5.
+- [snd(pair⁼(p,q)) = q]: taken literally, the two sides have different types. I state it together with the [fst] part as [Ψ(pair⁼(p,q)) = (p,q)], where [Ψ] is the inverse map from the proof of [lem:isEq-pair=].
+- [lem:isEq-pair-bin=]: [q : y = y'] isn't definitionally a path over [p]. So the map converts [q] with [po_const], and its equivalence is a composite of [tot] (totalization) and the result for general pairs.
+- Exercise [xca:binary-sum-id]: I used the encode–decode method rather than the route the book suggests.
+- Exercise [xca:sum-equiv-base]: this uses Coq-HoTT's [equiv_functor_sigma_pb], because a direct proof needs half-adjoint coherence, which the book hasn't introduced yet.
+- Footnote proof of contract-away: I left this alternative proof out; the main proof is formalized.
+
+Usage note: a file that imports [IntroUF2] should import [HoTT.Basics] first, or Rocq reports a notation-level conflict. *)

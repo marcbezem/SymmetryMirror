@@ -389,3 +389,24 @@ Definition ns {X Y : Type} {f g : X -> Y} (h : forall x, f x = g x)
   {x x' : X} (p : x = x')
   : h x' ⋅ ap' f p = ap' g p ⋅ h x
   := match p with idpath => trans_1p (h x) end.
+
+(** ** Summary of this formalization
+
+I've formalized §§2.2–2.6 in [Formalization/IntroUF.v]. It compiles with [coqc -noinit -indices-matter] against the installed Coq-HoTT and uses no axioms: [Print Assumptions] reports "Closed under the global context" for the results I checked. The only place function extensionality appears is the funext remark in §2.6, which assumes HoTT's [Funext] but is never used.
+
+How the three conventions are handled
+1. Path composition order: [trans p q] is defined by induction on [q], as in the book, so [p ∙ refl ≡ p] holds by definition. The notation [q ⋅ p] puts the paths in function-composition order. HoTT's own [concat] ([@]) recurses on both arguments, so I show [q ⋅ p = p @ q] as a lemma.
+2. [y = f(x)] for pointing paths and fibers: neither comes up in these sections, so this file doesn't use it.
+3. [ptw]: it's defined for dependent functions, with [ptw (refl f) ≡ x ↦ refl (f x)]. I also show it can be identified with HoTT's [apD10] and with the footnote's [ap (ev x)] version.
+
+What's covered, by section
+- 2.2: [cst], composition, [id], and associativity and both unit laws holding by definition (checked as [idpath]).
+- 2.3: the universe hierarchy and cumulativity, [nat : Type0], and the correspondence between families of types and functions into a universe.
+- 2.4: rule (P4) as [ind_N], with both computation rules holding by definition. It also has recursion, iteration, and the book's [add] (by induction on the second argument), [mul] and [fact]. [2+2 ≡ 4] and [fact 3 ≡ 6] hold by definition. The alternative definitions of addition and multiplication via iteration are proved equal to the originals.
+- 2.5: rule (E3) as [path_ind], plus [symm], [trans] and all six parts of the path-groupoid-laws exercise; powers [p ^^ n] with [p^(n+1) :≡ p · p^n], and negative powers; [trp] (transport), and both transport exercises, proved by path induction without funext; the transport of structure example for [T(x) :≡ (x = x)], with the added fact (not stated in the text) that this transport is conjugation.
+- 2.6: [ap'], which is [ap] from the book; all three parts of the construction [lem:apcomp]; the exercise [xca:trp-ap]; [ptw] and the funext remark (via HoTT's [path_forall]); the naturality square [ns(h,p)], built from the left unit law as the book says.
+
+Things that differ from the text
+- The informal examples about reals and polygons are left out, since the library has nothing to state them with.
+- Coq-HoTT reserves [⋅] without associativity, so iterated compositions need parentheses.
+- Numerals sometimes need [%nat], because they otherwise default to the library's truncation levels. *)
