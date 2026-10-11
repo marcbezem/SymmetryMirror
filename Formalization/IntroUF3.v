@@ -1,14 +1,71 @@
 (** * Formalization of Sections 2.13 - 2.15 of [intro-uf.tex]
 
+    ** Summary of this formalization
+
+    Sections 2.13 - 2.15 are formalized in this file, which builds on
+    [IntroUF.v] and [IntroUF2.v].  It compiles.  [Print Assumptions]
+    shows that the only axiom used is Coq-HoTT's [Funext], and only by
+    the results that need it.  The exception is the derivation of the
+    book's univalence axiom, which uses the library's [Univalence], as
+    intended.
+
+    Book notions defined from Coq-HoTT notions: [neg := not] (notation
+    [¬]); [ptoe p] is [trp] in the identity family, and the library's
+    [negb] is the swap of [Bool].  Own definitions, because the library's
+    notions differ: [isProp P :≡ ∏_{a,b:P} (a = b)], [isSet], [isGrpd]
+    and [is_ntype n] (the library's [IsHProp], [IsHSet], [IsTrunc] are
+    defined via contractibility), inequality [≠], [idtoeqv] into the
+    book's type [≃] of equivalences, and the class [UnivalenceUF].
+
+    2.13 Univalence
+    - The book's axiom is a class [UnivalenceUF := ∀ X Y, isEquiv idtoeqv].
+      Its inverse is [etop] (the book's [f̄]).  The four identifications
+      listed in the text are proved: [etop (ptoe p) = p] and
+      [ptoe (etop f) = f]; [etop id = refl]; [etop (g f) = etop g · etop f].
+    - Exercise [xca:C2]: every [p : Bool = Bool] is either [refl] or
+      [swap], [refl ≠ swap], and [swap · swap = refl].
+    - At the end of the file an instance of [UnivalenceUF] is derived
+      from Coq-HoTT's [Univalence].  This needs the fact that
+      [isEquiv f] is a proposition, which the book only proves in 2.15;
+      a short preliminary obtains it from the library.
+
+    2.14 Heavy transport
+    - Transport in function-type families, and its univalence special
+      case: transport along [etop g] gives [g ∘ f ∘ g⁻¹].
+    - Transport in [f x = g x] and its four special cases (the last is
+      conjugation), plus the dependent version stated with [po_e(apd …)].
+    - [trptw] (pointwise transport).
+    - Dan's lemma, formalized literally as written:
+      [(f(x) =^Y_p f(x')) ≃ (f(x) = f(x))].  The right-hand side and the
+      [e]/[p] mix-up in the statement look like typos in the source.
+
+    2.15 Propositions, sets and groupoids
+    - [isProp], [isSet], [isGrpd], [is_ntype n] (for n ≥ 0), [¬], [≠].
+    - Every proposition is a set, following the book's argument.
+    - [Bool] is a set, via Simon Huber's proof.
+    - All six parts of [lem:prop-utils], plus the fact that [True ⨿ True]
+      is not a proposition.
+    - [lem:level-n-utils], which the book states without proof, by
+      comparing [is_ntype] with Coq-HoTT's [IsTrunc].
+    - [isContr], [isProp], [isSet], [isGrpd], [is_ntype n] and
+      [isEquiv f] are all propositions; the [isContr] case follows the
+      book's proof.
+    - A type is a proposition exactly when all its identity types are
+      contractible.
+    - The diagrams remark has no formal content, so it is only a comment.
+
+    ** Conventions
+
     Continuation of [IntroUF.v] and [IntroUF2.v], with the same
-    conventions (path composition [q ⋅ p :≡ p ∙ q], fibers with
-    [y = f x], and [ptw] for Book HoTT's [happly]).
+    conventions: path composition [q ⋅ p :≡ p ∙ q], fibers with
+    [y = f x], and notions that occur definitionally in Coq-HoTT defined
+    from the library notion and used under the book's name.
 
     The univalence axiom is stated as in the book, as a class
-    [UnivalenceUF] postulating [isEq(p ↦ ptoe p)].  At the end of the
+    [UnivalenceUF] postulating [isEquiv(p ↦ ptoe p)].  At the end of the
     file we derive an instance from Coq-HoTT's axiom [Univalence].
     As in [IntroUF2.v], function extensionality is used through the
-    book's principle [funext : isEq(ptw)], derived from Coq-HoTT's
+    book's principle [funext : isEquiv(ptw)], derived from Coq-HoTT's
     [Funext], and only where needed. *)
 
 From HoTT Require Import Basics Types.Sigma Types.Equiv Types.Bool
@@ -20,29 +77,29 @@ Local Open Scope uf_scope.
 (** ** Preliminaries: identifying equivalences
 
     Two equivalences can be identified as soon as their underlying
-    functions can, because [isEq(f)] is a proposition (shown in the book
-    in 2.15, see [isEq_isprop] below).  Here we obtain it from the
+    functions can, because [isEquiv(f)] is a proposition (shown in the book
+    in 2.15, see [isEquiv_isProp] below).  Here we obtain it from the
     library, so that 2.13 can be presented before 2.15. *)
 
-(** [iscontr(X)] is a retract of Coq-HoTT's [Contr X], which is an
+(** [isContr(X)] is a retract of Coq-HoTT's [Contr X], which is an
     h-proposition. *)
-Instance ishprop_iscontr `{Funext} (X : Type) : IsHProp (iscontr X).
+Instance ishprop_isContr `{Funext} (X : Type) : IsHProp (isContr X).
 Proof.
   apply hprop_allpath. intros a b.
-  exact (ap (fun C : Contr X => (center X; contr) : iscontr X)
-            (path_ishprop (Build_Contr _ (pr1 a) (pr2 a))
-                          (Build_Contr _ (pr1 b) (pr2 b)))).
+  exact (ap (fun C : Contr X => (center X; contr) : isContr X)
+            (path_ishprop (Build_Contr _ (fst a) (snd a))
+                          (Build_Contr _ (fst b) (snd b)))).
 Defined.
 
-Instance ishprop_isEq `{Funext} {X Y : Type} (f : X -> Y)
-  : IsHProp (isEq f)
+Instance ishprop_isEquiv `{Funext} {X Y : Type} (f : X -> Y)
+  : IsHProp (isEquiv f)
   := istrunc_forall.
 
 Definition path_Eqv `{Funext} {X Y : Type} (e e' : X ≃ Y)
-  : pr1 e = pr1 e' -> e = e'
+  : fst e = fst e' -> e = e'
   := path_sigma_hprop e e'.
 
-Definition idEqv (X : Type) : X ≃ X := (id X; id_isEq X).
+Definition idEqv (X : Type) : X ≃ X := (id X; id_isEquiv X).
 
 (** ** 2.13 Univalence *)
 
@@ -51,13 +108,13 @@ Definition ptoe {X Y : Type} (p : X = Y) : X -> Y
   := trp (fun T : Type => T) p.
 
 Definition idtoeqv {X Y : Type} (p : X = Y) : X ≃ Y
-  := (ptoe p; trp_isEq (fun T : Type => T) p).
+  := (ptoe p; trp_isEquiv (fun T : Type => T) p).
 
-Definition idtoeqv_refl (X : Type) : idtoeqv (idpath X) = idEqv X := idpath.
+Definition idtoeqv_refl (X : Type) : idtoeqv (refl X) = idEqv X := refl.
 
 (** Principle [def:univalence]: the univalence axiom postulates
-    [ua_{X,Y} : isEq(p ↦ ptoe p)]. *)
-Class UnivalenceUF := ua : forall X Y : Type, isEq (@idtoeqv X Y).
+    [ua_{X,Y} : isEquiv(p ↦ ptoe p)]. *)
+Class UnivalenceUF := ua : forall X Y : Type, isEquiv (@idtoeqv X Y).
 
 Section Univalence.
 
@@ -72,8 +129,8 @@ Section Univalence.
   Definition ptoe_etop {X Y : Type} (f : X ≃ Y) : idtoeqv (etop f) = f
     := eqinv_r (ua X Y) f.
 
-  Definition etop_id (X : Type) : etop (idEqv X) = idpath
-    := etop_ptoe idpath.
+  Definition etop_id (X : Type) : etop (idEqv X) = refl
+    := etop_ptoe refl.
 
   Context `{Funext}.
 
@@ -94,22 +151,22 @@ Section Univalence.
   Defined.
 
   (** Exercise [xca:C2]. *)
-  Definition negb_isEq : isEq negb
-    := iso_to_isEq negb negb (fun b => match b with yes | no => idpath end)
-         (fun b => match b with yes | no => idpath end).
+  Definition negb_isEquiv : isEquiv negb
+    := iso_to_isEquiv negb negb (fun b => match b with yes | no => refl end)
+         (fun b => match b with yes | no => refl end).
 
-  Definition swapEqv : Bool ≃ Bool := (negb; negb_isEq).
+  Definition swapEqv : Bool ≃ Bool := (negb; negb_isEquiv).
 
   Definition swap : Bool = Bool :> Type := etop swapEqv.
 
   (** Every equivalence [Bool -> Bool] is the identity or [negb]. *)
-  Definition bool_eqv_cases (f : Bool -> Bool) (t : isEq f)
+  Definition bool_eqv_cases (f : Bool -> Bool) (t : isEquiv f)
     : (f = id Bool) + (f = negb).
   Proof.
     assert (inj : forall b b', f b = f b' -> b = b').
     { intros b b' e. exact ((eqinv_l t b)^ @ ap (eqinv t) e @ eqinv_l t b'). }
     enough (G : forall b1 b2, f yes = b1 -> f no = b2 -> (f = id Bool) + (f = negb))
-      by exact (G _ _ idpath idpath).
+      by exact (G _ _ refl refl).
     intros [] [] e1 e2.
     - destruct (yes_ne_no (inj _ _ (e1 @ e2^))).
     - left. apply ptw_inv. intros []; assumption.
@@ -119,9 +176,9 @@ Section Univalence.
 
   (** [Bool = Bool] has exactly two elements: [refl] and [swap]. *)
   Definition Bool_paths_cases (p : Bool = Bool :> Type)
-    : (p = idpath) + (p = swap).
+    : (p = refl) + (p = swap).
   Proof.
-    destruct (bool_eqv_cases (ptoe p) (pr2 (idtoeqv p))) as [e|e].
+    destruct (bool_eqv_cases (ptoe p) (snd (idtoeqv p))) as [e|e].
     - left.
       exact ((etop_ptoe p)^ @ ap etop (path_Eqv (idtoeqv p) (idEqv Bool) e)
              @ etop_id Bool).
@@ -129,17 +186,17 @@ Section Univalence.
       exact ((etop_ptoe p)^ @ ap etop (path_Eqv (idtoeqv p) swapEqv e)).
   Defined.
 
-  Definition refl_ne_swap : (idpath (Bool : Type) = swap) -> Empty.
+  Definition refl_ne_swap : (refl (Bool : Type) = swap) -> False.
   Proof.
     intro e.
-    pose (e' := ap (fun p => pr1 (idtoeqv p)) e @ ap pr1 (ptoe_etop swapEqv)).
+    pose (e' := ap (fun p => fst (idtoeqv p)) e @ ap fst (ptoe_etop swapEqv)).
     exact (yes_ne_no (ptw e' yes)).
   Defined.
 
-  Definition swap_swap : swap ⋅ swap = idpath.
+  Definition swap_swap : swap ⋅ swap = refl.
   Proof.
     refine ((etop_comp swapEqv swapEqv)^ @ _ @ etop_id Bool).
-    apply ap, path_Eqv, ptw_inv. intros []; exact idpath.
+    apply ap, path_Eqv, ptw_inv. intros []; exact refl.
   Defined.
 
 End Univalence.
@@ -154,37 +211,37 @@ Definition fun_family {X : Type} (Y Z : X -> Type) : X -> Type
 Definition trp_fun {X : Type} {Y Z : X -> Type} {x x' : X} (e : x = x')
   (f : Y x -> Z x) (y' : Y x')
   : trp (fun_family Y Z) e f y' = trp Z e (f (trp Y e⁻¹ y')).
-Proof. destruct e. exact idpath. Defined.
+Proof. destruct e. exact refl. Defined.
 
 (** The special case [Y :≡ Z :≡ id_U] with a path coming from univalence:
     [trp^{X ↦ (X → X)}_{etop g}(f) = g ∘ f ∘ g⁻¹]. *)
 Definition trp_trp_inv {A B : Type} (p : A = B) (b : B)
   : ptoe p (trp (fun T : Type => T) p⁻¹ b) = b.
-Proof. destruct p. exact idpath. Defined.
+Proof. destruct p. exact refl. Defined.
 
 Definition trp_endo_gen `{Funext} {A B : Type} (p : A = B) (g : A ≃ B)
-  (h : ptoe p = pr1 g) (f : A -> A)
-  : trp (fun X : Type => X -> X) p f = comp (pr1 g) (comp f (eqinv (pr2 g))).
+  (h : ptoe p = fst g) (f : A -> A)
+  : trp (fun X : Type => X -> X) p f = comp (fst g) (comp f (eqinv (snd g))).
 Proof.
   apply ptw_inv. intro b.
   refine (trp_fun (Y := fun T : Type => T) (Z := fun T : Type => T) p f b @ _).
   unfold comp.
-  refine (ptw h _ @ ap (fun a => pr1 g (f a)) _).
-  refine ((eqinv_l (pr2 g) _)^ @ ap (eqinv (pr2 g)) _).
+  refine (ptw h _ @ ap (fun a => fst g (f a)) _).
+  refine ((eqinv_l (snd g) _)^ @ ap (eqinv (snd g)) _).
   exact ((ptw h _)^ @ trp_trp_inv p b).
 Defined.
 
 Definition trp_endo_ua `{UnivalenceUF} `{Funext} {A B : Type} (g : A ≃ B)
   (f : A -> A)
   : trp (fun X : Type => X -> X) (etop g) f
-    = comp (pr1 g) (comp f (eqinv (pr2 g)))
-  := trp_endo_gen (etop g) g (ap pr1 (ptoe_etop g)) f.
+    = comp (fst g) (comp f (eqinv (snd g)))
+  := trp_endo_gen (etop g) g (ap fst (ptoe_etop g)) f.
 
 (** Construction [lem:trp-in-fx=Ygx]:
     [trp^Z_e(i) = ap_g(e) · i · ap_f(e)⁻¹], where [Z(x) :≡ (f(x) = g(x))]. *)
 Definition trp_paths_fg {X Y : Type} (f g : X -> Y) {x x' : X} (e : x = x')
   (i : f x = g x)
-  : trp (fun x => f x = g x) e i = (ap' g e ⋅ i) ⋅ (ap' f e)⁻¹.
+  : trp (fun x => f x = g x) e i = (ap g e ⋅ i) ⋅ (ap f e)⁻¹.
 Proof. destruct e. exact (trans_1p i)^. Defined.
 
 (** Exercise [xca:trp-in-a/x=b/x]. *)
@@ -193,10 +250,10 @@ Section TrpInPaths.
   Context {X : Type} (a b : X) {x x' : X} (e : x = x').
 
   Definition trp_paths_const (i : a = b) : trp (fun _ => a = b) e i = i.
-  Proof. destruct e. exact idpath. Defined.
+  Proof. destruct e. exact refl. Defined.
 
   Definition trp_paths_l (i : a = x) : trp (fun x => a = x) e i = e ⋅ i.
-  Proof. destruct e. exact idpath. Defined.
+  Proof. destruct e. exact refl. Defined.
 
   Definition trp_paths_r (i : x = b) : trp (fun x => x = b) e i = i ⋅ e⁻¹.
   Proof. destruct e. exact (trans_1p i)^. Defined.
@@ -217,10 +274,10 @@ Definition po_to_trp {X : Type} {Y : X -> Type} {x x' : X} {p : x = x'}
 Definition trp_paths_dep {X : Type} {Y : X -> Type} (f g : forall x, Y x)
   {x x' : X} (e : x = x') (i : f x = g x)
   : trp (fun x => f x = g x) e i
-    = (po_to_trp (apd' g e) ⋅ ap' (trp Y e) i) ⋅ (po_to_trp (apd' f e))⁻¹.
+    = (po_to_trp (apd g e) ⋅ ap (trp Y e) i) ⋅ (po_to_trp (apd f e))⁻¹.
 Proof.
   destruct e. cbn.
-  exact ((ap_id i)^ @ (trans_1p (ap' (id (Y x)) i))^).
+  exact ((ap_id i)^ @ (trans_1p (ap (id (Y x)) i))^).
 Defined.
 
 (** Definition [def:Dan's-lemma], stated literally as in the text:
@@ -234,27 +291,28 @@ Proof. destruct p. exact (idEqv _). Defined.
 Definition trptw {X Y : Type} {x : X} {y : Y} {f g : X -> Y} (e : f = g)
   (p : y = f x)
   : trp (fun h : X -> Y => y = h x) e p = ptw e x ⋅ p.
-Proof. destruct e. exact idpath. Defined.
+Proof. destruct e. exact refl. Defined.
 
 (** ** 2.15 Propositions, sets and groupoids *)
 
 (** Definition [def:isSet]. *)
-Definition isprop (P : Type) : Type := forall a b : P, a = b.
-Definition isset (S : Type) : Type := forall x y : S, isprop (x = y).
-Definition isgrpd (G : Type) : Type := forall g h : G, isset (g = h).
+Definition isProp (P : Type) : Type := forall a b : P, a = b.
+Definition isSet (S : Type) : Type := forall x y : S, isProp (x = y).
+Definition isGrpd (G : Type) : Type := forall g h : G, isSet (g = h).
 
 (** [n]-types for [n ≥ 0]: [X] is an [(n+1)]-type if all its identity
     types are [n]-types. *)
-Fixpoint is_ntype (n : nat) (X : Type) : Type
+Fixpoint is_ntype (n : ℕ) (X : Type) : Type
   := match n with
-     | O => isset X
+     | O => isSet X
      | S n => forall x y : X, is_ntype n (x = y)
      end.
 
-Definition is_ntype_1 (X : Type) : is_ntype 1 X = isgrpd X := idpath.
+Definition is_ntype_1 (X : Type) : is_ntype 1 X = isGrpd X := refl.
 
-(** Definition [def:neg-eq-ne]: negation and inequality. *)
-Definition neg (P : Type) : Type := P -> Empty.
+(** Definition [def:neg-eq-ne]: negation [¬P :≡ (P -> ∅)], the library's
+    [not], and inequality [a ≠ b :≡ ¬(a = b)]. *)
+Definition neg (P : Type) : Type := not P.
 Notation "¬ P" := (neg P) : uf_scope.
 
 Definition ne {A : Type} (a b : A) : Type := ¬ (a = b).
@@ -263,111 +321,111 @@ Notation "a ≠ b" := (ne a b) (at level 70) : uf_scope.
 Definition yes_ne_no' : yes ≠ no := yes_ne_no.
 
 (** Lemma [lem:prop-is-set]. *)
-Definition prop_is_set {X : Type} (f : isprop X) : isset X.
+Definition prop_is_set {X : Type} (f : isProp X) : isSet X.
 Proof.
   (* [q · f(a,b) = f(a,c)] for [q : b = c], by induction on [q]. *)
   assert (K : forall a b c (q : b = c), q ⋅ f a b = f a c).
-  { intros a b c q. destruct q. exact idpath. }
+  { intros a b c q. destruct q. exact refl. }
   (* Hence [q = f(b,c) · f(b,b)⁻¹], which doesn't depend on [q]. *)
   assert (L : forall b c (q : b = c), q = f b c ⋅ (f b b)⁻¹).
   { intros b c q. destruct q. exact (trans_Vp (f b b))^. }
   intros x y p q. exact (L x y p @ (L x y q)^).
 Defined.
 
-(** Lemma [lem:isset-bool], following Simon Huber's proof. *)
+(** Lemma [lem:isSet-bool], following Simon Huber's proof. *)
 Definition C_bool (b b' : Bool) : b = b' -> Type
   := match b, b' with
-     | yes, yes => fun p => p = idpath
-     | no, no => fun p => p = idpath
-     | _, _ => fun _ => Unit
+     | yes, yes => fun p => p = refl
+     | no, no => fun p => p = refl
+     | _, _ => fun _ => True
      end.
 
 Definition C_bool_all (b b' : Bool) (p : b = b') : C_bool b b' p.
-Proof. destruct p, b; exact idpath. Defined.
+Proof. destruct p, b; exact refl. Defined.
 
-Definition bool_loops_trivial (b : Bool) (p : b = b) : p = idpath.
+Definition bool_loops_trivial (b : Bool) (p : b = b) : p = refl.
 Proof. destruct b; exact (C_bool_all _ _ p). Defined.
 
-Definition isset_bool : isset Bool.
+Definition isSet_bool : isSet Bool.
 Proof. intros b b' p q. destruct q. exact (bool_loops_trivial b p). Defined.
 
 (** Lemma [lem:prop-utils]. *)
 Section PropUtils.
 
-  Definition Empty_isprop : isprop Empty := fun a => match a with end.
+  Definition False_isProp : isProp False := fun a => match a with end.
 
-  Definition Unit_isprop : isprop Unit
-    := fun a b => match a, b with tt, tt => idpath end.
+  Definition True_isProp : isProp True
+    := fun a b => match a, b with triv, triv => refl end.
 
-  Definition Pi_isprop `{Funext} {A : Type} {R : A -> Type}
-    (h : forall a, isprop (R a)) : isprop (forall a, R a)
+  Definition Pi_isProp `{Funext} {A : Type} {R : A -> Type}
+    (h : forall a, isProp (R a)) : isProp (forall a, R a)
     := fun p q => ptw_inv (fun a => h a (p a) (q a)).
 
-  Definition fun_isprop `{Funext} {A P : Type} (h : isprop P)
-    : isprop (A -> P)
-    := Pi_isprop (fun _ => h).
+  Definition fun_isProp `{Funext} {A P : Type} (h : isProp P)
+    : isProp (A -> P)
+    := Pi_isProp (fun _ => h).
 
-  Definition Sigma_isprop {A : Type} {R : A -> Type} (hA : isprop A)
-    (hR : forall a, isprop (R a)) : isprop {a : A & R a}.
+  Definition Sigma_isProp {A : Type} {R : A -> Type} (hA : isProp A)
+    (hR : forall a, isProp (R a)) : isProp {a : A & R a}.
   Proof.
     intros [a1 r1] [a2 r2].
     pose (u := hA a1 a2).
     exact (pathpair u (trp (fun T : Type => T) (po u r1 r2)^ (hR _ _ _))).
   Defined.
 
-  Definition prod_isprop {P Q : Type} (hP : isprop P) (hQ : isprop Q)
-    : isprop (P × Q)
-    := Sigma_isprop hP (fun _ => hQ).
+  Definition prod_isProp {P Q : Type} (hP : isProp P) (hQ : isProp Q)
+    : isProp (P × Q)
+    := Sigma_isProp hP (fun _ => hQ).
 
-  Definition neg_isprop `{Funext} (A : Type) : isprop (¬ A)
-    := fun_isprop Empty_isprop.
+  Definition neg_isProp `{Funext} (A : Type) : isProp (¬ A)
+    := fun_isProp False_isProp.
 
-  Definition lem_isprop `{Funext} {P : Type} (hP : isprop P)
-    : isprop (P ⨿ ¬ P).
+  Definition lem_isProp `{Funext} {P : Type} (hP : isProp P)
+    : isProp (P ⨿ ¬ P).
   Proof.
     intros [p|np] [q|nq].
     - exact (ap inl (hP p q)).
     - destruct (nq p).
     - destruct (np q).
-    - exact (ap inr (neg_isprop P np nq)).
+    - exact (ap inr (neg_isProp P np nq)).
   Defined.
 
 End PropUtils.
 
 (** [𝟙 ⨿ 𝟙] is not a proposition. *)
-Definition unit_plus_unit_not_prop : ¬ isprop (Unit ⨿ Unit)
-  := fun h => inl_ne_inr tt tt (h (inl tt) (inr tt)).
+Definition True_plus_True_not_prop : ¬ isProp (True ⨿ True)
+  := fun h => inl_ne_inr triv triv (h (inl triv) (inr triv)).
 
 (** Lemma [lem:level-n-utils], which the book states without proof.  We
     prove it by comparing [is_ntype] with Coq-HoTT's [IsTrunc]. *)
-Fixpoint tr_nat (n : nat) : trunc_index
+Fixpoint tr_nat (n : ℕ) : trunc_index
   := match n with O => minus_two.+2 | S n => (tr_nat n).+1 end.
 
-Definition isprop_IsHProp {P : Type} : isprop P -> IsHProp P
+Definition isProp_IsHProp {P : Type} : isProp P -> IsHProp P
   := hprop_allpath P.
 
-Definition IsHProp_isprop {P : Type} `{IsHProp P} : isprop P
+Definition IsHProp_isProp {P : Type} `{IsHProp P} : isProp P
   := path_ishprop.
 
-Definition ntype_IsTrunc (n : nat) {X : Type}
+Definition ntype_IsTrunc (n : ℕ) {X : Type}
   : is_ntype n X -> IsTrunc (tr_nat n) X.
 Proof.
   revert X. induction n as [|n IH]; intros X h; apply istrunc_S; intros x y.
-  - exact (isprop_IsHProp (h x y)).
+  - exact (isProp_IsHProp (h x y)).
   - exact (IH _ (h x y)).
 Defined.
 
-Definition IsTrunc_ntype (n : nat) {X : Type}
+Definition IsTrunc_ntype (n : ℕ) {X : Type}
   : IsTrunc (tr_nat n) X -> is_ntype n X.
 Proof.
   revert X. induction n as [|n IH]; intros X h x y.
-  - exact IsHProp_isprop.
+  - exact IsHProp_isProp.
   - exact (IH _ _).
 Defined.
 
 Section LevelNUtils.
 
-  Context `{Funext} (n : nat).
+  Context `{Funext} (n : ℕ).
 
   Definition Pi_ntype {A : Type} {Z : A -> Type}
     (h : forall a, is_ntype n (Z a)) : is_ntype n (forall a, Z a).
@@ -398,50 +456,50 @@ Section IsXIsProp.
 
   Context `{Funext}.
 
-  (** [iscontr(A)] is a proposition, following the proof in the book. *)
-  Definition iscontr_isprop (A : Type) : isprop (iscontr A).
+  (** [isContr(A)] is a proposition, following the proof in the book. *)
+  Definition isContr_isProp (A : Type) : isProp (isContr A).
   Proof.
     intros [a f] [b g].
-    assert (hA : isprop A) by exact (fun x y => f y ⋅ (f x)⁻¹).
+    assert (hA : isProp A) by exact (fun x y => f y ⋅ (f x)⁻¹).
     pose (e := f b).
     exact (pathpair e (trp (fun T : Type => T) (po e f g)^
-                         (Pi_isprop (fun y => prop_is_set hA b y) _ _))).
+                         (Pi_isProp (fun y => prop_is_set hA b y) _ _))).
   Defined.
 
   (** Exercise [xca:isX-is-prop]. *)
-  Definition isprop_isprop (A : Type) : isprop (isprop A).
+  Definition isProp_isProp (A : Type) : isProp (isProp A).
   Proof.
     intros f g.
     apply ptw_inv. intro a. apply ptw_inv. intro b.
     exact (prop_is_set f a b _ _).
   Defined.
 
-  Definition isset_isprop (A : Type) : isprop (isset A)
-    := Pi_isprop (fun x => Pi_isprop (fun y => isprop_isprop (x = y))).
+  Definition isSet_isProp (A : Type) : isProp (isSet A)
+    := Pi_isProp (fun x => Pi_isProp (fun y => isProp_isProp (x = y))).
 
-  Definition isgrpd_isprop (A : Type) : isprop (isgrpd A)
-    := Pi_isprop (fun x => Pi_isprop (fun y => isset_isprop (x = y))).
+  Definition isGrpd_isProp (A : Type) : isProp (isGrpd A)
+    := Pi_isProp (fun x => Pi_isProp (fun y => isSet_isProp (x = y))).
 
-  Definition ntype_isprop (n : nat) : forall A : Type, isprop (is_ntype n A).
+  Definition ntype_isProp (n : ℕ) : forall A : Type, isProp (is_ntype n A).
   Proof.
     induction n as [|n IH]; intro A.
-    - exact (isset_isprop A).
-    - exact (Pi_isprop (fun x => Pi_isprop (fun y => IH (x = y)))).
+    - exact (isSet_isProp A).
+    - exact (Pi_isProp (fun x => Pi_isProp (fun y => IH (x = y)))).
   Defined.
 
-  Definition isEq_isprop {X Y : Type} (f : X -> Y) : isprop (isEq f)
-    := Pi_isprop (fun y => iscontr_isprop (fiber f y)).
+  Definition isEquiv_isProp {X Y : Type} (f : X -> Y) : isProp (isEquiv f)
+    := Pi_isProp (fun y => isContr_isProp (fiber f y)).
 
 End IsXIsProp.
 
 (** Exercise [xca:prop-contractible=]. *)
-Definition isprop_iff_paths_contr (P : Type)
-  : (isprop P -> forall p q : P, iscontr (p = q))
-    * ((forall p q : P, iscontr (p = q)) -> isprop P).
+Definition isProp_iff_paths_contr (P : Type)
+  : (isProp P -> forall p q : P, isContr (p = q))
+    * ((forall p q : P, isContr (p = q)) -> isProp P).
 Proof.
   split.
   - intros h p q. exact (h p q; fun r => prop_is_set h p q (h p q) r).
-  - intros c p q. exact (pr1 (c p q)).
+  - intros c p q. exact (fst (c p q)).
 Defined.
 
 (** Remark [rem:diagram] introduces diagrams as notation for identity
@@ -453,50 +511,25 @@ Defined.
     [idtoeqv] is homotopic to the composite of the library's
     [equiv_path] with the equivalence [(X <~> Y) ≃ (X ≃ Y)]. *)
 
-Definition isEq_homotopic {X Y : Type} (f g : X -> Y)
-  (h : forall x, f x = g x) (t : isEq f) : isEq g
-  := isEq_of_IsEquiv g (H := isequiv_homotopic f (H := IsEquiv_of_isEq t) h).
+Definition isEquiv_homotopic {X Y : Type} (f g : X -> Y)
+  (h : forall x, f x = g x) (t : isEquiv f) : isEquiv g
+  := isEquiv_of_IsEquiv g (H := isequiv_homotopic f (H := IsEquiv_of_isEquiv t) h).
 
-Definition Eqv_of_Equiv_isEq `{Funext} (X Y : Type)
-  : isEq (@Eqv_of_Equiv X Y).
+Definition Eqv_of_Equiv_isEquiv `{Funext} (X Y : Type)
+  : isEquiv (@Eqv_of_Equiv X Y).
 Proof.
-  refine (iso_to_isEq _ (fun e => Build_Equiv _ _ (pr1 e) (IsEquiv_of_isEq (pr2 e)))
+  refine (iso_to_isEquiv _ (fun e => Build_Equiv _ _ (fst e) (IsEquiv_of_isEquiv (snd e)))
             _ _).
-  - intro e. apply path_equiv. exact idpath.
-  - intro e. apply path_Eqv. exact idpath.
+  - intro e. apply path_equiv. exact refl.
+  - intro e. apply path_Eqv. exact refl.
 Defined.
 
 Instance UnivalenceUF_from_HoTT `{Univalence} : UnivalenceUF.
 Proof.
   intros X Y.
-  refine (isEq_homotopic (comp Eqv_of_Equiv (equiv_path X Y)) _ _
-            (comp_isEq (isEq_of_IsEquiv (equiv_path X Y))
-                       (Eqv_of_Equiv_isEq X Y))).
-  intro p. destruct p. apply path_Eqv. exact idpath.
+  refine (isEquiv_homotopic (comp Eqv_of_Equiv (equiv_path X Y)) _ _
+            (comp_isEquiv (isEquiv_of_IsEquiv (equiv_path X Y))
+                       (Eqv_of_Equiv_isEquiv X Y))).
+  intro p. destruct p. apply path_Eqv. exact refl.
 Defined.
 
-(** ** Summary of this formalization
-
-I've formalized §§2.13–2.15 in a new file, [Formalization/IntroUF3.v], and added it to [_CoqProject]. It compiles. [Print Assumptions] shows that the only axiom used is Coq-HoTT's [Funext], and only by the results that need it. The exception is the derivation of the book's univalence axiom, which uses the library's [Univalence], as intended.
-
-§2.13 Univalence
-- [ptoe p := trp^{id_U} p] and [idtoeqv : (X = Y) → (X ≃ Y)].
-- The book's axiom is a class [UnivalenceUF := ∀ X Y, isEq idtoeqv]. Its inverse is [etop] (the book's [f̄]). I proved the four identifications listed in the text: [etop (ptoe p) = p] and [ptoe (etop f) = f]; [etop id = refl]; [etop (g f) = etop g · etop f].
-- Exercise [xca:C2]: every [p : Bool = Bool] is either [refl] or [swap], [refl ≠ swap], and [swap · swap = refl].
-- At the end of the file I derive an instance of [UnivalenceUF] from Coq-HoTT's [Univalence]. This needs the fact that [isEq f] is a proposition, which the book only proves in §2.15. A short preliminary obtains it from the library, so §2.13 can come first.
-
-§2.14 Heavy transport
-- Transport in function-type families, and its univalence special case: transport along [etop g] gives [g ∘ f ∘ g⁻¹].
-- Transport in [f x = g x] and its four special cases (the last is conjugation), plus the dependent version stated with [po_e(apd …)].
-- [trptw] (pointwise transport).
-- Dan's lemma, formalized literally as written: [(f(x) =^Y_p f(x')) ≃ (f(x) = f(x))]. The right-hand side and the [e]/[p] mix-up in the statement look like typos in the source.
-
-§2.15 Propositions, sets and groupoids
-- [isprop], [isset], [isgrpd], [is_ntype n] (for n ≥ 0), [¬], [≠].
-- Every proposition is a set, following the book's argument.
-- [Bool] is a set, via Simon Huber's proof.
-- All six parts of [lem:prop-utils], plus the fact that 𝟙 ⨿ 𝟙 is not a proposition.
-- [lem:level-n-utils], which the book states without proof. I proved it by comparing [is_ntype] with Coq-HoTT's [IsTrunc].
-- [iscontr], [isprop], [isset], [isgrpd], [is_ntype n] and [isEq f] are all propositions. The [iscontr] case follows the book's proof.
-- A type is a proposition exactly when all its identity types are contractible.
-- The diagrams remark has no formal content, so it is only a comment. *)
