@@ -10,7 +10,7 @@
     used only where function extensionality is needed; and [Univalence]
     only for the results about identifications in [Prop] and [Set]
     ([same_component_props], [Bool_SetU_not_isInj], [xca:lem-prop] and
-    [xca:lem-prop-sizing]).
+    [xca:lem-prop-sizing]) and for [xca:unique-fact-image].
 
     Book notions defined from Coq-HoTT notions: the propositional
     truncation [‖T‖ :≡ ptrunc T :≡ Trunc (-1) T] with [trunc :≡ tr]; its
@@ -53,6 +53,24 @@
     - The image [im f] and the factorization [f = i ∘ p], which commutes
       by definition, with [p] surjective and [i] injective; exercises
       [xca:prop-image-is-set] and [xca:all-prop-image].
+    - Exercise [xca:unique-fact-image], second part: the type [ImFact]
+      of image factorizations is contractible ([ImFact_isContr]), with
+      center the image factorization.  It suffices that [ImFact] is a
+      proposition.  Following a hint by the author, two factorizations
+      [(C,g,h)] and [(C',g',h')] give [e : C → C'] with [e(c)] in the
+      fiber of [h'] at [h(c)]: that fiber is a proposition, so we may
+      assume [a : A] with [c = g(a)] and take [g'(a)] ([fact_map]).  The
+      same construction in the other direction gives an inverse, since
+      the fibers of [h] and [h'] are propositions ([fact_Eqv]).  To avoid
+      transporting the identification [f = h ∘ g] along [ua(e)], the
+      6-tuples are reordered as [(C, h, isInj h, (g, f = h ∘ g), isSurj g)]
+      ([ImFact_reorder]).  For injective [h], the type
+      [∑_g (f = h ∘ g)] is a proposition ([lift_isProp]), being a retract
+      of [∏_a h⁻¹(f(a))].  So only [(C, h)] has to be identified, by
+      induction on the path [ua(e)] ([fact_path]).
+      NOTE for the book text: the author's hint, together with the
+      observation that [∑_g (f = h ∘ g)] is a proposition when [h] is
+      injective, could be added to the exercise.
 
     2.18 Decidability, excluded middle and propositional resizing
     - Decidable propositions, LEM, double-negation elimination; LEM
@@ -62,14 +80,10 @@
     - Propositional resizing for universes [u < v], and exercise
       [xca:lem-prop-sizing]: LEM in the larger universe implies it.
 
-    Things that differ from the text, or are left out
+    Things that differ from the text
     - The notation [‖T‖] is used only in comments: a notation whose
       opening and closing delimiters coincide cannot be parsed reliably,
       so the code writes [ptrunc T].
-    - Exercise [xca:unique-fact-image], second part (contractibility of
-      the type of image factorizations), is not formalized.  It needs a
-      substantial computation of transport along a univalence path in
-      the type of factorizations.
     - [∃] is written [Ex], since [exists] is a keyword.
 
     ** Conventions
@@ -533,6 +547,106 @@ Section ImageFactorization.
   Defined.
 
 End ImageFactorization.
+
+(** Exercise [xca:unique-fact-image], second part: the type of image
+    factorizations is contractible. *)
+Section ImageFactorizationUnique.
+
+  Context `{Univalence} {A B : Type} (f : A -> B).
+
+  (** The type of image factorizations of [f]. *)
+  Definition ImFact : Type
+    := {C : Type & {g : A -> C & {h : C -> B &
+         (f = h ∘ g) × isSurj g × isInj h}}}.
+
+  Definition im_fact : ImFact
+    := (im f; (im_p f; (im_i f; ((refl; im_p_isSurj f); im_i_isInj f)))).
+
+  Definition isSurj_isProp {X Y : Type} (g : X -> Y) : isProp (isSurj g)
+    := Pi_isProp (fun _ => ptrunc_isProp).
+
+  (** If [h] is injective, then [∑_{g : A → C} (f = h ∘ g)] is a
+      proposition: it is a retract of [∏_{a:A} h⁻¹(f(a))]. *)
+  Definition lift_isProp {C : Type} {h : C -> B} (j : isInj h)
+    : isProp {g : A -> C & f = h ∘ g}.
+  Proof.
+    pose (s := fun w : {g : A -> C & f = h ∘ g} =>
+                 (fun a => (fst w a; ptw (snd w) a)) : forall a, fiber h (f a)).
+    pose (r := fun F : forall a, fiber h (f a) =>
+                 ((fun a => fst (F a)); ptw_inv (fun a => snd (F a)))
+                 : {g : A -> C & f = h ∘ g}).
+    assert (rs : forall w, r (s w) = w).
+    { intros [g φ]. exact (ap (fun φ' => (g; φ') : {g : A -> C & f = h ∘ g})
+                              (eqinv_l (funext _ _) φ)). }
+    intros w w'.
+    exact ((rs w)^ @ ap r (Pi_isProp (fun a => j (f a)) (s w) (s w')) @ rs w').
+  Defined.
+
+  (** The factorizations, reordered: first [C] and the injection [h]. *)
+  Definition FactRest (C : Type) (h : C -> B) : Type
+    := {j : isInj h & {w : {g : A -> C & f = h ∘ g} & isSurj (fst w)}}.
+
+  Definition FactRest_isProp (C : Type) (h : C -> B) : isProp (FactRest C h)
+    := Sigma_isProp (Pi_isProp (fun _ => isProp_isProp _))
+         (fun j => Sigma_isProp (lift_isProp j) (fun w => isSurj_isProp _)).
+
+  Definition ImFact' : Type := {C : Type & {h : C -> B & FactRest C h}}.
+
+  Definition ImFact_reorder : ImFact ≃ ImFact'.
+  Proof.
+    refine (mkEqv (fun x : ImFact => match x with (C; (g; (h; ((φ; s); j)))) =>
+                              ((C; (h; (j; ((g; φ); s)))) : ImFact') end)
+                  (fun x : ImFact' => match x with (C; (h; (j; ((g; φ); s)))) =>
+                              ((C; (g; (h; ((φ; s); j)))) : ImFact) end) _ _).
+    - intros [C [g [h [[φ s] j]]]]. exact refl.
+    - intros [C [h [j [[g φ] s]]]]. exact refl.
+  Defined.
+
+  (** Following a hint by the author: for factorizations [(C,g,h)] and
+      [(C',g',h')], define [e(c)] in the fiber of [h'] at [h(c)], which is
+      a proposition; so we may assume [a : A] with [c = g(a)], and take
+      [g'(a)]. *)
+  Definition fact_map {C C' : Type} {h : C -> B} {h' : C' -> B}
+    (r : FactRest C h) (r' : FactRest C' h') (c : C) : fiber h' (h c).
+  Proof.
+    destruct r as [j [[g φ] s]], r' as [j' [[g' φ'] s']].
+    refine (ptrunc_rec (j' (h c)) _ (s c)). intros [a p].
+    exact (g' a; ap h p @ (ptw φ a)^ @ ptw φ' a).
+  Defined.
+
+  Definition fact_Eqv {C C' : Type} {h : C -> B} {h' : C' -> B}
+    (r : FactRest C h) (r' : FactRest C' h') : C ≃ C'.
+  Proof.
+    refine (mkEqv (fun c => fst (fact_map r r' c))
+                  (fun c' => fst (fact_map r' r c')) _ _).
+    - intro c. exact (ap fst (fst r (h c)
+        (_; snd (fact_map r r' c) @ snd (fact_map r' r _)) (c; refl))).
+    - intro c'. exact (ap fst (fst r' (h' c')
+        (_; snd (fact_map r' r c') @ snd (fact_map r r' _)) (c'; refl))).
+  Defined.
+
+  Definition fact_path {C C' : Type} (p : C = C') {h : C -> B} {h' : C' -> B}
+    (hh : forall c, h c = h' (ptoe p c)) (r : FactRest C h) (r' : FactRest C' h')
+    : ((C; (h; r)) : ImFact') = (C'; (h'; r')).
+  Proof.
+    destruct p. destruct (ptw_inv hh : h = h').
+    exact (ap (fun r0 => ((C; (h; r0)) : ImFact')) (FactRest_isProp C h r r')).
+  Defined.
+
+  Definition ImFact'_isProp : isProp ImFact'.
+  Proof.
+    intros [C [h r]] [C' [h' r']].
+    pose (E := fact_Eqv r r').
+    refine (fact_path (etop E) _ r r').
+    intro c. exact (snd (fact_map r r' c) @ ap h' (ptw (ap fst (ptoe_etop E)) c)^).
+  Defined.
+
+  (** Exercise [xca:unique-fact-image], second part. *)
+  Definition ImFact_isContr : isContr ImFact
+    := isProp_inhabited_isContr
+         (isProp_Eqv (Eqv_inv ImFact_reorder) ImFact'_isProp) im_fact.
+
+End ImageFactorizationUnique.
 
 (** Exercise [xca:prop-image-is-set]. *)
 Definition im_isSet {A B : Type} (f : A -> B) (sB : isSet B) : isSet (im f).
