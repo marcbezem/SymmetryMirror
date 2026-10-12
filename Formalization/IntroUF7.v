@@ -37,8 +37,19 @@
     - [isFinSet], [lem:maxonefinitetype], [FinSet], [FinSet_n], [Card];
       [FinSet ≃ ∑_n FinSet_n]; [FinSet_0] and [FinSet_1] are contractible.
     - Exercise [xca:finsets-decidable].
-    - Exercise [xca:2-element-sets], first two parts: [T = T] is a
-      2-element set, and [¬ ∏_{T : FinSet_2} (T = 𝟚)] (by univalence).
+    - Exercise [xca:2-element-sets]: [T = T] is a 2-element set;
+      [¬ ∏_{T : FinSet_2} (T = 𝟚)] (by univalence); and, uniformly in
+      [T : FinSet_2], [(T = T) = 𝟚] ([two_element_loops_Bool]: a loop is
+      sent to [yes] iff it is [refl], which is decidable) and
+      [T = (𝟚 = T)] ([two_element_paths_Bool]: [t] gives the equivalence
+      [yes ↦ t], [no ↦] the other element).
+      NOTE for the book text, following a hint by the author: the last
+      two parts first show that [∑_{x:T} ¬(x = t)] is a proposition for
+      [t : T] ([compl_isProp]), so that "the other element" of [t] is
+      well defined without choice ([other]); and they repeatedly use
+      that, to prove a proposition about all [T : FinSet_2], one may
+      assume [T ≡ 𝟚] ([FinSet2_prop_ind], since [FinSet_2] is connected).
+      The book could give these two hints with the exercise.
     - Exercise [xca:tabulation] ([lookup]) and [cor:lists-truncated].
     - Remark [rem:subset-of-fin-set]: a proposition is a finite set iff
       it is decidable.
@@ -48,9 +59,7 @@
       library's class [Finite] ([finite_sigma], [fcard_prod], [finadd],
       [finite_quotient]).
 
-    Left out
-    - Exercise [xca:2-element-sets], last two parts
-      ([∏_T ((T = T) = 𝟚)] and [∏_T (T = (𝟚 = T))]).
+    Elsewhere
     - The remark that [FinSet] is essentially small is formalized in
       [IntroUF8.v] ([FinSet_essSmall]).
 
@@ -534,7 +543,7 @@ Proof.
   exact (trp isDecSet e⁻¹ (Fin_isDecSet n)).
 Defined.
 
-(** Exercise [xca:2-element-sets], first two parts. *)
+(** Exercise [xca:2-element-sets]. *)
 Section TwoElementSets.
 
   Context `{Univalence}.
@@ -623,6 +632,140 @@ Section TwoElementSets.
     apply swapF_ne_refl.
     exact (ap1^ @ cancel_loop _ (s Fin2_FinSet2) ((t _ _ l _)^ @ a)).
   Defined.
+
+  (** Exercise [xca:2-element-sets], last two parts, following a hint by
+      the author: first show that [∑_{x:T} ¬(x = t)] is a proposition, and
+      use that, for propositions, a 2-element set may be assumed to be [𝟚]. *)
+
+  Definition Bool2 : FinSet_n 2
+    := (exist (fun X : Type => isSet X) Bool isSet_bool; trunc Fin2_Bool_path).
+
+  (** Every 2-element set is merely equal to [Bool2]. *)
+  Definition FinSet2_conn (T : FinSet_n 2) : ptrunc (Bool2 = T).
+  Proof.
+    refine (ptrunc_rec ptrunc_isProp _ (snd T)). intro e. apply trunc.
+    exact (path_sigma_prop (u := Bool2) (v := T) (fun _ => ptrunc_isProp)
+             (path_sigma_prop (u := fst Bool2) (v := fst T)
+                (fun X => isSet_isProp X) (e ⋅ Fin2_Bool_path⁻¹))).
+  Defined.
+
+  (** To prove a proposition about all 2-element sets, we may assume
+      that the 2-element set is [Bool]. *)
+  Definition FinSet2_prop_ind (P : FinSet_n 2 -> Type)
+    (hP : forall T, isProp (P T)) (b : P Bool2) (T : FinSet_n 2) : P T
+    := ptrunc_rec (hP T) (fun e => trp P e b) (FinSet2_conn T).
+
+  Definition Bool_compl (t x : Bool) : x ≠ t -> x = negb t.
+  Proof.
+    destruct t, x; intro n;
+      solve [exact refl | destruct (n refl)].
+  Defined.
+
+  Definition negb_ne (t : Bool) : negb t ≠ t.
+  Proof. destruct t; intro e; [exact (yes_ne_no e⁻¹) | exact (yes_ne_no e)]. Defined.
+
+  (** For [t : T], the complement [∑_{x:T} ¬(x = t)] is a proposition. *)
+  Definition compl_isProp (T : FinSet_n 2) (t : fst (fst T))
+    : isProp {x : fst (fst T) & x ≠ t}.
+  Proof.
+    revert t.
+    refine (FinSet2_prop_ind (fun T => forall t : fst (fst T), isProp {x : fst (fst T) & x ≠ t})
+              (fun T => Pi_isProp (fun t => isProp_isProp _)) _ T).
+    intros t [x f] [y g].
+    apply (path_sigma_prop (fun _ => neg_isProp _)).
+    exact (Bool_compl t x f @ (Bool_compl t y g)⁻¹).
+  Defined.
+
+  (** Hence it is contractible, its center being "the other element". *)
+  Definition compl (T : FinSet_n 2) : forall t : fst (fst T), {x : fst (fst T) & x ≠ t}
+    := FinSet2_prop_ind (fun T => forall t : fst (fst T), {x : fst (fst T) & x ≠ t})
+         (fun T => Pi_isProp (compl_isProp T)) (fun t => (negb t; negb_ne t)) T.
+
+  Definition other (T : FinSet_n 2) (t : fst (fst T)) : fst (fst T) := fst (compl T t).
+
+  Definition other_ne (T : FinSet_n 2) (t : fst (fst T)) : other T t ≠ t
+    := snd (compl T t).
+
+  Definition other_unique (T : FinSet_n 2) {t x : fst (fst T)} (n : x ≠ t)
+    : x = other T t
+    := ap fst (compl_isProp T t (x; n) (compl T t)).
+
+  (** Last part: [∏_{T:FinSet_2} (T = (𝟚 = T))].  An element [t] gives the
+      equivalence [𝟚 ≃ T] mapping [yes] to [t] and [no] to the other element. *)
+  Definition pick (T : FinSet_n 2) (t : fst (fst T)) : Bool -> fst (fst T)
+    := fun b => if b then t else other T t.
+
+  Definition pick_isEquiv (T : FinSet_n 2) (t : fst (fst T)) : isEquiv (pick T t).
+  Proof.
+    revert t.
+    refine (FinSet2_prop_ind (fun T => forall t, isEquiv (pick T t))
+              (fun T => Pi_isProp (fun t => isEquiv_isProp _)) _ T).
+    intro t.
+    assert (h : (fun b : Bool => if b then t else negb t) = pick Bool2 t).
+    { apply ptw_inv. intros []; [exact refl | exact (other_unique Bool2 (negb_ne t))]. }
+    refine (trp isEquiv h _).
+    pose (inv := fun b : Bool => if b then t else negb t).
+    refine (iso_to_isEquiv inv inv _ _);
+      intro b; destruct t, b; exact refl.
+  Defined.
+
+  Definition pickEqv (T : FinSet_n 2) (t : fst (fst T)) : Bool ≃ fst (fst T)
+    := (pick T t; pick_isEquiv T t).
+
+  Definition Eqv_inj {X Y : Type} (e : X ≃ Y) {x x' : X} : fst e x = fst e x' -> x = x'
+    := fun p => (eqinv_l (snd e) x)^ @ ap (eqinv (snd e)) p @ eqinv_l (snd e) x'.
+
+  Definition elems_Bool_Eqv (T : FinSet_n 2) : fst (fst T) ≃ (Bool ≃ fst (fst T)).
+  Proof.
+    refine (mkEqv (pickEqv T) (fun e => fst e yes) (fun t => refl) _).
+    intro e. apply path_Eqv, ptw_inv. intros [].
+    - exact refl.
+    - exact (other_unique T (fun p => yes_ne_no (Eqv_inj e p)^))^.
+  Defined.
+
+  Definition two_element_paths_Bool (T : FinSet_n 2)
+    : fst (fst T) = (Bool = fst (fst T) :> Type) :> Type
+    := etop (Eqv_comp (elems_Bool_Eqv T) (Eqv_inv (idtoeqv; ua Bool (fst (fst T))))).
+
+  (** Third part: [∏_{T:FinSet_2} ((T = T) = 𝟚)].  A loop [p : T = T] is
+      sent to [yes] iff [p = refl], which is decidable. *)
+  Definition swap_ne_refl : swap ≠ refl := fun e => refl_ne_swap e⁻¹.
+
+  Definition loop_refl_dec (T : FinSet_n 2) (p : fst (fst T) = fst (fst T))
+    : (p = refl) ⨿ ¬ (p = refl).
+  Proof.
+    revert p.
+    refine (FinSet2_prop_ind
+              (fun T => forall p : fst (fst T) = fst (fst T), (p = refl) ⨿ ¬ (p = refl))
+              (fun T => Pi_isProp (fun p => lem_isProp
+                                            (paths_sets_isSet (snd (fst T)) p refl))) _ T).
+    intro p. destruct (Bool_paths_cases p) as [e|e].
+    - exact (inl e).
+    - exact (inr (fun e' => swap_ne_refl (e' ⋅ e⁻¹))).
+  Defined.
+
+  Definition loop_Bool (T : FinSet_n 2) (p : fst (fst T) = fst (fst T)) : Bool
+    := match loop_refl_dec T p with inl _ => yes | inr _ => no end.
+
+  Definition loop_Bool_isEquiv (T : FinSet_n 2) : isEquiv (loop_Bool T).
+  Proof.
+    refine (FinSet2_prop_ind (fun T => isEquiv (loop_Bool T))
+              (fun T => isEquiv_isProp _) _ T).
+    assert (h : (fun p : Bool = Bool :> Type => fst BoolPaths_Bool p) = loop_Bool Bool2).
+    { apply ptw_inv. intro p. unfold loop_Bool.
+      destruct (loop_refl_dec Bool2 p) as [e|n];
+        destruct (Bool_paths_cases p) as [e'|e'].
+      - exact (ap (fun q => fst BoolPaths_Bool q) e').
+      - destruct (swap_ne_refl (e ⋅ e'⁻¹)).
+      - destruct (n e').
+      - exact (ap (fun q => fst BoolPaths_Bool q) e'
+               @ ptw (ap fst (ptoe_etop swapEqv)) yes). }
+    exact (trp isEquiv h (snd BoolPaths_Bool)).
+  Defined.
+
+  Definition two_element_loops_Bool (T : FinSet_n 2)
+    : (fst (fst T) = fst (fst T)) = Bool :> Type
+    := etop (loop_Bool T; loop_Bool_isEquiv T).
 
 End TwoElementSets.
 
