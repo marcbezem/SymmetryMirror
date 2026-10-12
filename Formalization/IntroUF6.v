@@ -36,7 +36,9 @@
       (the unique equivalence [e_f : A/≡_f ≃ ‖im(f)‖₀]).
 
     Left out
-    - Exercise [xca:ints-as-quotient] (integers as a quotient of [ℕ × ℕ]).
+    - Exercise [xca:ints-as-quotient] (integers as a quotient of [ℕ × ℕ])
+      is formalized in [IntroUF7.v], since it uses the results on [ℕ] of
+      2.23.
     - The other inductive types of 2.12 in [thm:isset-inductive-types]
       (left to the reader in the book); [ℕ] is shown to be a set in
       [IntroUF7.v] via Hedberg's theorem.

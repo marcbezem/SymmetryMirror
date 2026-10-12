@@ -59,6 +59,20 @@
       library's class [Finite] ([finite_sigma], [fcard_prod], [finadd],
       [finite_quotient]).
 
+    From 2.22
+    - Exercise [xca:ints-as-quotient], placed here since it uses the
+      results on [ℕ] of 2.23: [ints_quot_Z : A/R ≃ Z] for
+      [A :≡ ℕ × ℕ], [R((w₁,d₁),(w₂,d₂)) :≡ (w₁ + d₂ = w₂ + d₁)] and
+      [Z :≡ {(w,d) | (d = 0) ∨ (w = 0 ∧ d ≠ 0)}], with
+      [f([(w,d)]) = (w,d)] for [(w,d,p) : Z] ([intsZ_cls]).  Following a
+      hint by the author, [f] is induced by the normal form [nf], sending
+      [(w,d)] to [(w - d, 0)] if [w ≥ d] and to [(0, d - w)] otherwise
+      (decided by the library's [leq_dichotomy]).  Key facts: [R(x, nf(x))]
+      ([RZ_nf]), and elements of [Z] related by [R] are equal
+      ([NF_unique]); [f] respects [R] by transitivity of [R].
+      NOTE for the book text: the author's hint could be added to the
+      exercise.
+
     Elsewhere
     - The remark that [FinSet] is essentially small is formalized in
       [IntroUF8.v] ([FinSet_essSmall]).
@@ -957,3 +971,111 @@ Definition quot_isFinSet `{Univalence} {X : Type} (hX : isFinSet X)
                            (fun x y => fst (R x y))
                            (fun x y => isProp_IsHProp (snd (R x y)))
                            rr rt rs dR)).
+
+(** Exercise [xca:ints-as-quotient] (from 2.22, placed here since it uses
+    the results on [ℕ] of 2.23). *)
+Section IntsAsQuotient.
+
+  Context `{Univalence}.
+
+  Definition NN : Type := ℕ × ℕ.
+
+  Definition NN_isSet : isSet NN := Sigma_isSet ℕ_isSet (fun _ => ℕ_isSet).
+
+  (** [R((w₁,d₁),(w₂,d₂)) :≡ (w₁ + d₂ = w₂ + d₁)]. *)
+  Definition RZ (x y : NN) : PropU
+    := ((add (fst x) (snd y) = add (fst y) (snd x)); ℕ_isSet _ _).
+
+  Definition nat_add_swap (a b c : ℕ) : (a + (b + c) = b + (a + c))%nat
+    := nat_add_assoc a b c @ ap (fun t => (t + c)%nat) (nat_add_comm a b)
+       @ (nat_add_assoc b a c)^.
+
+  Definition RZ_refl (x : NN) : fst (RZ x x) := refl.
+
+  Definition RZ_sym (x y : NN) : fst (RZ x y) -> fst (RZ y x) := fun r => r⁻¹.
+
+  Definition RZ_trans (x y z : NN) : fst (RZ x y) -> fst (RZ y z) -> fst (RZ x z).
+  Proof.
+    destruct x as [w1 d1], y as [w2 d2], z as [w3 d3].
+    change ((d2 + w1 = d1 + w2)%nat -> (d3 + w2 = d2 + w3)%nat
+            -> (d3 + w1 = d1 + w3)%nat).
+    intros h1 h2. apply (isinj_nat_add_l d2).
+    exact (nat_add_swap d2 d3 w1 @ ap (nat_add d3) h1 @ nat_add_swap d3 d1 w2
+           @ ap (nat_add d1) h2 @ nat_add_swap d1 d2 w3).
+  Defined.
+
+  (** Following a hint by the author: [(w,d)] is sent to [(w - d, 0)] if
+      [w ≥ d], and to [(0, d - w)] otherwise. *)
+  Definition nf (x : NN) : NN
+    := match leq_dichotomy (snd x) (fst x) with
+       | inl _ => ((fst x - snd x)%nat; 0%nat)
+       | inr _ => (0%nat; (snd x - fst x)%nat)
+       end.
+
+  Definition RZ_nf (x : NN) : fst (RZ x (nf x)).
+  Proof.
+    destruct x as [w d]. unfold nf.
+    destruct (leq_dichotomy (snd (w; d)) (fst (w; d))) as [l|l]; unfold RZ; cbn.
+    - exact (nat_add_sub_r_cancel l)^.
+    - exact (nat_add_sub_l_cancel (leq_succ_l l) @ (nat_add_zero_r d)^).
+  Defined.
+
+  (** [Z :≡ {(w,d) | (d = 0) ∨ (w = 0 ∧ d ≠ 0)}]. *)
+  Definition isNF (x : NN) : Type := (snd x = 0%nat) ∨ ((fst x = 0%nat) × (snd x ≠ 0%nat)).
+
+  Definition Z : Type := {x : NN & isNF x}.
+
+  Definition Z_isSet : isSet Z := Sigma_isSet NN_isSet (fun _ => prop_is_set ptrunc_isProp).
+
+  Definition nf_isNF (x : NN) : isNF (nf x).
+  Proof.
+    destruct x as [w d]. unfold nf.
+    destruct (leq_dichotomy (snd (w; d)) (fst (w; d))) as [l|l]; apply trunc.
+    - exact (inl refl).
+    - exact (inr (refl; fun e => lt_irrefl w (leq_trans l (equiv_nat_sub_leq^-1 e)))).
+  Defined.
+
+  Definition add_eq_zero (n m : ℕ) : (n + m = 0)%nat -> n = 0%nat.
+  Proof. destruct n; intro e; [exact refl | destruct (neq_nat_zero_succ _ e^)]. Defined.
+
+  (** Elements of [Z] related by [R] are equal. *)
+  Definition NF_unique (z z' : Z) : fst (RZ (fst z) (fst z')) -> fst z = fst z'.
+  Proof.
+    destruct z as [[w d] p], z' as [[w' d'] p']. cbn.
+    change ((d' + w = d + w')%nat -> ((w; d) : NN) = (w'; d')).
+    revert p. refine (ptrunc_rec (fun_isProp (NN_isSet _ _)) _). intro p.
+    revert p'. refine (ptrunc_rec (fun_isProp (NN_isSet _ _)) _). intro p'.
+    destruct p as [e|[e n]], p' as [e'|[e' n']]; cbn in *.
+    - destruct e^, e'^. intro r. exact (ap (fun t => (t; 0%nat) : NN) r).
+    - destruct e^, e'^. intro r. destruct (n' (add_eq_zero d' w r)).
+    - destruct e^, e'^. intro r. destruct (n (add_eq_zero d w' r^)).
+    - destruct e^, e'^. intro r.
+      exact (ap (fun t => (0%nat; t) : NN) ((nat_add_zero_r d)^ @ r^ @ nat_add_zero_r d')).
+  Defined.
+
+  Definition nfZ (x : NN) : Z := (nf x; nf_isNF x).
+
+  Definition nf_Z (z : Z) : nfZ (fst z) = z
+    := path_sigma_prop (fun _ => ptrunc_isProp)
+         (NF_unique (nfZ (fst z)) z (RZ_sym _ _ (RZ_nf (fst z)))).
+
+  Definition nfZ_resp (x y : NN) (r : fst (RZ x y)) : nfZ x = nfZ y
+    := path_sigma_prop (fun _ => ptrunc_isProp)
+         (NF_unique (nfZ x) (nfZ y)
+            (RZ_trans _ _ _ (RZ_trans _ _ _ (RZ_sym _ _ (RZ_nf x)) r) (RZ_nf y))).
+
+  (** The equivalence [f : A/R ≃ Z], with [f([(w,d)]) = (w,d)] for
+      [(w,d,p) : Z]. *)
+  Definition intsZ : quot RZ -> Z := fbar RZ RZ_refl Z_isSet nfZ nfZ_resp.
+
+  Definition intsZ_cls (z : Z) : intsZ (cls RZ (fst z)) = z := nf_Z z.
+
+  Definition ints_quot_Z : quot RZ ≃ Z.
+  Proof.
+    refine (mkEqv intsZ (fun z => cls RZ (fst z)) _ intsZ_cls).
+    refine (im_ind RZ _ (fun q => quot_isSet RZ _ _) _). intro x.
+    exact (snd (cls_eq_iff RZ RZ_refl RZ_sym RZ_trans (nf x) x)
+             (RZ_sym _ _ (RZ_nf x))).
+  Defined.
+
+End IntsAsQuotient.
