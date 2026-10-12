@@ -51,8 +51,8 @@
     Left out
     - Exercise [xca:2-element-sets], last two parts
       ([∏_T ((T = T) = 𝟚)] and [∏_T (T = (𝟚 = T))]).
-    - The remark that [FinSet] is the image of [Fin] and hence
-      essentially small.
+    - The remark that [FinSet] is essentially small is formalized in
+      [IntroUF8.v] ([FinSet_essSmall]).
 
     ** Conventions
 

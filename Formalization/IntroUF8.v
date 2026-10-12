@@ -55,6 +55,15 @@
     - Exercise [xca:stuff-struct-prop] (more examples) has no single
       formal statement and is left out.
 
+    Remark after [def:groupoidFin] (from 2.24)
+    - [FinSet] is essentially [U]-small ([FinSet_essSmall]), given the
+      replacement principle.  NOTE for the book text, following a hint by
+      the author: the proof does not go through [FinSet ≃ im(Fin : ℕ → U)]
+      as the remark suggests, but uses that, by univalence, a sum over [U]
+      such as [FinSet] is locally [U]-small; then replacement applies to
+      the surjection [ℕ → FinSet], [n ↦ Fin n], whose image is [FinSet].
+      The book could mention this use of univalence explicitly.
+
     ** Conventions
 
     Continuation of [IntroUF.v] - [IntroUF7.v] and [Bridge.v], with the
@@ -557,3 +566,48 @@ End Examples.
 
 (** Exercise [xca:stuff-struct-prop] asks for more examples of this kind
     of analysis; it has no single formal statement. *)
+
+(** Remark after [def:groupoidFin]: [FinSet] is essentially [U]-small, by
+    the replacement principle applied to the surjection [ℕ → FinSet],
+    [n ↦ Fin n]; [FinSet] is locally small by univalence. *)
+Section FinSetSmall.
+
+  Universe u.
+  Context `{Univalence}.
+
+  (** The image of a surjection is equivalent to its codomain. *)
+  Definition im_surj_eqv {X Y : Type} (f : X -> Y) (s : isSurj f) : im f ≃ Y
+    := sigma_contr_fibers (fun y => isProp_inhabited_isContr ptrunc_isProp (s y)).
+
+  Definition FinSet_U : Type := {S : {X : Type@{u} & isSet X} & isFinSet (fst S)}.
+
+  Definition FinSet_locSmall
+    : forall S T : FinSet_U, {Y : Type@{u} & (S = T) ≃ Y}.
+  Proof.
+    intros S T.
+    refine (exist (fun Y : Type@{u} => (S = T) ≃ Y) (fst (fst S) ≃ fst (fst T)) _).
+    refine (Eqv_comp (subtype_paths_eqv (fun _ => ptrunc_isProp) S T) _).
+    refine (Eqv_comp (subtype_paths_eqv (fun X => isSet_isProp X) (fst S) (fst T)) _).
+    exact (idtoeqv; ua _ _).
+  Defined.
+
+  Definition Fin_FinSet (n : ℕ) : FinSet_U
+    := exist (fun S : {X : Type@{u} & isSet X} => isFinSet (fst S))
+         (exist (fun X : Type@{u} => isSet X) (Fin n) (fun x y => fst (Fin_isDecSet n x y)))
+         (trunc (exist (fun m : ℕ => (Fin n : Type@{u}) = Fin m) n refl)).
+
+  Definition Fin_FinSet_isSurj : isSurj Fin_FinSet.
+  Proof.
+    intros [S h]. revert h.
+    refine (ptrunc_ind _ (fun _ => ptrunc_isProp) _). intros [n e].
+    exact (trunc (n; path_sigma_prop (u := (S; trunc (n; e)) : FinSet_U) (v := Fin_FinSet n)
+                       (fun _ => ptrunc_isProp)
+                       (path_sigma_prop (u := S) (v := fst (Fin_FinSet n))
+                          (fun X => isSet_isProp X) e))).
+  Defined.
+
+  Definition FinSet_essSmall (rep : Replacement) : {Y : Type@{u} & FinSet_U ≃ Y}
+    := essSmall_Eqv (Eqv_inv (im_surj_eqv Fin_FinSet Fin_FinSet_isSurj))
+         (rep ℕ FinSet_U Fin_FinSet (small_essSmall ℕ) FinSet_locSmall).
+
+End FinSetSmall.
