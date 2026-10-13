@@ -28,7 +28,8 @@
 
     Placement differing from the book: exercise [xca:ints-as-quotient]
     (2.22) is in 2.23, and the remark that [FinSet] is essentially small
-    (2.24) is in 2.27, because their proofs use later results.
+    (2.24) is in 2.27, because their proofs use later results (for the
+    latter, the lemma [sigma_contr_fibers] of 2.27).
 
     NOTEs for the book text (hints by the author that simplified proofs)
     are in the summaries of 2.17 ([xca:unique-fact-image]), 2.23

@@ -30,8 +30,8 @@
     - Exercise [xca:dec-quant-finset].
     - Exercises [xca:fin-sum-of-finsets] and [xca:dec-quot-finite-set],
       via a bridge between [isFinSet] and the library's class [Finite].
-    - The remark that [FinSet] is essentially small is in 2.27, since its
-      proof uses results of 2.25. *)
+    - The remark that [FinSet] is essentially small requires an extra
+      lemma, [sigma_contr_fibers], and is proved in 2.27. *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
@@ -123,6 +123,11 @@ Definition Card (S : FinSet) : ℕ := fst (snd card_type_iff (snd S)).
 
 Definition Card_spec (S : FinSet) : ptrunc (fst (fst S) = Fin (Card S))
   := snd (snd card_type_iff (snd S)).
+
+(** Remark after [def:groupoidFin]: the fact that [FinSet] is essentially
+    [U]-small requires an extra lemma, [sigma_contr_fibers] (a sum of
+    contractible types is equivalent to its base), and is proved in 2.27
+    ([FinSet_essSmall] in [S27_StuffStructure.v]). *)
 
 (** [FinSet ≃ ∑_{n:ℕ} FinSet_n], by [lem:maxonefinitetype]. *)
 Definition FinSet_sum_eqv : FinSet ≃ {n : ℕ & FinSet_n n}.
