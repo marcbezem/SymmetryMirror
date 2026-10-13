@@ -2,6 +2,35 @@
 -arg -noinit
 -arg -indices-matter
 
-IntroUF.v
-Bridge.v
-Circle.v
+IntroUF/S02_Types.v
+IntroUF/S03_Universes.v
+IntroUF/S04_NaturalNumbers.v
+IntroUF/S05_IdentityTypes.v
+IntroUF/S06_ProductTypes.v
+IntroUF/S07_IdentifyingInFamilies.v
+IntroUF/S08_SumTypes.v
+IntroUF/S09_Equivalences.v
+IntroUF/S10_IdentifyingPairs.v
+IntroUF/S11_BinaryProducts.v
+IntroUF/S12_InductiveTypes.v
+IntroUF/S13_Univalence.v
+IntroUF/S14_HeavyTransport.v
+IntroUF/S15_PropsSetsGroupoids.v
+IntroUF/S16_PropTruncation.v
+IntroUF/S17_SurjInj.v
+IntroUF/S18_Decidability.v
+IntroUF/S19_Replacement.v
+IntroUF/S20_Subtypes.v
+IntroUF/S21_PointedTypes.v
+IntroUF/S22_SetOperations.v
+IntroUF/S23_MoreNaturalNumbers.v
+IntroUF/S24_FiniteSets.v
+IntroUF/S25_FamiliesMaps.v
+IntroUF/S26_HigherTruncations.v
+IntroUF/S27_StuffStructure.v
+IntroUF/IntroUF.v
+Circle/S01_Circle.v
+Circle/S02_Integers.v
+Circle/S03_Coverings.v
+Circle/Circle.v
+Symmetry.v
