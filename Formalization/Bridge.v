@@ -2,10 +2,13 @@
 
     ** Summary of this formalization
 
-    This file collects, in one place, the conversions between the
-    notions defined in [IntroUF.v], [IntroUF2.v] and [IntroUF3.v] and
-    their counterparts in the Coq-HoTT library, so that library results
-    can be reused for the book's notions.  It compiles; [Print
+    This file collects the conversions between the notions defined in
+    [IntroUF.v] (Chapter 2) and their counterparts in the Coq-HoTT
+    library, so that library results can be reused for the book's
+    notions.  The bridges that Chapter 2 itself uses from 2.16 on are in
+    [IntroUF.v], at the end of part 3: [Eqv_of_props], [fiber_hfiber]
+    ([fiber f y ≃ hfiber f y]), [isSet_IsHSet], [IsHSet_isSet] and
+    [Equiv_of_Eqv]; they are listed below for completeness.  It compiles; [Print
     Assumptions] shows that Coq-HoTT's [Funext] is used only by the
     equivalences between proposition-valued notions (to show that the
     notions involved are propositions), by [Equiv_Eqv_eqv] and by
@@ -36,11 +39,11 @@
 
     ** Conventions
 
-    As in [IntroUF.v], [IntroUF2.v] and [IntroUF3.v]. *)
+    As in [IntroUF.v]. *)
 
 From HoTT Require Import Basics Types.Sigma Types.Prod Types.Equiv
   Types.Forall Types.Paths Cubical.DPath Spaces.Nat.Core.
-From SymmetryMirror Require Import IntroUF IntroUF2 IntroUF3.
+From SymmetryMirror Require Import IntroUF.
 
 Local Open Scope uf_scope.
 
@@ -104,21 +107,6 @@ Definition ptw_inv_is_path_forall `{Funext} {X : Type} {Y : X -> Type}
   := ap (eqinv (funext f g)) (eisretr apD10 h)^
      @ eqinv_l (funext f g) (path_forall f g h).
 
-(** ** Equivalences between propositions *)
-
-Definition Eqv_of_props {P Q : Type} (hP : isProp P) (hQ : isProp Q)
-  (f : P -> Q) (g : Q -> P) : P ≃ Q
-  := mkEqv f g (fun p => hP _ _) (fun q => hQ _ _).
-
-(** ** Fibers: [y = f x] versus [f x = y] *)
-
-Definition fiber_hfiber {X Y : Type} (f : X -> Y) (y : Y)
-  : fiber f y ≃ hfiber f y
-  := mkEqv (fun w : fiber f y => (fst w; (snd w)^) : hfiber f y)
-           (fun w : hfiber f y => (pr1 w; (pr2 w)^) : fiber f y)
-           (fun w => ap (fun r => (fst w; r) : fiber f y) (inv_V (snd w)))
-           (fun w => ap (fun r => (pr1 w; r) : hfiber f y) (inv_V (pr2 w))).
-
 (** ** Contractibility *)
 
 Definition Contr_of_isContr {X : Type} (h : isContr X) : Contr X
@@ -143,9 +131,6 @@ Definition is_ntype_eqv `{Funext} (n : ℕ) (X : Type)
        (IsHProp_isProp (P := IsTrunc (tr_nat n) X))
        (ntype_IsTrunc n) (IsTrunc_ntype n).
 
-Definition isSet_IsHSet {X : Type} : isSet X -> IsHSet X := ntype_IsTrunc 0.
-Definition IsHSet_isSet {X : Type} : IsHSet X -> isSet X := IsTrunc_ntype 0.
-
 Definition isSet_eqv `{Funext} (X : Type) : isSet X ≃ IsHSet X
   := is_ntype_eqv 0 X.
 
@@ -163,9 +148,6 @@ Definition isEquiv_IsEquiv_eqv `{Funext} {X Y : Type} (f : X -> Y)
   : isEquiv f ≃ IsEquiv f
   := Eqv_of_props (isEquiv_isProp f) (IsHProp_isProp (P := IsEquiv f))
        IsEquiv_of_isEquiv (fun e => @isEquiv_of_IsEquiv X Y f e).
-
-Definition Equiv_of_Eqv {X Y : Type} (e : X ≃ Y) : X <~> Y
-  := Build_Equiv X Y (fst e) (IsEquiv_of_isEquiv (snd e)).
 
 Definition Equiv_of_Eqv_fun {X Y : Type} (e : X ≃ Y)
   : equiv_fun (Equiv_of_Eqv e) = fst e := refl.
