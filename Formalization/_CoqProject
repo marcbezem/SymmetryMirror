@@ -35,5 +35,8 @@ Circle/S03_Coverings.v
 Circle/S04_SymmetriesCircle.v
 Circle/S05_Reinterpretation.v
 Circle/S06_ConnCoverings.v
+Circle/S07_Permutations.v
+Circle/S08_MthRoot.v
+Circle/S09_HigherImages.v
 Circle/Circle.v
 Symmetry.v
