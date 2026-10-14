@@ -2,10 +2,13 @@
 
     ** Summary of this formalization
 
-    Sections 3.1 - 3.3 of Chapter 3 of the book "Symmetry", one file per
+    Sections 3.1 - 3.6 of Chapter 3 of the book "Symmetry", one file per
     section, each starting with its own summary: the circle and its
     universal property ([S01_Circle.v]), the integers as a higher
-    inductive type ([S02_Integers.v]) and coverings ([S03_Coverings.v]).
+    inductive type ([S02_Integers.v]), coverings ([S03_Coverings.v]), the
+    symmetries in the circle ([S04_SymmetriesCircle.v]), the circle as the
+    type of infinite cycles ([S05_Reinterpretation.v]) and connected
+    coverings over the circle ([S06_ConnCoverings.v], partly).
     They build on Chapter 2 ([IntroUF.IntroUF]).  Everything compiles with
     nothing admitted.
 
@@ -17,4 +20,7 @@
 From SymmetryMirror Require Export
   Circle.S01_Circle
   Circle.S02_Integers
-  Circle.S03_Coverings.
+  Circle.S03_Coverings
+  Circle.S04_SymmetriesCircle
+  Circle.S05_Reinterpretation
+  Circle.S06_ConnCoverings.

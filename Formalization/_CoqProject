@@ -32,5 +32,8 @@ IntroUF/IntroUF.v
 Circle/S01_Circle.v
 Circle/S02_Integers.v
 Circle/S03_Coverings.v
+Circle/S04_SymmetriesCircle.v
+Circle/S05_Reinterpretation.v
+Circle/S06_ConnCoverings.v
 Circle/Circle.v
 Symmetry.v
