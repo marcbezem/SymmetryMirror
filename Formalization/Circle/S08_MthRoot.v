@@ -35,9 +35,14 @@
       the [n]-th root of the trivial cycle), and [H_{ᵐ√t} = mH_t].
     - [X/m] ([Xm]) and lemma [lem:X-mod-m-chosen] ([X_mod_m_chosen]).
 
+    - The identification of [ρ_m] with the degree [m] map,
+      [ρ_m c = c dg_m] as maps [S1 → InfCyc] ([root_degree_square]), and
+      exercise [xca:pointed-maps-circle] ([root_degree_ptd]).  As in the
+      book, it comes down to comparing two loops at [(ℤ, zs)]; we compare
+      them through the equivalence [ev_0] of [lem:IdCisZet], using the
+      equivariant map [φ] with [φ(0,0) = 0] given by [lem:IdCycle].
+
     Left out (not yet formalized)
-    - The identification of [ρ_m] with the degree [m] map, [ρ_m c = c dg_m],
-      and exercise [xca:pointed-maps-circle].
     - Construction [thm:fiber-cdg] (the fiber of [ρ_m] at [(X,t)] is
       [P × X/m]).
  *)
@@ -688,3 +693,164 @@ Section XmodM.
     := inj_surj_isEquiv (fXm_inj hP x0) (fXm_surj x0).
 
 End XmodM.
+
+(** The identification of [ρ_m] with the degree [m] map ([ρ_m c = c dg_m],
+    as maps [S1 → Cyc_0]), and exercise [xca:pointed-maps-circle].  We work
+    with [InfCyc] (the component of [Endo]), on which [c] is defined. *)
+Section RootDegree.
+
+  Context `{Univalence} (k : ℕ).
+
+  Definition EZ : rho k Zs = Zs := ap cyc_endo (rho_Z_path k).
+
+  Definition rhoIC (w : InfCyc) : InfCyc
+    := (rho k (fst w);
+        ptrunc_rec ptrunc_isProp (fun p => trunc (ap (rho k) p ⋅ EZ⁻¹)) (snd w)).
+
+  Definition endo_fun_ap_rho {w w' : Endo} (E : w = w') (v : FN k × fst w)
+    : endo_fun (ap (rho k) E) v = (fst v; endo_fun E (snd v)).
+  Proof.
+    destruct E. refine (endo_fun_trp _ v @ _).
+    exact (ap (fun y => (fst v; y) : FN k × fst w) (endo_fun_trp (refl w) (snd v)))^.
+  Defined.
+
+  Definition endo_fun_endo_path {X Y : Type} {t : X -> X} {u : Y -> Y} (e : X ≃ Y)
+    (h : fst e ∘ t = u ∘ fst e) (x : X) : endo_fun (endo_path e h) x = fst e x
+    := endo_fun_trp _ x @ ap (fun r => transport idmap r x) (ap_fst_endo_path e h)
+       @ ptw (ap fst (ptoe_etop e)) x.
+
+  Definition endo_fun_inv {X Y : Type} {t : X -> X} {u : Y -> Y}
+    (p : ((X; t) : Endo) = (Y; u)) (y : Y) : endo_fun p (endo_fun p^ y) = y
+    := (endo_fun_concat p^ p y)^ @ ap (fun r => endo_fun r y) (concat_Vp p)
+       @ endo_fun_trp refl y.
+
+  (** The function underlying [EZ]: the unique equivariant [φ] with
+      [φ(0, 0) = 0] (in the book, [φ(k, r) = k + mr]). *)
+  Local Notation phi := (endo_fun EZ).
+
+  Definition endo_fun_comm {X Y : Type} {t : X -> X} {u : Y -> Y}
+    (p : ((X; t) : Endo) = (Y; u)) (x : X) : endo_fun p (t x) = u (endo_fun p x).
+  Proof.
+    assert (G : forall (w : Endo) (q : ((X; t) : Endo) = w),
+               @endo_fun _ X (fst w) t (snd w) q (t x)
+               = snd w (@endo_fun _ X (fst w) t (snd w) q x))
+      by (intros w q; destruct q; exact refl).
+    exact (G (Y; u) p).
+  Defined.
+
+  Definition phi_comm (w : FN k × ℤ) : phi (root k zs w) = zs (phi w)
+    := endo_fun_comm EZ w.
+
+  Definition ap_cyc_endo_cyc_of {u v : {w : Endo & CycP w}} (P : u = v)
+    : ap cyc_endo (ap cyc_of P) = ap fst P
+    := match P with refl => refl end.
+
+  Definition ap_cyc_endo_cyc_path (c d : Cyc) (E : cyc_endo c = cyc_endo d)
+    : ap cyc_endo (cyc_path c d E) = E
+    := ap_cyc_endo_cyc_of (path_sigma_prop CycP_isProp
+         (u := (cyc_endo c; (snd (fst c); (snd (fst (snd c)); snd (snd c)))))
+         (v := (cyc_endo d; (snd (fst d); (snd (fst (snd d)); snd (snd d))))) E)
+       @ ap_fst_pathpair _ _.
+
+  Definition phi_00 : phi (fn0 k; iplus 0) = iplus 0.
+  Proof.
+    unfold EZ, rho_Z_path, cyc_pointed_path.
+    rewrite ap_cyc_endo_cyc_path.
+    refine (ap (fun w : {e : (FN k × ℤ) ≃ ℤ & fst e ∘ root k zs = zs ∘ fst e}
+                  => fst (fst w) (fn0 k; iplus 0))
+              (eqinv_r (snd (endo_paths_eqv (root k zs) zs)) _) @ _).
+    exact (snd (fst (IdCycle_23 (snd (fst (rho_cyc k Zcyc))) (snd (fst Zcyc))
+                      (fst (snd (rho_cyc k Zcyc))) (fst (snd Zcyc))
+                      (snd (snd (rho_cyc k Zcyc))) (snd (snd Zcyc))
+                      (Hiff_rho_Z k) (fn0 k; iplus 0) (iplus 0)))).
+  Defined.
+
+  Definition PZ : rhoIC c0 = c0
+    := path_sigma_prop (fun _ => ptrunc_isProp) (u := rhoIC c0) (v := c0) EZ.
+
+  Definition ev0_endo {w1 w2 : InfCyc} (r : w1 = w2) (x : carrier_IC w1)
+    : trp carrier_IC r x = endo_fun (ap fst r) x.
+  Proof.
+    refine (transport_compose idmap carrier_IC r x @ _).
+    refine (ap (fun q => transport idmap q x) (ap_compose fst (fun w : Endo => fst w) r) @ _).
+    exact (endo_fun_trp _ x)^.
+  Defined.
+
+  Definition phi_comm' (w : FN k × ℤ) : phi (fst (Rt k zsEqv) w) = fst zsEqv (phi w)
+    := phi_comm w.
+
+  Definition loops_compare
+    : ev0 c0 (PZ^ @ ap rhoIC cloop @ PZ) = ev0 c0 (ap c (loopZ (iplus (S k)))).
+  Proof.
+    refine (_ @ (ev0_ap_c_loopZ (iplus (S k)))^).
+    unfold ev0. refine (ev0_endo _ _ @ _).
+    refine (ap (fun r => endo_fun r (iplus 0))
+              (ap_pp fst (PZ^ @ ap rhoIC cloop) PZ
+               @ ap (fun r => r @ ap fst PZ) (ap_pp fst PZ^ (ap rhoIC cloop))) @ _).
+    refine (endo_fun_concat _ _ _ @ _).
+    refine (ap (endo_fun (ap fst PZ)) (endo_fun_concat _ _ _) @ _).
+    pose (aPZ := ap_fst_pathpair (Y := fun x : Endo => ptrunc (Zs = x)) _ _ : ap fst PZ = EZ).
+    refine (ap (fun r => endo_fun r _) aPZ @ _).
+    assert (w0 : endo_fun (ap fst PZ^) (iplus 0) = (fn0 k; iplus 0)).
+    { refine (ap (fun r => endo_fun r (iplus 0)) (ap_V fst PZ @ ap inverse aPZ) @ _).
+      refine (ap (endo_fun EZ^) phi_00^ @ _).
+      refine (ap (fun r => endo_fun EZ^ (endo_fun r (fn0 k; iplus 0))) (inv_V EZ)^ @ _).
+      exact (endo_fun_inv EZ^ _). }
+    refine (ap (fun v => endo_fun EZ (endo_fun (ap fst (ap rhoIC cloop)) v)) w0 @ _).
+    assert (y : endo_fun (ap fst (ap rhoIC cloop)) (fn0 k; iplus 0) = (fn0 k; zp (iplus 0))).
+    { refine (ap (fun r => endo_fun r (fn0 k; iplus 0))
+                ((ap_compose rhoIC fst cloop)^ @ ap_compose fst (rho k) cloop) @ _).
+      refine (endo_fun_ap_rho _ _ @ _).
+      refine (ap (fun z => ((fn0 k; z) : FN k × ℤ)) _).
+      refine (ap (fun r => endo_fun r (iplus 0)) (ap_fst_pathpair _ _) @ _).
+      exact (endo_fun_endo_path zpEqv _ (iplus 0)). }
+    refine (ap (endo_fun EZ) y @ _).
+    assert (rp : tpow (Rt k zsEqv) (zmul (iplus (S k)) (iminus (negN 1))) (fn0 k; iplus 0)
+                 = (fn0 k; zp (iplus 0))).
+    { refine (root_pow k ℤ_isSet zsEqv _ _ @ _).
+      exact (ap (fun z => ((fn0 k; z) : FN k × ℤ)) (eqinv_mkEqv zs zp zp_zs zs_zp _)). }
+    refine (ap phi rp^ @ _).
+    refine (tpow_comm_map ℤ_isSet (Rt k zsEqv) zsEqv phi phi_comm' _ _ @ _).
+    refine (ap (tpow zsEqv _) phi_00 @ _).
+    refine (zadd_0_l _ @ _).
+    exact (zmul_neg (iplus (S k)) (iplus 1)).
+  Defined.
+
+  Definition loops_eq : PZ^ @ ap rhoIC cloop @ PZ = ap c (loopZ (iplus (S k)))
+    := Eqv_inj ((ev0 c0; ev0_isEquiv c0) : (c0 = c0) ≃ carrier_IC c0) loops_compare.
+
+  Definition conj_back {A : Type} {a b : A} (p : a = b) (X : a = a) (Z : b = b)
+    (e : p^ @ X @ p = Z) : X = p @ Z @ p^.
+  Proof.
+    destruct e. destruct p. rewrite !concat_p1, !concat_1p. exact refl.
+  Defined.
+
+  Definition square_loop
+    : ap (fun z => rhoIC (c z)) loop
+      = PZ⁻¹ ⋅ (ap (fun z => c (dg (S k) z)) loop ⋅ PZ).
+  Proof.
+    refine (ap_compose c rhoIC loop @ ap (ap rhoIC) (S1_rec_loop InfCyc c0 cloop) @ _).
+    refine (conj_back PZ _ _ loops_eq @ _).
+    refine (ap (fun Y => PZ @ Y @ PZ^)
+              (ap_compose (dg (S k)) c loop
+               @ ap (ap c) (S1_rec_loop S1 base (loopZ (iplus (S k)))))^ @ _).
+    exact (trans_is_concat _ _ @ ap (fun r => r @ PZ^) (trans_is_concat PZ _))^.
+  Defined.
+
+  (** [ρ_m c = c dg_m] as maps [S1 → InfCyc]. *)
+  Definition root_degree_square : (fun z => rhoIC (c z)) = (fun z => c (dg (S k) z))
+    := S1_fun_path (f := fun z => rhoIC (c z)) (g := fun z => c (dg (S k) z)) PZ square_loop.
+
+  (** Exercise [xca:pointed-maps-circle]: the same as pointed maps. *)
+  Definition rho_c_ptd : S1star →* ((InfCyc; c0) : Ustar)
+    := ((fun z => rhoIC (c z)); PZ⁻¹).
+
+  Definition c_dg_ptd : S1star →* ((InfCyc; c0) : Ustar)
+    := ((fun z => c (dg (S k) z)); refl).
+
+  Definition root_degree_ptd : rho_c_ptd = c_dg_ptd
+    := eqinv (snd (ptw_star rho_c_ptd c_dg_ptd))
+         (S1_htpy (f := fun z => rhoIC (c z)) (g := fun z => c (dg (S k) z)) PZ square_loop;
+          trans_Vp PZ).
+
+End RootDegree.
