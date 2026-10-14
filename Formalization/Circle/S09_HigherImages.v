@@ -8,9 +8,12 @@
     - Exercise [xca:cancel-injection] ([cancel_injection]).
     - Exercise [xca:cancel-surjection], for a set [Y]
       ([cancel_surjection]).  NOTE for the book text: without the
-      assumption that [Y] is a set the statement fails, e.g. for the
-      surjection [𝟚 → 𝟙] and the constant maps [𝟙 → S1] at [base], where
-      [(f = g) ≃ (base = base)] but [(fp = gp) ≃ (base = base)²].
+      assumption that [Y] is a set the statement fails.  Counterexample,
+      suggested by the author ([cancel_surjection_fails]): the constant
+      map [p : 𝟙 → S1] at [base] is a surjection, and [id_S1 ≠ -id_S1]
+      (3.4), but [id_S1 ∘ p] and [-id_S1 ∘ p] are both constant at [base],
+      so [ap_{_∘p} : (id = -id) → (id∘p = -id∘p)] goes from an empty type
+      to an inhabited one.
     - Definitions [def:n-image], [def:n-connected], [def:n-truncated] for
       [n ≥ -2], with the library's [Trunc n] ([im_n], [isnConn],
       [isnConnMap], [isnTruncMap]); [n]-truncated maps use the library's
@@ -68,9 +71,7 @@ Defined.
 (** Exercise [xca:cancel-surjection], for a set [Y]: precomposition with
     a surjection induces equivalences on identifications.
     NOTE for the book text: without the assumption that [Y] is a set the
-    statement fails, e.g. for the surjection [𝟚 → 𝟙] and the constant maps
-    [𝟙 → S1] at [base], where [(f = g) ≃ (base = base)] and
-    [(fp = gp) ≃ (base = base) × (base = base)]. *)
+    statement fails; see [cancel_surjection_fails] below. *)
 Definition cancel_surjection `{Funext} {A B Y : Type} (p : A -> B) (s : isSurj p)
   (sY : isSet Y) (f g : B -> Y) : isEquiv (@ap (B -> Y) (A -> Y) (fun h => h ∘ p) f g).
 Proof.
@@ -78,6 +79,20 @@ Proof.
   refine (snd (Eqv_of_props (sBY f g) (sAY _ _) (ap (fun h => h ∘ p)) _)).
   intro r. apply ptw_inv. intro b.
   exact (ptrunc_rec (sY _ _) (fun w => ap f (snd w) @ ptw r (fst w) @ (ap g (snd w))^) (s b)).
+Defined.
+
+(** The counterexample, suggested by the author: the constant map
+    [p : 𝟙 → S1] at [base] is a surjection, [id_S1 ≠ -id_S1] (3.4), but
+    [id_S1 ∘ p] and [-id_S1 ∘ p] are both constant at [base]. *)
+Definition const_base_isSurj `{Univalence} : isSurj (fun _ : True => base)
+  := fun z => ptrunc_rec ptrunc_isProp (fun e : base = z => trunc (tt; e⁻¹))
+                (S1_base_paths z).
+
+Definition cancel_surjection_fails `{Univalence}
+  : ¬ isEquiv (@ap (S1 -> S1) (True -> S1) (fun h => h ∘ (fun _ : True => base))
+                 idmap negid).
+Proof.
+  intro s. apply id_negid_not_conn. exact (trunc (eqinv s refl)).
 Defined.
 
 (** Definitions [def:n-image], [def:n-connected], [def:n-truncated], for
