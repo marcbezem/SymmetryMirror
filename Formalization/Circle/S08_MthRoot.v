@@ -42,9 +42,20 @@
       them through the equivalence [ev_0] of [lem:IdCisZet], using the
       equivariant map [φ] with [φ(0,0) = 0] given by [lem:IdCycle].
 
-    Left out (not yet formalized)
-    - Construction [thm:fiber-cdg] (the fiber of [ρ_m] at [(X,t)] is
-      [P × X/m]).
+    - Construction [thm:fiber-cdg] ([fiber_cdg]): for any cycle [(X,t)],
+      [∑_{c:Cyc} ((X,t) = ρ_m(c)) ≃ P × X/m], where [P] says that [m]
+      divides the order of [t].  The map sends [(c, e)] to the proof of [P]
+      and the class [[e⁻¹(0,y)]] for any [y] in [c] (independent of [y]).
+      Instead of the book's inverse (whose second round trip the book
+      leaves to the reader), we show that the fibers are contractible:
+      over [(P, [x])] the fiber is equivalent to the type of quadruples
+      [(c, e, y, e⁻¹(0,y) = x)], which in turn is equivalent to the type of
+      pointed cycles in one component, contractible by
+      [lem:sum-cycle-point-contr].  That component is the one of the
+      orbit of a point [x₀] under [t^m], with [t^m] restricted to it (the
+      book's [(V, t^m)]); the standard cycle [ℤ/∼_H] of [cor:set-trunc-cyc]
+      would not do here, since as a quotient by a [Prop]-valued relation
+      it lives in a higher universe than [(X,t)].
  *)
 
 From HoTT Require Import
@@ -854,3 +865,341 @@ Section RootDegree.
           trans_Vp PZ).
 
 End RootDegree.
+
+(** Construction [thm:fiber-cdg]: for any cycle [(X,t)], the fiber
+    [∑_{c:Cyc} ((X,t) = ρ_m(c))] of [ρ_m] is equivalent to [P × X/m], where
+    [P] says that [m] divides the order of [t].  The map sends [(c, e)] to
+    the proof of [P] (by [lem:m-root-id]) and the class [[e⁻¹(0,y)]] for
+    any [y] in [c].  Instead of the book's inverse (which restricts [t^m] to
+    a class [V]), we show that the fibers of this map are contractible: the
+    fiber over [(P, [x])] is equivalent to the type of pointed cycles in the
+    component of the standard cycle with [H = {q | t^{mq} = id}], which is
+    contractible by [lem:sum-cycle-point-contr]. *)
+Section FiberCdg.
+
+  Context `{Univalence} (k : ℕ) (d : Cyc).
+
+  Local Notation X := (fst (fst d)).
+  Local Notation sX := (snd (fst d)).
+  Local Notation t := (fst (snd d)).
+  Local Notation cy := (snd (snd d)).
+  Local Notation Y c := (fst (fst c)).
+
+  Definition Fib : Type := {c : Cyc & d = rho_cyc k c}.
+
+  Definition Einv {c : Cyc} (e : d = rho_cyc k c) : FN k × Y c -> X
+    := endo_fun (ap cyc_endo e)^.
+
+  Definition endo_fun_retr {A B : Type} {a : A -> A} {b : B -> B}
+    (p : ((A; a) : Endo) = (B; b)) (v : A) : endo_fun p^ (endo_fun p v) = v
+    := ap (fun r => endo_fun p^ (endo_fun r v)) (inv_V p)^ @ endo_fun_inv p^ v.
+
+  Definition Einv_inj {c : Cyc} (e : d = rho_cyc k c) {v v' : FN k × Y c}
+    (h : Einv e v = Einv e v') : v = v'
+    := (endo_fun_retr (ap cyc_endo e)^ v)^
+       @ ap (endo_fun ((ap cyc_endo e)^)^) h @ endo_fun_retr (ap cyc_endo e)^ v'.
+
+  Definition Einv_pow {c : Cyc} (e : d = rho_cyc k c) (n : ℤ) (v : FN k × Y c)
+    : Einv e (tpow (Rt k (fst (snd c))) n v) = tpow t n (Einv e v)
+    := tpow_comm_map sX (Rt k (fst (snd c))) t (Einv e)
+         (endo_fun_comm (ap cyc_endo e)^) n v.
+
+  Definition hiff_e {c : Cyc} (e : d = rho_cyc k c) : Hiffc d (rho_cyc k c)
+    := IdCycle_12 _ _ _ _ (trunc (ap cyc_endo e)).
+
+  Definition Pdiv_F (w : Fib) : Pdiv k sX t
+    := fun n h => ptrunc_rec ptrunc_isProp (fun z => trunc (fst z; fst (snd z)))
+                    (fst (Hc_rho k (fst w) n) (fst (hiff_e (snd w) n) h)).
+
+  Definition gpt {c : Cyc} (e : d = rho_cyc k c) (y : Y c) : Xm k t
+    := clsm k t (Einv e (fn0 k; y)).
+
+  Definition gpt_wconst {c : Cyc} (e : d = rho_cyc k c) : wconst (gpt e).
+  Proof.
+    intros y y'. apply (snd (clsm_iff k sX t _ _)).
+    refine (ptrunc_rec ptrunc_isProp _ (snd (snd (snd c)) y y')). intros [r er].
+    refine (trunc (r; _)).
+    refine (ap (fun z => Einv e (fn0 k; z)) er @ _).
+    refine (ap (Einv e) (root_pow k (snd (fst c)) (fst (snd c)) r (fn0 k; y))^ @ _).
+    exact (Einv_pow e _ _).
+  Defined.
+
+  Definition g_F (w : Fib) : Xm k t
+    := wconst_elim (quot_isSet (simm k t)) (gpt_wconst (snd w)) (fst (snd (snd (fst w)))).
+
+  Definition g_F_pt (w : Fib) (y : Y (fst w)) : g_F w = gpt (snd w) y
+    := ap (wconst_elim (quot_isSet (simm k t)) (gpt_wconst (snd w))) (ptrunc_isProp _ _)
+       @ wconst_elim_trunc _ _ y.
+
+  Definition G_F (w : Fib) : Pdiv k sX t × Xm k t := (Pdiv_F w; g_F w).
+
+  (** The standard cycle [c₀] with [H_{c₀} = {q | t^{mq} = id}]. *)
+  Local Notation Hs q := (Ht sX t (zmul (iplus (S k)) q)).
+
+  Definition Hs_0 : fst (Hs (iplus 0)) := fst (fst (Ht_subgroup sX t)).
+
+  Definition Hs_add (n q : ℤ) (hn : fst (Hs n)) (hq : fst (Hs q)) : fst (Hs (zadd n q))
+    := trp (fun z => fst (Ht sX t z)) (zmul_add _ _ _)^
+         (snd (fst (Ht_subgroup sX t)) _ _ hn hq).
+
+  Definition Hs_neg (n : ℤ) (hn : fst (Hs n)) : fst (Hs (zneg n))
+    := trp (fun z => fst (Ht sX t z)) (zmul_neg _ _)^ (snd (Ht_subgroup sX t) _ hn).
+
+  (** A cycle [c₀] whose [H] is [{q | t^{mq} = id}] determines the
+      component of the cycles [c] with [(X,t)] identified with [ρ_m(c)]. *)
+
+  Definition Ht_root_cancel (c : Cyc) (q : ℤ)
+    (h : fst (Hc (rho_cyc k c) (zmul (iplus (S k)) q))) : fst (Hc c q).
+  Proof.
+    apply ptw_inv. intro y.
+    exact (ap (fun v : FN k × Y c => snd v)
+              ((root_pow k (snd (fst c)) (fst (snd c)) q (fn0 k; y))^ @ ptw h _)).
+  Defined.
+
+  Definition hiff_comp (c0 : Cyc)
+    (Hc0 : forall q, (fst (Hc c0 q) -> fst (Hs q)) × (fst (Hs q) -> fst (Hc c0 q)))
+    (c : Cyc) (hH : Hiffc d (rho_cyc k c)) : ptrunc (c0 = c).
+  Proof.
+    apply cyc_merely_eq. intro q. refine (fun h => _; fun h => _).
+    - exact (Ht_root_cancel c q (fst (hH (zmul (iplus (S k)) q)) (fst (Hc0 q) h))).
+    - pose (h1 := m_root_id_conv k (snd (fst c)) (fst (snd c)) q h).
+      pose (h2 := snd (hH (zmul (iplus (S k)) q)) h1).
+      exact (snd (Hc0 q) h2).
+  Defined.
+
+  Definition comp_hiff (c0 : Cyc)
+    (Hc0 : forall q, (fst (Hc c0 q) -> fst (Hs q)) × (fst (Hs q) -> fst (Hc c0 q)))
+    (hP : Pdiv k sX t) (c : Cyc) (m0 : ptrunc (c0 = c))
+    : Hiffc d (rho_cyc k c).
+  Proof.
+    pose (hc := IdCycle_12 _ _ _ _ (ptrunc_rec ptrunc_isProp
+                  (fun p => trunc (ap cyc_endo p)) m0) : Hiffc c0 c).
+    intro n. refine (fun h => _; fun h => _).
+    - refine (ptrunc_rec (snd (Hc (rho_cyc k c) n)) _ (hP n h)). intros [q eq].
+      apply (snd (Hc_rho k c n)). refine (trunc (q; (eq; _))).
+      exact (fst (hc q) (snd (Hc0 q) (trp (fun z => fst (Ht sX t z)) eq h))).
+    - refine (ptrunc_rec (snd (Ht sX t n)) _ (fst (Hc_rho k c n) h)). intros [q [eq hq]].
+      exact (trp (fun z => fst (Ht sX t z)) eq^ (fst (Hc0 q) (snd (hc q) hq))).
+  Defined.
+
+End FiberCdg.
+
+Definition cyc_path_ap `{Univalence} {c c' : Cyc} (p : c = c')
+  : cyc_path c c' (ap cyc_endo p) = p.
+Proof.
+  destruct p. unfold cyc_path, path_sigma_prop. cbn.
+  match goal with |- context [CycP_isProp ?w ?a ?b] => generalize (CycP_isProp w a b) end.
+  intro q. assert (E : q = refl) by apply (prop_is_set (CycP_isProp _)).
+  rewrite E. exact refl.
+Defined.
+
+Section FiberCdg2.
+
+  Context `{Univalence} (k : ℕ) (d : Cyc).
+
+  Local Notation X := (fst (fst d)).
+  Local Notation sX := (snd (fst d)).
+  Local Notation t := (fst (snd d)).
+  Local Notation cy := (snd (snd d)).
+  Local Notation Y c := (fst (fst c)).
+
+  (** The orbit of [x₀] under [t^m], with [t^m] restricted to it: a cycle in
+      the universe of [X] whose [H] is [{q | t^{mq} = id}]. *)
+  Definition tm : X -> X := tpow t (iplus (S k)).
+  Definition tm_inv : X -> X := tpow t (zneg (iplus (S k))).
+
+  Definition tpow_neg_r (n : ℤ) (y : X) : tpow t n (tpow t (zneg n) y) = y
+    := (tpow_add sX t (zneg n) n y)^
+       @ ap (fun w => tpow t w y) (zadd_comm (zneg n) n @ zadd_zneg n).
+
+  Definition tmEqv : X ≃ X
+    := mkEqv tm tm_inv (fun x => tpow_neg sX t _ x) (fun x => tpow_neg_r _ x).
+
+  Definition eqinv_zaddEqv (z w : ℤ) : eqinv (snd (zaddEqv z)) w = zadd w (zneg z).
+  Proof.
+    refine (eqinv_mkEqv (zadd z) (fun w => fromInt (int_add (int_neg (toInt z)) (toInt w)))
+              _ _ w @ _).
+    apply toInt_inj. rewrite toInt_fromInt, toInt_zadd, toInt_zneg.
+    exact (int_add_comm _ _).
+  Defined.
+
+  Definition tpow_tm (r : ℤ) (x : X) : tpow tmEqv r x = tpow t (zmul (iplus (S k)) r) x.
+  Proof.
+    revert r. refine (ℤ_ind_prop _ (fun r => sX _ _) _ _).
+    - intro j. induction j as [|j IH]; [exact refl|].
+      refine (ap tm IH @ (tpow_add sX t _ _ x)^ @ _).
+      exact (ap (fun w => tpow t w x) (zadd_comm _ _)).
+    - intros [j]. induction j as [|j IH]; [exact refl|].
+      refine (eqinv_mkEqv tm tm_inv _ _ _ @ ap tm_inv IH @ (tpow_add sX t _ _ x)^ @ _).
+      exact (ap (fun w => tpow t w x) (eqinv_zaddEqv _ _)^).
+  Defined.
+
+  Section Orbit.
+
+    Context (x0 : X).
+
+    Definition XV : Type := {x : X & fst (simm k t x0 x)}.
+
+    Definition sXV : isSet XV := Sigma_isSet sX (fun _ => prop_is_set ptrunc_isProp).
+
+    Definition XV_path {v v' : XV} (e : fst v = fst v') : v = v'
+      := path_sigma_prop (fun _ => ptrunc_isProp) e.
+
+    Definition tV (v : XV) : XV
+      := (tm (fst v); simm_trans k sX t x0 (fst v) _ (snd v) (trunc (iplus 1; refl))).
+
+    Definition tVi (v : XV) : XV
+      := (tm_inv (fst v);
+          simm_trans k sX t x0 (fst v) _ (snd v)
+            (trunc (zneg (iplus 1); ap (fun w => tpow t w (fst v)) (zmul_neg _ _)^))).
+
+    Definition tVEqv : XV ≃ XV
+      := mkEqv tV tVi (fun v => XV_path (v := tVi (tV v)) (v' := v) (tpow_neg sX t _ (fst v)))
+               (fun v => XV_path (v := tV (tVi v)) (v' := v) (tpow_neg_r _ (fst v))).
+
+    Definition fst_tpow_tV (r : ℤ) (v : XV)
+      : fst (tpow tVEqv r v) = tpow t (zmul (iplus (S k)) r) (fst v)
+      := tpow_comm_map sX tVEqv tmEqv fst (fun v => refl) r v @ tpow_tm r (fst v).
+
+    Definition XV_isCycle : isCycle tVEqv.
+    Proof.
+      refine (trunc ((x0; simm_refl k t x0) : XV); fun v v' => _).
+      refine (ptrunc_rec ptrunc_isProp _
+                (simm_trans k sX t _ _ _ (simm_sym k sX t _ _ (snd v)) (snd v'))).
+      intros [r er]. exact (trunc (r; XV_path (er @ (fst_tpow_tV r v)^))).
+    Defined.
+
+    Definition cV : Cyc := ((XV; sXV); (tVEqv; XV_isCycle)).
+
+    Definition HcV (q : ℤ)
+      : (fst (Hc cV q) -> fst (Ht sX t (zmul (iplus (S k)) q)))
+        × (fst (Ht sX t (zmul (iplus (S k)) q)) -> fst (Hc cV q)).
+    Proof.
+      refine (fun h => _; fun h => _).
+      - apply (snd (Ht_point sX t cy x0 _)).
+        exact ((fst_tpow_tV q (x0; simm_refl k t x0))^
+               @ ap fst (ptw h (x0; simm_refl k t x0))).
+      - apply ptw_inv. intro v. apply XV_path.
+        exact (fst_tpow_tV q v @ ptw h (fst v)).
+    Defined.
+
+  End Orbit.
+
+  Definition Ipt (x : X) (c : Cyc) (y : Y c) : Type
+    := {e : d = rho_cyc k c & Einv k d e (fn0 k; y) = x}.
+
+  Local Notation IC23 c hH x y
+    := (IdCycle_23 sX (sFX k (snd (fst c))) t (Rt k (fst (snd c))) cy
+         (root_isCycle k (snd (fst c)) (fst (snd c)) (snd (snd c))) hH x (fn0 k; y)).
+
+  Local Notation PhiE c := (endo_paths_eqv (fst t) (root k (fst (fst (snd c))))).
+
+  Definition toI (x0 : X) (hP : Pdiv k sX t) (x : X) (c : Cyc) (y : Y c)
+    (m0 : ptrunc (cV x0 = c)) : Ipt x c y.
+  Proof.
+    pose (z := fst (IC23 c (comp_hiff k d (cV x0) (HcV x0) hP c m0) x y)).
+    pose (E' := eqinv (snd (PhiE c)) (fst z)).
+    refine (cyc_path d (rho_cyc k c) E'; _).
+    assert (h : endo_fun E' x = (fn0 k; y)).
+    { exact (ap (fun w : {e : X ≃ (FN k × Y c) & _} => fst (fst w) x)
+                (eqinv_r (snd (PhiE c)) (fst z)) @ snd z). }
+    unfold Einv.
+    refine (ap (fun r => endo_fun r^ (fn0 k; y)) (ap_cyc_endo_cyc_path d (rho_cyc k c) E') @ _).
+    exact (ap (endo_fun E'^) h^ @ endo_fun_retr E' x).
+  Defined.
+
+  Definition Ipt_isProp (x : X) (c : Cyc) (y : Y c) : isProp (Ipt x c y).
+  Proof.
+    intros [e1 q1] [e2 q2].
+    pose (C := IC23 c (hiff_e k d e1) x y).
+    assert (pf : forall e (q : Einv k d e (fn0 k; y) = x),
+               endo_fun (ap cyc_endo e) x = (fn0 k; y)).
+    { intros e q. exact (ap (endo_fun (ap cyc_endo e)) q^ @ endo_fun_inv (ap cyc_endo e) _). }
+    pose (z1 := (fst (PhiE c) (ap cyc_endo e1); pf e1 q1)
+                : {w : {e : X ≃ (FN k × Y c) & _} & fst (fst w) x = (fn0 k; y)}).
+    pose (z2 := (fst (PhiE c) (ap cyc_endo e2); pf e2 q2)
+                : {w : {e : X ≃ (FN k × Y c) & _} & fst (fst w) x = (fn0 k; y)}).
+    assert (ee : e1 = e2).
+    { refine ((cyc_path_ap e1)^ @ ap (cyc_path d (rho_cyc k c)) _ @ cyc_path_ap e2).
+      exact (Eqv_inj (PhiE c) (ap fst (isContr_isProp' C z1 z2))). }
+    exact (path_sigma_prop (fun e => sX _ _) (u := (e1; q1)) (v := (e2; q2)) ee).
+  Defined.
+
+  Definition Ptd (x : X) : Type
+    := {c : Cyc & {e : d = rho_cyc k c & {y : Y c & Einv k d e (fn0 k; y) = x}}}.
+
+  Definition Ptd_isContr (hP : Pdiv k sX t) (x : X) : isContr (Ptd x).
+  Proof.
+    refine (ptrunc_rec (isContr_isProp _) _ (fst cy)). intro x0.
+    refine (isContr_retract
+              (fun w : {w : component Cyc (cV x0) & Y (fst w)} =>
+                 (fst (fst w); (fst (toI x0 hP x _ (snd w) (snd (fst w)));
+                                (snd w; snd (toI x0 hP x _ (snd w) (snd (fst w))))))
+                 : Ptd x)
+              (fun p => ((fst p; hiff_comp k d (cV x0) (HcV x0) (fst p)
+                                   (hiff_e k d (fst (snd p))));
+                         fst (snd (snd p))) : {w : component Cyc (cV x0) & Y (fst w)})
+              _ (sum_cycle_point_contr (cV x0))).
+    intros [c [e [y q]]].
+    exact (ap (fun z : Ipt x c y => ((c; (fst z; (y; snd z))) : Ptd x))
+              (Ipt_isProp x c y _ (e; q))).
+  Defined.
+
+  Definition Pdiv_isProp : isProp (Pdiv k sX t)
+    := Pi_isProp (fun n => fun_isProp ptrunc_isProp).
+
+  Definition PXm_isSet : isSet (Pdiv k sX t × Xm k t)
+    := Sigma_isSet (prop_is_set Pdiv_isProp) (fun _ => quot_isSet (simm k t)).
+
+  Definition Ky_isProp (x : X) (w : Fib k d)
+    : isProp {y : Y (fst w) & Einv k d (snd w) (fn0 k; y) = x}.
+  Proof.
+    intros [y1 q1] [y2 q2].
+    apply (path_sigma_prop (fun _ => sX _ _)).
+    exact (ap (fun v : FN k × Y (fst w) => snd v) (Einv_inj k d (snd w) (q1 @ q2^))).
+  Defined.
+
+  Definition Ky_of (x : X) (w : Fib k d) (r : clsm k t x = g_F k d w)
+    : {y : Y (fst w) & Einv k d (snd w) (fn0 k; y) = x}.
+  Proof.
+    refine (ptrunc_rec (Ky_isProp x w) _ (fst (snd (snd (fst w))))). intro y0.
+    pose (r' := r @ g_F_pt k d w y0).
+    refine (ptrunc_rec (Ky_isProp x w) _ (fst (clsm_iff k sX t _ _) r')). intros [n en].
+    refine (tpow (fst (snd (fst w))) (zneg n) y0; _).
+    refine (ap (Einv k d (snd w))
+              (root_pow k (snd (fst (fst w))) (fst (snd (fst w))) (zneg n) (fn0 k; y0))^ @ _).
+    refine (Einv_pow k d (snd w) _ _ @ _).
+    refine (ap (fun z => tpow t z _) (zmul_neg _ _) @ _).
+    exact (ap (tpow t _) en @ tpow_neg sX t _ x).
+  Defined.
+
+  Definition fiber_G_isContr (hP : Pdiv k sX t) (x : X)
+    : isContr {w : Fib k d & (hP; clsm k t x) = G_F k d w}.
+  Proof.
+    refine (isContr_retract
+              (fun p : Ptd x => (((fst p; fst (snd p)) : Fib k d);
+                     ap011 (fun a b => (a; b) : Pdiv k sX t × Xm k t)
+                       (Pdiv_isProp _ _)
+                       (ap (clsm k t) (snd (snd (snd p)))^
+                        @ (g_F_pt k d (fst p; fst (snd p)) (fst (snd (snd p))))^))
+                     : {w : Fib k d & (hP; clsm k t x) = G_F k d w})
+              (fun q : {w : Fib k d & (hP; clsm k t x) = G_F k d w} =>
+                 (fst (fst q); (snd (fst q);
+                   Ky_of x (fst q) (ap (fun v : Pdiv k sX t × Xm k t => snd v) (snd q))))
+                 : Ptd x)
+              _ (Ptd_isContr hP x)).
+    intro q. refine (path_sigma_prop (fun w => PXm_isSet _ _) _). exact refl.
+  Defined.
+
+  Definition G_F_isEquiv : isEquiv (G_F k d).
+  Proof.
+    intros [hP V]. revert V hP.
+    refine (im_ind (simm k t) (fun V => forall hP, isContr (fiber (G_F k d) (hP; V)))
+              (fun V => Pi_isProp (fun hP => isContr_isProp _)) _).
+    intros x hP.
+    exact (fiber_G_isContr hP x).
+  Defined.
+
+  Definition fiber_cdg : Fib k d ≃ (Pdiv k sX t × Xm k t) := (G_F k d; G_F_isEquiv).
+
+End FiberCdg2.

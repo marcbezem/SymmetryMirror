@@ -10,7 +10,7 @@
     type of infinite cycles ([S05_Reinterpretation.v]) and connected
     coverings over the circle ([S06_ConnCoverings.v]), permutations
     ([S07_Permutations.v]), the [m]-th root ([S08_MthRoot.v]) and higher
-    images ([S09_HigherImages.v]); 3.6 and 3.8 partly.
+    images ([S09_HigherImages.v]); 3.6 partly.
     They build on Chapter 2 ([IntroUF.IntroUF]).  Everything compiles with
     nothing admitted.
 
