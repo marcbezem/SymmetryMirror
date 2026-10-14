@@ -215,6 +215,23 @@ Section Reinterpretation.
   Definition c_isEquiv : isEquiv c
     := snd (conn_eq_f_ap_f_x S1_isConn (component_isConn Zs) base c) ap_c_isEquiv.
 
+  (** The identity type [(X,t) = (Y,u)] in [Endo] is equivalent to
+      [∑_{e : X ≃ Y} (e t = u e)]. *)
+  Definition endo_trp_eqv {X Y : Type} (p : X = Y) (t : X -> X) (u : Y -> Y)
+    : (trp (fun X : Type => X -> X) p t = u) ≃ (ptoe p ∘ t = u ∘ ptoe p).
+  Proof. destruct p. exact (idEqv _). Defined.
+
+  Definition endo_paths_eqv {X Y : Type} (t : X -> X) (u : Y -> Y)
+    : (((X; t) : Endo) = (Y; u)) ≃ {e : X ≃ Y & fst e ∘ t = u ∘ fst e}.
+  Proof.
+    refine (Eqv_comp (Eqv_inv (path_sigma_eqv (Y := fun X : Type => X -> X))) _).
+    refine (Eqv_comp (tot (fun p => fst (endo_trp_eqv p t u));
+                      tot_isEquiv _ (fun p => snd (endo_trp_eqv p t u))) _).
+    exact (Eqv_of_Equiv (equiv_functor_sigma_pb
+             (Q := fun e : X ≃ Y => fst e ∘ t = u ∘ fst e)
+             (Equiv_of_Eqv (idtoeqv; ua X Y)))).
+  Defined.
+
   (** Exercise [xca:TTYoneda], first part. *)
   Definition yoneda_eqv {X : Type} (F : X -> Type) (x : X)
     : F x ≃ (forall y : X, x = y -> F y).

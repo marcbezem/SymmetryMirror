@@ -23,14 +23,36 @@
       the winding number of the projected loop ([loopsAE_isEquiv]); and
       [H_t] is the image of that map ([image_loops_Ht]).
 
+    - [lem:IdCycle], all three implications, with identifications in
+      [Endo] characterized as [∑_{e:X≃Y} (e t = u e)] ([endo_paths_eqv],
+      3.5): 1 ⇒ 2 ([IdCycle_12]), 2 ⇒ 3 ([IdCycle_23], via the book's
+      [P_x], whose center gives the unique [e] with [e(x₀) = y₀]) and
+      3 ⇒ 1 ([IdCycle_31]); [cor:ConnCycles] ([ConnCycles]).
+    - Exercise [xca:map-of-cycles], all three parts.
+    - [cor:set-trunc-cyc] ([set_trunc_cyc]): [H] is some [H_t] iff it
+      contains [0] and is closed under addition and negation; the
+      converse direction is [def:standard-cycle] ([standard_cycle],
+      [(ℤ/∼_H, zs)] with [H_t = H]).
+    - [def:Order] ([Order], [ord], [HO], [divides]); [(ℤ, zs)] and the
+      standard [m]-cycles are cycles, giving the principal orders.
+    - The Limited Principle of Omniscience ([LPO]), [LEM → LPO]
+      ([LEM_LPO]) and exercise [xca:not-not-lpoP].
+    - Remark [rem:flipthecircle]: [(S1, r) = (S1, id)] as coverings, via
+      the general [(A, f e) = (A', f)] for an equivalence [e].
+    - Functoriality: the function underlying a composite identification
+      in [Endo] is the composite ([endo_fun_concat]).
+
     Left out (not yet formalized)
     - [con:psi-alpha-m] and [cor:dgm-conncov] (the book leaves the
       inverse of [ψ_m] as an exercise).
-    - [lem:IdCycle], [cor:ConnCycles], [cor:id-m-cycle],
-      [cor:set-trunc-cyc], [xca:map-of-cycles], [def:Order],
-      [def:standard-cycle], the Limited Principle of Omniscience with
-      [LEM → LPO] and [xca:not-not-lpoP], [lem:componentsofcoversofS1]
-      and [rem:flipthecircle]. *)
+    - [cor:id-m-cycle]: the evaluation map is an instance of
+      [ConnCycles], and the compatibility with [zs] follows from
+      [endo_fun_concat]; the instantiation at [Fin m] ran into universe
+      constraints and was not finished.
+    - [lem:componentsofcoversofS1] (LPO implies that every decidable
+      cycle has a principal order), which needs Euclidean division on
+      [ℤ] and the computation of [H] for the standard cycles.
+ *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
@@ -388,3 +410,533 @@ Section Orders.
   Defined.
 
 End Orders.
+
+(** Maps commuting with the permutations commute with their powers. *)
+Section CycleMaps.
+
+  Context `{Univalence} {X Y : Type} (sY : isSet Y) (t : X ≃ X) (u : Y ≃ Y)
+    (f : X -> Y) (hf : forall x, f (fst t x) = fst u (f x)).
+
+  Definition cmap_inv (y : X) : f (eqinv (snd t) y) = eqinv (snd u) (f y)
+    := (eqinv_l (snd u) _)^ @ ap (eqinv (snd u)) ((hf _)^ @ ap f (eqinv_r (snd t) y)).
+
+  Definition tpow_comm_map (n : ℤ) (x : X) : f (tpow t n x) = tpow u n (f x).
+  Proof.
+    revert n. refine (ℤ_ind_prop _ (fun n => sY _ _) _ _).
+    - intro k. induction k as [|k IH]; [exact refl | exact (hf _ @ ap (fst u) IH)].
+    - intros [k]. induction k as [|k IH];
+        [exact refl | exact (cmap_inv _ @ ap (eqinv (snd u)) IH)].
+  Defined.
+
+End CycleMaps.
+
+Definition zadd_sub_add (m n : ℤ) : zadd (zadd m (zneg n)) n = m
+  := toInt_inj (y := m)
+       (toInt_zadd _ _ @ ap (fun a => int_add a (toInt n))
+          (toInt_zadd _ _ @ ap (int_add (toInt m)) (toInt_zneg n))
+        @ (int_add_assoc _ _ _)^ @ ap (int_add (toInt m)) (int_add_neg_l _)
+        @ int_add_0_r _).
+
+(** The construction in the proof of [lem:IdCycle]: if [H_t ⊆ H_u], then
+    for [x₀ : X], [y₀ : Y] there is a unique [e : X → Y] with [e t = u e]
+    and [e(x₀) = y₀], namely the center of
+    [P_x :≡ ∑_{y:Y} ∏_{n:ℤ} ((x = t^n(x₀)) → (y = u^n(y₀)))]. *)
+Section CycleMapConstruction.
+
+  Context `{Univalence} {X Y : Type} (sX : isSet X) (sY : isSet Y)
+    (t : X ≃ X) (u : Y ≃ Y) (cX : isCycle t)
+    (hH : forall n, fst (Ht sX t n) -> fst (Ht sY u n)) (x0 : X) (y0 : Y).
+
+  Definition agree (m n : ℤ) (e : tpow t m x0 = tpow t n x0)
+    : tpow u m y0 = tpow u n y0.
+  Proof.
+    pose (d := zadd m (zneg n)).
+    pose (ed := tpow_add sX t m (zneg n) x0 @ ap (tpow t (zneg n)) e @ tpow_neg sX t n x0
+                : tpow t d x0 = x0).
+    pose (hd := hH d (snd (Ht_point sX t cX x0 d) ed)).
+    exact (ap (fun w => tpow u w y0) (zadd_sub_add m n)^ @ tpow_add sY u d n y0
+           @ ap (tpow u n) (ptw hd y0)).
+  Defined.
+
+  Definition Pt (x : X) : Type
+    := {y : Y & forall n : ℤ, x = tpow t n x0 -> y = tpow u n y0}.
+
+  Definition Pt_isContr (x : X) : isContr (Pt x).
+  Proof.
+    refine (ptrunc_rec (isContr_isProp _) _ (snd cX x0 x)). intros [m em].
+    refine ((tpow u m y0; fun n en => agree m n (em^ @ en)); _).
+    intros [y φ].
+    apply (path_sigma_prop (fun y => Pi_isProp (fun n => Pi_isProp (fun _ => sY _ _)))).
+    exact (φ m em)^.
+  Defined.
+
+  Definition eF (x : X) : Y := fst (fst (Pt_isContr x)).
+
+  Definition eF_spec (x : X) (n : ℤ) (en : x = tpow t n x0) : eF x = tpow u n y0
+    := snd (fst (Pt_isContr x)) n en.
+
+  Definition Pt_unique (x : X) (y y' : Pt x) : fst y = fst y'
+    := ap fst (isContr_isProp' (Pt_isContr x) y y').
+
+  Definition eF_x0 : eF x0 = y0 := eF_spec x0 (iplus 0) refl.
+
+  Definition eF_comm (x : X) : eF (fst t x) = fst u (eF x).
+  Proof.
+    refine (Pt_unique (fst t x) (fst (Pt_isContr _)) (fst u (eF x); _)).
+    intros n en.
+    pose (ex := (eqinv_l (snd t) x)^ @ ap (eqinv (snd t)) en @ (tpow_zp sX t n x0)^
+                : x = tpow t (zp n) x0).
+    exact (ap (fst u) (eF_spec x (zp n) ex) @ (tpow_zs sY u (zp n) y0)^
+           @ ap (fun w => tpow u w y0) (zs_zp n)).
+  Defined.
+
+  Definition eF_unique (f : X -> Y) (hf : forall x, f (fst t x) = fst u (f x))
+    (f0 : f x0 = y0) (x : X) : f x = eF x
+    := Pt_unique x (f x; fun n en => ap f en @ tpow_comm_map sY t u f hf n x0
+                                      @ ap (tpow u n) f0)
+         (fst (Pt_isContr x)).
+
+End CycleMapConstruction.
+
+
+(** Lemma [lem:IdCycle].  Identifications [(X,t) = (Y,u)] are taken in
+    [Endo :≡ ∑_{X:U}(X → X)], and correspond to [∑_{e:X≃Y} (e t = u e)]
+    ([endo_paths_eqv], 3.5); part 3 is stated for the latter type, which
+    the book identifies with the former "transparently". *)
+Section IdCycle.
+
+  Context `{Univalence} {X Y : Type} (sX : isSet X) (sY : isSet Y)
+    (t : X ≃ X) (u : Y ≃ Y) (cX : isCycle t) (cY : isCycle u).
+
+  Definition Ht_transfer {A B : Type} (sA : isSet A) (sB : isSet B)
+    (a : A ≃ A) (b : B ≃ B) (e : A ≃ B) (h : forall x, fst e (fst a x) = fst b (fst e x))
+    (n : ℤ) : fst (Ht sA a n) -> fst (Ht sB b n)
+    := fun ha => ptw_inv (fun y => (ap (tpow b n) (eqinv_r (snd e) y))^
+                     @ (tpow_comm_map sB a b (fst e) h n _)^ @ ap (fst e) (ptw ha _)
+                     @ eqinv_r (snd e) y).
+
+  Definition inv_comm {A B : Type} (a : A ≃ A) (b : B ≃ B) (e : A ≃ B)
+    (h : forall x, fst e (fst a x) = fst b (fst e x)) (y : B)
+    : eqinv (snd e) (fst b y) = fst a (eqinv (snd e) y)
+    := ap (eqinv (snd e)) (ap (fst b) (eqinv_r (snd e) y)^ @ (h _)^) @ eqinv_l (snd e) _.
+
+  Definition Hiff : Type
+    := forall n, (fst (Ht sX t n) -> fst (Ht sY u n)) × (fst (Ht sY u n) -> fst (Ht sX t n)).
+
+  Definition EndoEqv : Type := {e : X ≃ Y & fst e ∘ fst t = fst u ∘ fst e}.
+
+  (** 1 ⇒ 2. *)
+  Definition IdCycle_12 (p : ptrunc (((X; fst t) : Endo) = (Y; fst u))) : Hiff.
+  Proof.
+    refine (ptrunc_rec (Pi_isProp (fun n => prod_isProp (fun_isProp (snd (Ht sY u n)))
+                                              (fun_isProp (snd (Ht sX t n))))) _ p).
+    intro q. pose (w := fst (endo_paths_eqv (fst t) (fst u)) q).
+    intro n. exact (Ht_transfer sX sY t u (fst w) (ptw (snd w)) n;
+                    Ht_transfer sY sX u t (Eqv_inv (fst w))
+                      (inv_comm t u (fst w) (ptw (snd w))) n).
+  Defined.
+
+  (** 2 ⇒ 3. *)
+  Definition IdCycle_23 (hH : Hiff) (x0 : X) (y0 : Y)
+    : isContr {w : EndoEqv & fst (fst w) x0 = y0}.
+  Proof.
+    pose (h1 := fun n => fst (hH n)). pose (h2 := fun n => snd (hH n)).
+    pose (f := eF sX sY t u cX h1 x0 y0). pose (g := eF sY sX u t cY h2 y0 x0).
+    assert (gf : forall x, g (f x) = x).
+    { intro x.
+      exact (eF_unique sX sX t t cX (fun n h => h) x0 x0 (fun x => g (f x))
+               (fun x => ap g (eF_comm _ _ _ _ _ _ _ _ x) @ eF_comm _ _ _ _ _ _ _ _ _)
+               (ap g (eF_x0 _ _ _ _ _ _ _ _) @ eF_x0 _ _ _ _ _ _ _ _) x
+             @ (eF_unique sX sX t t cX (fun n h => h) x0 x0 idmap (fun x => refl) refl x)^). }
+    assert (fg : forall y, f (g y) = y).
+    { intro y.
+      exact (eF_unique sY sY u u cY (fun n h => h) y0 y0 (fun y => f (g y))
+               (fun y => ap f (eF_comm _ _ _ _ _ _ _ _ y) @ eF_comm _ _ _ _ _ _ _ _ _)
+               (ap f (eF_x0 _ _ _ _ _ _ _ _) @ eF_x0 _ _ _ _ _ _ _ _) y
+             @ (eF_unique sY sY u u cY (fun n h => h) y0 y0 idmap (fun y => refl) refl y)^). }
+    refine ((((mkEqv f g gf fg; ptw_inv (eF_comm sX sY t u cX h1 x0 y0)) : EndoEqv);
+             eF_x0 sX sY t u cX h1 x0 y0); _).
+    intros [[e h] p0].
+    apply (path_sigma_prop (fun _ => sY _ _)).
+    apply (path_sigma_prop (fun e : X ≃ Y => Pi_isSet (fun _ => sY) _ _)).
+    apply path_Eqv, ptw_inv. intro x.
+    exact (eF_unique sX sY t u cX h1 x0 y0 (fst e) (ptw h) p0 x)^.
+  Defined.
+
+  (** 3 ⇒ 1. *)
+  Definition IdCycle_31 (h3 : forall x0 y0, isContr {w : EndoEqv & fst (fst w) x0 = y0})
+    : ptrunc (((X; fst t) : Endo) = (Y; fst u))
+    := ptrunc_rec ptrunc_isProp
+         (fun x0 => ptrunc_rec ptrunc_isProp
+            (fun y0 => trunc (eqinv (snd (endo_paths_eqv (fst t) (fst u)))
+                                (fst (fst (h3 x0 y0)))))
+            (fst cY))
+         (fst cX).
+
+  (** Corollary [cor:ConnCycles]: evaluation at [x₀] is an equivalence
+      [((X,t) = (Y,u)) ≃ Y]. *)
+  Definition ev_x0 (x0 : X) (p : ((X; fst t) : Endo) = (Y; fst u)) : Y
+    := fst (fst (fst (endo_paths_eqv (fst t) (fst u)) p)) x0.
+
+  Definition ConnCycles (hH : Hiff) (x0 : X) : isEquiv (ev_x0 x0).
+  Proof.
+    refine (comp_isEquiv (f := fst (endo_paths_eqv (fst t) (fst u)))
+              (g := fun w : EndoEqv => fst (fst w) x0)
+              (snd (endo_paths_eqv (fst t) (fst u))) _).
+    intro y0.
+    exact (isContr_Eqv (tot (fun w (p : fst (fst w) x0 = y0) => p⁻¹);
+                        tot_isEquiv _ (fun w => snd symm_eqv))
+             (IdCycle_23 hH x0 y0)).
+  Defined.
+
+End IdCycle.
+
+(** Exercise [xca:map-of-cycles]. *)
+Section MapOfCycles.
+
+  Context `{Univalence} {X Y : Type} (sX : isSet X) (sY : isSet Y)
+    (t : X ≃ X) (u : Y ≃ Y) (cX : isCycle t) (cY : isCycle u)
+    (f : X -> Y) (hf : forall x, f (fst t x) = fst u (f x)).
+
+  Definition mapcyc_i (n : ℤ) : fst (Ht sX t n) -> fst (Ht sY u n)
+    := fun ht => ptrunc_rec (snd (Ht sY u n))
+         (fun x0 => snd (Ht_point sY u cY (f x0) n)
+                      ((tpow_comm_map sY t u f hf n x0)^ @ ap f (ptw ht x0)))
+         (fst cX).
+
+  Definition mapcyc_ii : isSurj f
+    := fun y => ptrunc_rec ptrunc_isProp
+         (fun x0 => ptrunc_rec ptrunc_isProp
+            (fun w => trunc (tpow t (fst w) x0; snd w @ (tpow_comm_map sY t u f hf (fst w) x0)^))
+            (snd cY (f x0) y))
+         (fst cX).
+
+  Definition mapcyc_iii (hH : forall n, fst (Ht sY u n) -> fst (Ht sX t n)) : isInj f.
+  Proof.
+    apply (cancel_isInj sY). intros x x' e.
+    refine (ptrunc_rec (sX _ _) _ (snd cX x x')). intros [n en].
+    pose (eu := (tpow_comm_map sY t u f hf n x)^ @ ap f en^ @ e^ : tpow u n (f x) = f x).
+    pose (ht := hH n (snd (Ht_point sY u cY (f x) n) eu)).
+    exact ((ptw ht x)^ @ en^).
+  Defined.
+
+End MapOfCycles.
+
+(** Corollary [cor:set-trunc-cyc], first half: each [H_t] contains [0] and
+    is closed under addition and negation. *)
+Definition Ht_subgroup `{Univalence} {X : Type} (sX : isSet X) (t : X ≃ X)
+  : fst (Ht sX t (iplus 0))
+    × (forall n m, fst (Ht sX t n) -> fst (Ht sX t m) -> fst (Ht sX t (zadd n m)))
+    × (forall n, fst (Ht sX t n) -> fst (Ht sX t (zneg n))).
+Proof.
+  refine ((refl; fun n m hn hm => ptw_inv (fun x => _)); fun n hn => ptw_inv (fun x => _)).
+  - exact (tpow_add sX t n m x @ ap (tpow t m) (ptw hn x) @ ptw hm x).
+  - exact (ap (tpow t (zneg n)) (ptw hn x)^ @ tpow_neg sX t n x).
+Defined.
+
+(** Definition [def:Order]: [Order :≡ ‖Cyc‖₀], with [ord :≡ |_|₀]; the
+    subset [H] of an order, and divisibility [d | k] iff [H_k ⊆ H_d]. *)
+Definition Hc `{Univalence} (c : Cyc) : ℤ -> PropU := Ht (snd (fst c)) (fst (snd c)).
+
+Definition Order `{Univalence} : Type := strunc Cyc.
+
+Definition ord `{Univalence} : Cyc -> Order := settrunc.
+
+Definition HO `{Univalence} : Order -> ℤ -> PropU
+  := strunc_rec (Pi_isSet (fun _ => PropU_isSet)) Hc.
+
+Definition divides `{Univalence} (d k : Order) : Type
+  := forall n, fst (HO k n) -> fst (HO d n).
+
+(** The infinite cycle [(ℤ, zs)] and the standard [m]-cycles, giving the
+    principal orders [ℕ → Order] ([0] to the infinite order). *)
+Definition zadd_sub (x x' : ℤ) : x' = zadd x (zadd x' (zneg x)).
+Proof.
+  apply toInt_inj. symmetry.
+  rewrite toInt_zadd, toInt_zadd, toInt_zneg.
+  rewrite (int_add_comm (toInt x') _), int_add_assoc, int_add_neg_r.
+  exact refl.
+Defined.
+
+Definition Z_isCycle `{Univalence} : isCycle zsEqv
+  := (trunc (iplus 0); fun x x' => trunc (zadd x' (zneg x); zadd_sub x x')).
+
+Definition Zcyc `{Univalence} : Cyc := ((ℤ; ℤ_isSet); (zsEqv; Z_isCycle)).
+
+Section FinIsCycle.
+
+  Context `{Univalence} (k : ℕ).
+
+  Definition FinNat_isSet : isSet (FinNat (S k))
+    := Sigma_isSet (IsHSet_isSet ishset_nat) (fun x => prop_is_set (fn_isProp_lt k x)).
+
+  Definition fn0 : FinNat (S k) := (0%nat; leq_succ (leq_zero_l k)).
+
+  Definition fs_iter (i : ℕ) (l : (i < S k)%nat) : tpow (fsEqv k) (iplus i) fn0 = (i; l).
+  Proof.
+    induction i as [|i IH].
+    - apply (path_sigma_prop (fn_isProp_lt k)). exact refl.
+    - refine (ap (fs k) (IH (leq_succ_l l)) @ _). unfold fs. cbn.
+      destruct (dec (i < k)%nat) as [l'|nl].
+      + apply (path_sigma_prop (fn_isProp_lt k)). exact refl.
+      + destruct (nl (leq_pred' l)).
+  Defined.
+
+  Definition FinNat_isCycle : isCycle (fsEqv k).
+  Proof.
+    refine (trunc fn0; fun x x' => trunc (zadd (zneg (iplus (fst x))) (iplus (fst x')); _)).
+    refine ((fs_iter (fst x') (snd x'))^ @ _).
+    refine (ap (tpow (fsEqv k) (iplus (fst x'))) (tpow_neg FinNat_isSet (fsEqv k) _ fn0)^ @ _).
+    refine (ap (fun v => tpow (fsEqv k) (iplus (fst x')) (tpow (fsEqv k) (zneg (iplus (fst x))) v))
+              (fs_iter (fst x) (snd x)) @ _).
+    exact (tpow_add FinNat_isSet (fsEqv k) _ _ x)^.
+  Defined.
+
+  Definition Fin_isCycle : isCycle (finsuccEqv k).
+  Proof.
+    pose (e := Eqv_of_Equiv (equiv_fin_finnat (S k))).
+    assert (he : forall x, fst e (fst (finsuccEqv k) x) = fst (fsEqv k) (fst e x))
+      by (intro x; exact (eqinv_r (snd e) _)).
+    refine (trunc fin_zero; fun x x' => _).
+    refine (ptrunc_rec ptrunc_isProp _ (snd FinNat_isCycle (fst e x) (fst e x'))).
+    intros [n en]. refine (trunc (n; Eqv_inj e (en @ _))).
+    exact (tpow_comm_map FinNat_isSet (finsuccEqv k) (fsEqv k) (fst e) he n x)^.
+  Defined.
+
+  Definition Fincyc : Cyc := ((Fin (S k); Fin_isSet (S k)); (finsuccEqv k; Fin_isCycle)).
+
+End FinIsCycle.
+
+Definition principal_order `{Univalence} (n : ℕ) : Order
+  := match n with O => ord Zcyc | S k => ord (Fincyc k) end.
+
+(** The Limited Principle of Omniscience ([LPO]): for [P : ℕ → 𝟚], either
+    there is a smallest [n₀] with [P(n₀) = yes], or [P] is constantly [no]. *)
+Definition LPO : Type
+  := forall P : ℕ -> Bool,
+       {n0 : ℕ & Pmin (fun n => ((P n = yes); isSet_bool _ _)) n0} ⨿ (forall n, P n = no).
+
+Definition Bool_dec_yes (b : Bool) : isDecidable (b = yes)
+  := match b as b' return isDecidable (b' = yes) with
+     | yes => inl refl
+     | no => inr (fun e => yes_ne_no e^)
+     end.
+
+Definition not_yes_no (b : Bool) : ¬ (b = yes) -> b = no
+  := match b as b' return ¬ (b' = yes) -> b' = no with
+     | yes => fun n => match n refl with end
+     | no => fun _ => refl
+     end.
+
+(** The Law of Excluded Middle implies LPO. *)
+Definition LEM_LPO `{Funext} (lem : LEM) : LPO.
+Proof.
+  intro P. pose (Q := fun n => ((P n = yes); isSet_bool (P n) yes) : PropU).
+  destruct (lem (ptrunc {n : ℕ & P n = yes}) ptrunc_isProp) as [w|nw].
+  - exact (inl (min Q (fun n => Bool_dec_yes (P n)) w)).
+  - exact (inr (fun n => not_yes_no (P n) (fun e => nw (trunc (n; e))))).
+Defined.
+
+(** Exercise [xca:not-not-lpoP]. *)
+Definition not_not_LPO (P : ℕ -> Bool)
+  : ¬ ¬ ({n0 : ℕ & Pmin (fun n => ((P n = yes); isSet_bool _ _)) n0} ⨿ (forall n, P n = no)).
+Proof.
+  intro nq. apply nq. right. intro n.
+  apply not_yes_no. intro e.
+  apply nq. left.
+  exact (mu (fun n => ((P n = yes); isSet_bool _ _)) (fun n => Bool_dec_yes (P n)) (S n);
+         mu_Pmin (fun n => ((P n = yes); isSet_bool _ _)) (fun n => Bool_dec_yes (P n)) n e).
+Defined.
+
+(** Remark [rem:flipthecircle]: the orientation reversing map [r :≡ -id_S1]
+    and [id_S1] give the same covering, since [r] is an equivalence. *)
+Definition cov_eq `{Univalence} {A A' C : Type} (e : A ≃ A') (f : A' -> C)
+  : ((A; f ∘ fst e) : {B : Type & B -> C}) = (A'; f).
+Proof.
+  refine (pathpair (Y := fun B : Type => B -> C) (etop e) (ptw_inv (fun y => _))).
+  refine (transport_arrow_toconst (etop e) (f ∘ fst e) y @ ap f _).
+  exact ((ptw (ap fst (ptoe_etop e)) _)^ @ transport_pV idmap (etop e) y).
+Defined.
+
+Definition negid_negid `{Univalence} (x : S1) : negid (negid x) = x.
+Proof.
+  refine (S1_htpy (f := fun x => negid (negid x)) (g := idmap) refl _ x).
+  refine (ap_compose negid negid loop @ ap (ap negid) (S1_rec_loop S1 base loop⁻¹)
+          @ ap_V negid loop @ ap inverse (S1_rec_loop S1 base loop⁻¹) @ inv_V loop @ _).
+  exact ((trans_1p _ @ ap_idmap loop)^).
+Defined.
+
+Definition negidEqv `{Univalence} : S1 ≃ S1 := mkEqv negid negid negid_negid negid_negid.
+
+Definition flip_cover `{Univalence}
+  : ((S1; negid) : {B : Type & B -> S1}) = (S1; idmap)
+  := cov_eq negidEqv idmap.
+
+(** Corollary [cor:set-trunc-cyc], second half, and [def:standard-cycle]:
+    for [H ⊆ ℤ] containing [0] and closed under addition and negation, the
+    cycle [(ℤ/∼_H, zs)], with [z ∼_H z'] iff [z - z' ∈ H], has [H_t = H]. *)
+Section StandardCycle.
+
+  Context `{Univalence} (Hs : ℤ -> PropU) (h0 : fst (Hs (iplus 0)))
+    (hadd : forall n m, fst (Hs n) -> fst (Hs m) -> fst (Hs (zadd n m)))
+    (hneg : forall n, fst (Hs n) -> fst (Hs (zneg n))).
+
+  Definition zsub (z z' : ℤ) : ℤ := zadd z (zneg z').
+
+  Definition zsub_neg (z z' : ℤ) : zneg (zsub z z') = zsub z' z.
+  Proof.
+    apply toInt_inj. unfold zsub.
+    repeat first [rewrite toInt_zadd | rewrite toInt_zneg | rewrite toInt_zs | rewrite toInt_zp].
+    rewrite int_neg_add, int_neg_neg, int_add_comm. exact refl.
+  Defined.
+
+  Definition zsub_trans (z z' z'' : ℤ) : zadd (zsub z z') (zsub z' z'') = zsub z z''.
+  Proof.
+    apply toInt_inj. unfold zsub.
+    repeat first [rewrite toInt_zadd | rewrite toInt_zneg | rewrite toInt_zs | rewrite toInt_zp].
+    rewrite int_add_assoc, <- (int_add_assoc (toInt z)), int_add_neg_l, int_add_0_r.
+    exact refl.
+  Defined.
+
+  Definition zsub_zs (z z' : ℤ) : zsub (zs z) (zs z') = zsub z z'.
+  Proof.
+    apply toInt_inj. unfold zsub.
+    repeat first [rewrite toInt_zadd | rewrite toInt_zneg | rewrite toInt_zs | rewrite toInt_zp].
+    rewrite int_neg_succ, int_add_succ_l, int_add_pred_r, int_pred_succ. exact refl.
+  Defined.
+
+  Definition zsub_zp (z z' : ℤ) : zsub (zp z) (zp z') = zsub z z'.
+  Proof.
+    apply toInt_inj. unfold zsub.
+    repeat first [rewrite toInt_zadd | rewrite toInt_zneg | rewrite toInt_zs | rewrite toInt_zp].
+    rewrite int_neg_pred, int_add_pred_l, int_add_succ_r, int_succ_pred. exact refl.
+  Defined.
+
+  Definition zsub_0 (n : ℤ) : zsub (zadd (iplus 0) n) (iplus 0) = n.
+  Proof.
+    apply toInt_inj. unfold zsub.
+    repeat first [rewrite toInt_zadd | rewrite toInt_zneg | rewrite toInt_zs | rewrite toInt_zp]. cbn. rewrite int_add_0_r. exact refl.
+  Defined.
+
+  Definition RH (z z' : ℤ) : PropU := Hs (zsub z z').
+
+  Definition RH_refl (z : ℤ) : fst (RH z z) := trp (fun w => fst (Hs w)) (zadd_zneg z)^ h0.
+
+  Definition RH_sym (z z' : ℤ) (r : fst (RH z z')) : fst (RH z' z)
+    := trp (fun w => fst (Hs w)) (zsub_neg z z') (hneg _ r).
+
+  Definition RH_trans (z z' z'' : ℤ) (r : fst (RH z z')) (r' : fst (RH z' z''))
+    : fst (RH z z'')
+    := trp (fun w => fst (Hs w)) (zsub_trans z z' z'') (hadd _ _ r r').
+
+  Definition ZH : Type := quot RH.
+
+  Definition clsH (z : ℤ) : ZH := cls RH z.
+
+  Definition clsH_eq (z z' : ℤ) (r : fst (RH z z')) : clsH z = clsH z'
+    := snd (cls_eq_iff RH RH_refl RH_sym RH_trans z z') r.
+
+  Definition tH : ZH -> ZH
+    := fbar RH RH_refl (quot_isSet RH) (fun z => clsH (zs z))
+         (fun z z' r => clsH_eq _ _ (trp (fun w => fst (Hs w)) (zsub_zs z z')^ r)).
+
+  Definition tHi : ZH -> ZH
+    := fbar RH RH_refl (quot_isSet RH) (fun z => clsH (zp z))
+         (fun z z' r => clsH_eq _ _ (trp (fun w => fst (Hs w)) (zsub_zp z z')^ r)).
+
+  Definition tHEqv : ZH ≃ ZH.
+  Proof.
+    refine (mkEqv tH tHi _ _).
+    - refine (im_ind RH _ (fun q => quot_isSet RH _ _) _). intro z.
+      exact (ap clsH (zp_zs z)).
+    - refine (im_ind RH _ (fun q => quot_isSet RH _ _) _). intro z.
+      exact (ap clsH (zs_zp z)).
+  Defined.
+
+  Definition tpow_clsH (n z : ℤ) : tpow tHEqv n (clsH z) = clsH (zadd z n).
+  Proof.
+    revert n. refine (ℤ_ind_prop _ (fun n => quot_isSet RH _ _) _ _).
+    - intro k. induction k as [|k IH]; [exact refl | exact (ap tH IH)].
+    - intros [k]. induction k as [|k IH].
+      + exact refl.
+      + exact (eqinv_mkEqv tH tHi _ _ _ @ ap tHi IH
+               @ ap clsH (eqinv_mkEqv zs zp zp_zs zs_zp _)^).
+  Defined.
+
+  Definition ZH_isCycle : isCycle tHEqv.
+  Proof.
+    refine (trunc (clsH (iplus 0)); _).
+    refine (im_ind RH _ (fun q => Pi_isProp (fun q' => ptrunc_isProp)) _). intro z.
+    refine (im_ind RH _ (fun q' => ptrunc_isProp) _). intro z'.
+    exact (trunc (zadd z' (zneg z); ap clsH (zadd_sub z z') @ (tpow_clsH _ z)^)).
+  Defined.
+
+  Definition standard_cycle : Cyc := ((ZH; quot_isSet RH); (tHEqv; ZH_isCycle)).
+
+  Definition standard_cycle_H (n : ℤ)
+    : (fst (Hc standard_cycle n) -> fst (Hs n)) × (fst (Hs n) -> fst (Hc standard_cycle n)).
+  Proof.
+    pose (hp := Ht_point (quot_isSet RH) tHEqv ZH_isCycle (clsH (iplus 0)) n).
+    refine (fun h => _; fun h => snd hp _).
+    - pose (e := (tpow_clsH n (iplus 0))^ @ fst hp h).
+      exact (trp (fun w => fst (Hs w)) (zsub_0 n)
+               (fst (cls_eq_iff RH RH_refl RH_sym RH_trans _ _) e)).
+    - exact (tpow_clsH n (iplus 0) @ clsH_eq _ _ (trp (fun w => fst (Hs w)) (zsub_0 n)^ h)).
+  Defined.
+
+End StandardCycle.
+
+(** Corollary [cor:set-trunc-cyc]: [H ⊆ ℤ] is of the form [H_t] for a cycle
+    iff it contains [0] and is closed under addition and negation. *)
+Definition isSubgroupZ (Hs : ℤ -> PropU) : Type
+  := fst (Hs (iplus 0))
+     × (forall n m, fst (Hs n) -> fst (Hs m) -> fst (Hs (zadd n m)))
+     × (forall n, fst (Hs n) -> fst (Hs (zneg n))).
+
+Definition set_trunc_cyc `{Univalence} (Hs : ℤ -> PropU)
+  : (ptrunc {c : Cyc & forall n, (fst (Hc c n) -> fst (Hs n)) × (fst (Hs n) -> fst (Hc c n))}
+     -> isSubgroupZ Hs)
+    × (isSubgroupZ Hs
+       -> ptrunc {c : Cyc & forall n, (fst (Hc c n) -> fst (Hs n)) × (fst (Hs n) -> fst (Hc c n))}).
+Proof.
+  refine (_; fun s => trunc (standard_cycle Hs (fst (fst s)) (snd (fst s)) (snd s);
+                             standard_cycle_H _ _ _ _)).
+  refine (ptrunc_rec _ _).
+  - exact (prod_isProp (prod_isProp (snd (Hs _))
+             (Pi_isProp (fun n => Pi_isProp (fun m => fun_isProp (fun_isProp (snd (Hs _)))))))
+             (Pi_isProp (fun n => fun_isProp (snd (Hs _))))).
+  - intros [c hc].
+    pose (sg := Ht_subgroup (snd (fst c)) (fst (snd c))).
+    refine ((fst (hc _) (fst (fst sg));
+             fun n m hn hm => fst (hc _) (snd (fst sg) n m (snd (hc n) hn) (snd (hc m) hm)));
+            fun n hn => fst (hc _) (snd sg n (snd (hc n) hn))).
+Defined.
+
+(** Functoriality of the identification of [lem:IdCycle]: the underlying
+    function of a composite of identifications in [Endo] is the composite. *)
+Definition endo_fun `{Univalence} {X Y : Type} {t : X -> X} {u : Y -> Y}
+  (p : ((X; t) : Endo) = (Y; u)) : X -> Y
+  := fst (fst (fst (endo_paths_eqv t u) p)).
+
+Definition endo_fun_trp `{Univalence} {X Y : Type} {t : X -> X} {u : Y -> Y}
+  (p : ((X; t) : Endo) = (Y; u)) (x : X)
+  : endo_fun p x = transport idmap (ap (fun w : Endo => fst w) p) x.
+Proof.
+  assert (G : forall (w : Endo) (q : ((X; t) : Endo) = w),
+             @endo_fun _ X (fst w) t (snd w) q x
+             = transport idmap (ap (fun w : Endo => fst w) q) x)
+    by (intros w q; destruct q; exact refl).
+  exact (G (Y; u) p).
+Defined.
+
+Definition endo_fun_concat `{Univalence} {X Y Z : Type} {t : X -> X} {u : Y -> Y}
+  {v : Z -> Z} (p : ((X; t) : Endo) = (Y; u)) (q : ((Y; u) : Endo) = (Z; v)) (x : X)
+  : endo_fun (p @ q) x = endo_fun q (endo_fun p x).
+Proof.
+  refine (endo_fun_trp _ x @ _).
+  refine (ap (fun r => transport idmap r x) (ap_pp (fun w : Endo => fst w) p q)
+          @ transport_pp idmap _ _ x @ _).
+  exact (ap (transport idmap (ap (fun w : Endo => fst w) q)) (endo_fun_trp p x)^
+         @ (endo_fun_trp q _)^).
+Defined.
+
