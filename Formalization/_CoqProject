@@ -42,5 +42,6 @@ Circle/Circle.v
 Group/S02_TypeOfGroups.v
 Group/S03_AbstractGroups.v
 Group/S04_Homomorphisms.v
+Group/S05_Sign.v
 Group/Group.v
 Symmetry.v
