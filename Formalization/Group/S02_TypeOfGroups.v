@@ -230,10 +230,6 @@ Definition USym_AutG_eqv `{Funext} {A : Type} (gA : isGrpd A) (a : A)
   : USym (AutG gA a) ≃ (a = a)
   := subtype_paths_eqv (fun _ => ptrunc_isProp) (a; trunc refl) (a; trunc refl).
 
-Definition ap_trans {X Y : Type} (f : X -> Y) {x y z : X} (p : x = y) (q : y = z)
-  : ap f (q ⋅ p) = ap f q ⋅ ap f p.
-Proof. destruct q. exact refl. Defined.
-
 (** ** Groups with contractible classifying type *)
 
 Definition map_contr_isEquiv {X Y : Type} (cX : isContr X) (cY : isContr Y)
@@ -414,9 +410,6 @@ Proof.
   exact (ap_trans F h g @ c _ _ @ (ap_trans F g h)^).
 Defined.
 
-Definition trans_refl_l {X : Type} {a b : X} (p : a = b) : p ⋅ refl = p.
-Proof. destruct p. exact refl. Defined.
-
 Section AbelianExamples.
 
   Context `{Univalence}.
@@ -443,8 +436,8 @@ Section AbelianExamples.
     destruct e. intros g h.
     destruct (Bool_paths_cases g) as [eg|eg]; destruct (Bool_paths_cases h) as [eh|eh];
       destruct eg^, eh^; try exact refl.
-    - exact (trans_refl_l _)^.
-    - exact (trans_refl_l _).
+    - exact (trans_1p _)^.
+    - exact (trans_1p _).
   Defined.
 
   Definition SG2_isAb : isAb (SG 2).
