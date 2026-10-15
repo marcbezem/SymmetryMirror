@@ -1,7 +1,7 @@
-(** * Section 7.6 Sums of groups
+(** * Section 8.6 Sums of groups
 
-    Part of Chapter 7 ([congp.tex]); see [ConGroups.v] for an overview
-    of the chapter and [Symmetry.v] for the conventions.  (Section 7.5,
+    Part of Chapter 8 ([congp.tex]); see [ConGroups.v] for an overview
+    of the chapter and [Symmetry.v] for the conventions.  (Section 8.5,
     pushouts of types, is still to be written in the book.)
 
     ** Summary of this formalization
@@ -32,7 +32,7 @@ From SymmetryMirror Require Export ConGroups.S04_Pullback.
 
 Local Open Scope uf_scope.
 
-(** ** 7.6 Sums of groups *)
+(** ** 8.6 Sums of groups *)
 
 (** Definition [def:wedge]: the wedge as the library's pushout of the two
     points, with [i_1 :≡ pushl], [i_2 :≡ pushr], [g :≡ pglue(triv)],

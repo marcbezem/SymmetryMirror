@@ -1,6 +1,6 @@
-(** * Section 6.2 Monoids and abstract groups
+(** * Section 7.2 Monoids and abstract groups
 
-    Part of Chapter 6 ([absgroup.tex]); see [AbsGroup.v] for an overview
+    Part of Chapter 7 ([absgroup.tex]); see [AbsGroup.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -44,11 +44,11 @@
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
   Types.Forall Types.Paths Truncations.Core Spaces.List.Core.
-From SymmetryMirror Require Export Actions.Actions.
+From SymmetryMirror Require Export Cats.Cats.
 
 Local Open Scope uf_scope.
 
-(** ** 6.2 Monoids and abstract groups *)
+(** ** 7.2 Monoids and abstract groups *)
 
 (** Definition [def:monoid]. *)
 Record Monoid : Type := {

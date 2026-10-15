@@ -1,6 +1,6 @@
-(** * Section 6.6 Actions, from abstract to concrete and back
+(** * Section 7.6 Actions, from abstract to concrete and back
 
-    Part of Chapter 6 ([absgroup.tex]); see [AbsGroup.v] for an overview
+    Part of Chapter 7 ([absgroup.tex]); see [AbsGroup.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -10,7 +10,7 @@
     - [abstr(Σ_S) ≅ Perm(S)] ([SG_Perm_iso]), using [idtoeqv_trans].
     - Lemma [lem:actionsconcr2abstr]: [GSet G ≃ absGSet(abstr G)]
       ([actions_eqv]), by the book's chain of equivalences through
-      [GSet_eqv] (Section 5.2) and [abstr_hom_eqv] (Section 6.5); the
+      [GSet_eqv] (Section 5.2) and [abstr_hom_eqv] (Section 7.5); the
       underlying set of [ev(X)] is [X(sh_G)] by definition
       ([actions_eqv_set]).
 
@@ -26,7 +26,7 @@ From SymmetryMirror Require Export AbsGroup.S05_Homomorphisms.
 
 Local Open Scope uf_scope.
 
-(** ** 6.6 Actions, from abstract to concrete and back *)
+(** ** 7.6 Actions, from abstract to concrete and back *)
 
 (** Inverse and composition of abstract isomorphisms. *)
 Definition AbsIso_inv {A B : AbsGroup} (i : AbsIso A B) : AbsIso B A.

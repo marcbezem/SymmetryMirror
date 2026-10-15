@@ -1,8 +1,8 @@
-(** * Chapter 6 of [absgroup.tex]: Groups, abstractly
+(** * Chapter 7 of [absgroup.tex]: Groups, abstractly
 
     ** Summary of this formalization
 
-    Section 6.1 is an overview without results.  Sections 6.2 - 6.7:
+    Section 7.1 is an overview without results.  Sections 7.2 - 7.7:
     monoids and abstract groups ([S02_Monoids.v]), abstract homomorphisms
     ([S03_AbstractHomomorphisms.v]), groups from abstract to concrete and
     back ([S04_AbstractToConcrete.v]), homomorphisms
@@ -11,7 +11,7 @@
     summary.  The sections hidden in the published book ("Benefits from
     having the categorical equivalence", "Delooping groups and
     homomorphisms via the Rezk completion") are not formalized.  They
-    build on Chapters 2 - 5 ([Actions.Actions]).  Everything compiles with
+    build on Chapters 2 - 6 ([Cats.Cats]).  Everything compiles with
     nothing admitted.
 
     Main results: [abstr : Group → AbsGroup] is an equivalence

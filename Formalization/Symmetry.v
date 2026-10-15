@@ -11,10 +11,14 @@
       sections: [IntroUF/IntroUF.v] (Chapter 2, [intro-uf.tex]),
       [Circle/Circle.v] (Chapter 3, [circle.tex], Sections 3.1 - 3.9),
       [Group/Group.v] (Chapter 4, [group.tex], Sections 4.2 - 4.7) and
-      [Actions/Actions.v] (Chapter 5, [actions.tex], Sections 5.2 - 5.7)
-      [AbsGroup/AbsGroup.v] (Chapter 6, [absgroup.tex], Sections
-      6.2 - 6.7) and [ConGroups/ConGroups.v] (Chapter 7, [congp.tex],
-      Sections 7.2 - 7.4, 7.6, 7.7).
+      [Actions/Actions.v] (Chapter 5, [actions.tex], Sections 5.2 - 5.7),
+      [Cats/Cats.v] (Chapter 6, [cats.tex], Sections 6.2 - 6.8),
+      [AbsGroup/AbsGroup.v] (Chapter 7, [absgroup.tex], Sections
+      7.2 - 7.7) and [ConGroups/ConGroups.v] (Chapter 8, [congp.tex],
+      Sections 8.2 - 8.4, 8.6, 8.7).
+    - Results that are left out are stated without proof, as definitions
+      of their statements (named [..._stmt]) at their proper place, and
+      listed in the summary of their file.
     - One file per section, [S<nn>_<Name>.v], each starting with a summary
       of what is formalized, what differs from the text, and NOTEs for the
       book text.  Each section exports the previous one, and the first
@@ -43,5 +47,6 @@ From SymmetryMirror Require Export
   Circle.Circle
   Group.Group
   Actions.Actions
+  Cats.Cats
   AbsGroup.AbsGroup
   ConGroups.ConGroups.

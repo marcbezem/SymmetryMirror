@@ -1,6 +1,6 @@
-(** * Section 7.3 Wreath products
+(** * Section 8.3 Wreath products
 
-    Part of Chapter 7 ([congp.tex]); see [ConGroups.v] for an overview
+    Part of Chapter 8 ([congp.tex]); see [ConGroups.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -21,7 +21,7 @@ From SymmetryMirror Require Export ConGroups.S02_Semidirect.
 
 Local Open Scope uf_scope.
 
-(** ** 7.3 Wreath products *)
+(** ** 8.3 Wreath products *)
 
 Section Wreath.
 

@@ -1,6 +1,6 @@
-(** * Section 6.4 Groups: from abstract to concrete and back
+(** * Section 7.4 Groups: from abstract to concrete and back
 
-    Part of Chapter 6 ([absgroup.tex]); see [AbsGroup.v] for an overview
+    Part of Chapter 7 ([absgroup.tex]); see [AbsGroup.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -8,7 +8,7 @@
     - The abstract permutation group [ag_Perm X] of a set [X], with
       elements [X ≃ X] under composition.  The book uses [abstr(Σ_X)],
       whose elements are identifications [X = X]; by univalence these
-      correspond, and [SG_Perm_iso] (Section 6.6) gives the isomorphism.
+      correspond, and [SG_Perm_iso] (Section 7.6) gives the isomorphism.
     - Definition [def:abstrGtorsors]: [absGSet G :≡ ∑_{X:Set}
       absHom(G, Perm(X))], the action [gact], the principal torsor
       [absprtor], and [absGTor] (the component of [absprtor]).
@@ -38,7 +38,7 @@
       and [abstr_isEquiv rep : isEquiv abstr].  NOTE for the book text:
       the size issue (and the need for replacement, or another way to get
       a small classifying type) is not mentioned.
-    - Subsection 6.4.1: definition [def:phi^*] ([abs_restrict]),
+    - Subsection 7.4.1: definition [def:phi^*] ([abs_restrict]),
       definition [def:phi_*] ([abs_coinduce], with [coind_set] and the
       action [h · b :≡ b(h⁻¹ ·)]), and exercise [xca:phi^*-|phi_*]
       ([abs_adj_restrict_coinduce]).
@@ -57,7 +57,7 @@ Local Open Scope uf_scope.
 Local Open Scope ag_scope.
 Local Notation "g · h" := (ag_mul _ g h) (at level 40, left associativity) : ag_scope.
 
-(** ** 6.4 Groups: from abstract to concrete and back *)
+(** ** 7.4 Groups: from abstract to concrete and back *)
 
 (** The abstract permutation group of a set [X]: the self-equivalences
     of [X] under composition.  The book uses [abstr(Σ_X)], whose elements
@@ -415,7 +415,7 @@ Definition abstr_isEquiv `{Univalence} (rep : Replacement) : isEquiv abstr
        (fun G => (concr_abstr_path rep G)^)
        (fun G => (path_AbsGroup (abstr_concr_small_iso rep G))^).
 
-(** *** 6.4.1 The left and right adjoint of restriction, abstractly *)
+(** *** 7.4.1 The left and right adjoint of restriction, abstractly *)
 
 Definition gact_mul `{Univalence} {G : AbsGroup} (X : absGSet G) (a b : ag_S G)
   (x : gset X) : gact X (a · b) x = gact X a (gact X b x)

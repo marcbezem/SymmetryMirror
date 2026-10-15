@@ -53,6 +53,14 @@ Actions/S05_Torsors.v
 Actions/S06_Cayley.v
 Actions/S07_Burnside.v
 Actions/Actions.v
+Cats/S02_Categories.v
+Cats/S03_Duality.v
+Cats/S04_Functors.v
+Cats/S05_Adjunctions.v
+Cats/S06_Yoneda.v
+Cats/S07_Equivalences.v
+Cats/S08_Limits.v
+Cats/Cats.v
 AbsGroup/S02_Monoids.v
 AbsGroup/S03_AbstractHomomorphisms.v
 AbsGroup/S04_AbstractToConcrete.v

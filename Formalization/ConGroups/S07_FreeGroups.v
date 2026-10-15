@@ -1,6 +1,6 @@
-(** * Section 7.7 Free groups
+(** * Section 8.7 Free groups
 
-    Part of Chapter 7 ([congp.tex]); see [ConGroups.v] for an overview
+    Part of Chapter 8 ([congp.tex]); see [ConGroups.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -30,7 +30,7 @@ From SymmetryMirror Require Export ConGroups.S06_Sums.
 
 Local Open Scope uf_scope.
 
-(** ** 7.7 Free groups *)
+(** ** 8.7 Free groups *)
 
 (** Definition [def:bfree]: the higher inductive type [BF_S] with a point
     [base] and loops [loop_s : base = base] for [s : S], implemented as

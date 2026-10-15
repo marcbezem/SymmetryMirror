@@ -1,6 +1,6 @@
-(** * Section 7.2 Semidirect products
+(** * Section 8.2 Semidirect products
 
-    Part of Chapter 7 ([congp.tex]); see [ConGroups.v] for an overview
+    Part of Chapter 8 ([congp.tex]); see [ConGroups.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -33,7 +33,7 @@ From SymmetryMirror Require Export AbsGroup.AbsGroup.
 
 Local Open Scope uf_scope.
 
-(** ** 7.2 Semidirect products *)
+(** ** 8.2 Semidirect products *)
 
 (** Definition [def:semidirect-product]: for an action [H : BG → Group]
     of [G] in groups, [G ⋉ H :≡ mkgroup(∑_{t:BG} BH(t))], pointed at

@@ -1,6 +1,6 @@
-(** * Section 6.7 Heaps
+(** * Section 7.7 Heaps
 
-    Part of Chapter 6 ([absgroup.tex]); see [AbsGroup.v] for an overview
+    Part of Chapter 7 ([absgroup.tex]); see [AbsGroup.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -27,7 +27,7 @@ From SymmetryMirror Require Export AbsGroup.S06_Actions.
 
 Local Open Scope uf_scope.
 
-(** ** 6.7 Heaps *)
+(** ** 7.7 Heaps *)
 
 (** Definition [def:bipt-conn-groupoid]: [UU^{=1}] is the type of
     connected groupoids, and [UU_{**}^{=1} :≡ ∑_{A:UU^{=1}} A × A]. *)

@@ -1,6 +1,6 @@
-(** * Section 6.5 Homomorphisms, from abstract to concrete and back
+(** * Section 7.5 Homomorphisms, from abstract to concrete and back
 
-    Part of Chapter 6 ([absgroup.tex]); see [AbsGroup.v] for an overview
+    Part of Chapter 7 ([absgroup.tex]); see [AbsGroup.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -27,7 +27,7 @@ From SymmetryMirror Require Export AbsGroup.S04_AbstractToConcrete.
 
 Local Open Scope uf_scope.
 
-(** ** 6.5 Homomorphisms, from abstract to concrete and back *)
+(** ** 7.5 Homomorphisms, from abstract to concrete and back *)
 
 (** Lemma [lem:homomabstrconcr]: "delooping" an abstract homomorphism,
     following the book's family [C(x)]. *)
