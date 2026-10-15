@@ -51,5 +51,6 @@ Actions/S03_Subgroups.v
 Actions/S04_Orbits.v
 Actions/S05_Torsors.v
 Actions/S06_Cayley.v
+Actions/S07_Burnside.v
 Actions/Actions.v
 Symmetry.v
