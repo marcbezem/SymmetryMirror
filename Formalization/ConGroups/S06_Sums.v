@@ -20,9 +20,12 @@
     - Lemma [lem:sumofgroupsISsum] ([sumG_univ]) and corollary
       [cor:ZplusZuniv] ([ZZ_sum_univ]).
 
-    Left out (time limit per result)
-    - Exercise [xca:whatAREabeliangroups] and lemma
-      [lem:wedgeofgpoidisgpoid] (words for decidable groups).
+    Left out (statements only, no proofs yet; time limit per result)
+    - Exercise [xca:whatAREabeliangroups]
+      ([xca_whatAREabeliangroups_stmt], with [fold_map] and
+      [wedge_incl]) and lemma [lem:wedgeofgpoidisgpoid]
+      ([lem_wedgeofgpoidisgpoid_stmt]; the book's proof uses words for
+      decidable groups).
  *)
 
 From HoTT Require Import
@@ -111,6 +114,12 @@ Proof.
            (fun a => ptrunc_isProp _ _)).
 Defined.
 
+(** Lemma [lem:wedgeofgpoidisgpoid] (statement only): the wedge of the
+    classifying types of decidable groups is a groupoid. *)
+Definition lem_wedgeofgpoidisgpoid_stmt : Type
+  := forall G1 G2 : Group, isDecSet (USym G1) -> isDecSet (USym G2) ->
+       isGrpd (wedgeT (BG G1) (BG G2)).
+
 (** Definition [def:sumofgroup].  The book takes [Aut_{A_1 ∨ A_2}(a_12)],
     which needs that the wedge of groupoids is a groupoid (proved in the
     book only for decidable groups, lemma [lem:wedgeofgpoidisgpoid]); we
@@ -165,3 +174,20 @@ Proof.
   - intros [a b]. exact (ap011 (fun x y => (x; y) : USym G × USym G)
                            (eqinv_r (snd (Hom_ZZ_eqv G)) a) (eqinv_r (snd (Hom_ZZ_eqv G)) b)).
 Defined.
+
+(** Exercise [xca:whatAREabeliangroups] (statement only): [G] is abelian
+    iff the fold map [BG ∨ BG →* BG] extends over the inclusion
+    [BG ∨ BG →* BG × BG]. *)
+Definition BGxBG (G : Group) : Ustar := (utype (BG G) × utype (BG G); (sh G; sh G)).
+
+Definition fold_map (G : Group) : wedge (BG G) (BG G) →* BG G
+  := univvee_bw (BG G) (BG G) (BG G) (pid (BG G); pid (BG G)).
+
+Definition wedge_incl (G : Group) : wedge (BG G) (BG G) →* BGxBG G
+  := univvee_bw (BG G) (BG G) (BGxBG G)
+       ((((fun z => (z; sh G)) : utype (BG G) -> utype (BGxBG G)); refl);
+        (((fun z => (sh G; z)) : utype (BG G) -> utype (BGxBG G)); refl)).
+
+Definition xca_whatAREabeliangroups_stmt : Type
+  := forall G : Group,
+       isAb G <-> {e : BGxBG G →* BG G & pcomp e (wedge_incl G) = fold_map G}.

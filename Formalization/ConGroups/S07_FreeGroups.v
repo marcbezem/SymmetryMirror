@@ -17,15 +17,21 @@
       sums, [FG S] is classified by the [1]-truncation of [BF_S], since
       the book shows that [BF_S] is a groupoid only for decidable [S].
 
-    Left out (time limit per result)
-    - Signed letters, reduction and Dyck words, theorem
-      [thm:free-group-elements] (reduced words), and the exercises
-      [R_1 ≃ ℤ] and [F_{n+1} = F_n ∨ ℤ].
+    - Signed letters [Stilde] with complementation [compl], the
+      reduction [reduce] (the exercise: by nested induction on words,
+      using decidable equality), reduced words [Reduced], Dyck words
+      [Dyck], and the interpretation [interp : S̃^* → UF_S].
+
+    Left out (statements only, no proofs yet; time limit per result)
+    - The remark [S̃^*/∼ ≃ R_S] ([reduce_quot_stmt]), theorem
+      [thm:free-group-elements] ([thm_free_group_elements_stmt]), and the
+      exercises [R_1 ≃ ℤ] ([R1_Z_stmt]) and [F_{n+1} = F_n ∨ ℤ]
+      ([FG_succ_stmt], with [iterWedgeZ]).
  *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
-  Types.Forall Types.Paths Truncations.Core Colimits.Coeq.
+  Types.Forall Types.Paths Truncations.Core Colimits.Coeq Spaces.List.Core Spaces.Finite.Fin.
 From SymmetryMirror Require Export ConGroups.S06_Sums.
 
 Local Open Scope uf_scope.
@@ -126,3 +132,92 @@ Section FreeGroup.
   Defined.
 
 End FreeGroup.
+
+(** ** Words in signed letters *)
+Section Words.
+
+  Context {S : Type} (dS : isDecSet S).
+
+  (** Signed letters [S̃ :≡ S ⨿ S] with complementation. *)
+  Definition Stilde : Type := S ⨿ S.
+
+  Definition compl (x : Stilde) : Stilde
+    := match x with inl a => inr a | inr a => inl a end.
+
+  Definition Stilde_dec (x y : Stilde) : isDecidable (x = y).
+  Proof.
+    destruct x as [a|a], y as [b|b].
+    - destruct (snd (dS a b)) as [e|n]; [left; exact (ap inl e) | right].
+      intro p. exact (n (ap (fun w => match w with inl c => c | inr _ => a end) p)).
+    - right. intro p.
+      exact (false_ne_true (ap (fun w : Stilde => match w with inl _ => false | inr _ => true end) p)).
+    - right. intro p.
+      exact (false_ne_true (ap (fun w : Stilde => match w with inl _ => true | inr _ => false end) p)).
+    - destruct (snd (dS a b)) as [e|n]; [left; exact (ap inr e) | right].
+      intro p. exact (n (ap (fun w => match w with inr c => c | inl _ => a end) p)).
+  Defined.
+
+  (** The reduction [ρ_S], by nested induction on words (the exercise
+      after the definition of reduced words). *)
+  Fixpoint reduce (w : list Stilde) : list Stilde
+    := match w with
+       | nil => nil
+       | cons x w' =>
+           match reduce w' with
+           | nil => cons x nil
+           | cons y r => match Stilde_dec y (compl x) with
+                         | inl _ => r
+                         | inr _ => cons x (cons y r)
+                         end
+           end
+       end.
+
+  (** Reduced words [R_S] (the image of [ρ_S]) and Dyck words [D_S]. *)
+  Definition Reduced : Type := im reduce.
+
+  Definition Dyck : Type := fiber reduce nil.
+
+  (** The remark that [ρ_S] induces [S̃^*/∼ ≃ R_S] (statement only). *)
+  Definition reduce_rel (u v : list Stilde) : PropU
+    := ((reduce u = reduce v);
+        list_isSet (sum_isSet (fun x y => fst (dS x y)) (fun x y => fst (dS x y))) _ _).
+
+  Definition reduce_quot_stmt `{Univalence} : Type
+    := {e : quot reduce_rel ≃ Reduced &
+         forall w, fst (fst e (S22_SetOperations.cls reduce_rel w)) = reduce w}.
+
+  (** The interpretation [⟦_⟧ : S̃^* → UF_S]. *)
+  Fixpoint interp (w : list Stilde) : USym (FG S)
+    := match w with
+       | nil => refl
+       | cons (inl a) w' => fgen S a ⋅ interp w'
+       | cons (inr a) w' => (fgen S a)⁻¹ ⋅ interp w'
+       end.
+
+  (** Theorem [thm:free-group-elements] (statement only). *)
+  Definition thm_free_group_elements_stmt : Type
+    := isEquiv (fun w : Reduced => interp (fst w)).
+
+End Words.
+
+(** The exercise [R_1 ≃ ℤ] (statement only), with [ε ↦ 0] and [ζ_*]
+    corresponding to [zs]. *)
+Definition True_isDecSet : isDecSet True
+  := hedberg (fun x y => match x, y with tt, tt => inl refl end).
+
+Definition zeta_star (w : Reduced True_isDecSet) : Reduced True_isDecSet
+  := (reduce True_isDecSet (cons (inl triv) (fst w)); trunc (cons (inl triv) (fst w); refl)).
+
+Definition R1_Z_stmt : Type
+  := {e : Reduced True_isDecSet ≃ ℤ &
+       (fst e (nil; trunc (nil; refl)) = iplus 0)
+       × (forall w, fst e (zeta_star w) = zs (fst e w))}.
+
+(** The exercise [F_{n+1} ≃ F_n ∨ ℤ] (statement only), hence
+    [F_n = ((ℤ ∨ ℤ) ∨ ⋯) ∨ ℤ] with [n] copies of [ℤ]. *)
+Fixpoint iterWedgeZ `{Univalence} (n : ℕ) : Group
+  := match n with O => TG | S n' => sumG (iterWedgeZ n') ZZ end.
+
+Definition FG_succ_stmt `{Univalence} : Type
+  := (forall n : ℕ, Iso (FG (Fin (S n))) (sumG (FG (Fin n)) ZZ))
+     × (forall n : ℕ, FG (Fin n) = iterWedgeZ n).
