@@ -1,6 +1,6 @@
-(** * Section 6.3 Abstract homomorphisms
+(** * Section 7.3 Abstract homomorphisms
 
-    Part of Chapter 6 ([absgroup.tex]); see [AbsGroup.v] for an overview
+    Part of Chapter 7 ([absgroup.tex]); see [AbsGroup.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
@@ -16,7 +16,8 @@
     - Exercise [xca:abshomcomposition]: [absHom_comp], [absHom_id],
       [abstr_id], [abstr_comp] (from [USym_compose]); the monoids
       [absHom_monoid G] and [Hom_monoid G] (with the monoid laws of
-      pointed maps [pcomp_pid_l], [pcomp_pid_r], [pcomp_assoc]).
+      pointed maps [pcomp_pid_l], [pcomp_pid_r], [pcomp_assoc], now in
+      Section 6.2 as the laws of the wild category of pointed types).
     - Example [ex:conjhom]: [conj_absHom].
     - Exercise [xca:abs-homgroup]: [ptw_mul_hom_of_isAb] and, for the
       converse, it suffices that [id · id] is a homomorphism
@@ -36,7 +37,7 @@ Local Open Scope uf_scope.
 Local Open Scope ag_scope.
 Local Notation "g · h" := (ag_mul _ g h) (at level 40, left associativity) : ag_scope.
 
-(** ** 6.3 Abstract homomorphisms *)
+(** ** 7.3 Abstract homomorphisms *)
 
 (** Exercise [xca:onlymult-hom]: preserving the multiplication implies
     preserving the unit and the inverses. *)
@@ -131,29 +132,6 @@ Definition absHom_monoid `{Funext} (G : AbsGroup) : Monoid
         mo_lunit := fun f => path_absHom (absHom_comp (absHom_id G) f) f (fun s => refl);
         mo_assoc := fun f g h => path_absHom (absHom_comp f (absHom_comp g h))
                                     (absHom_comp (absHom_comp f g) h) (fun s => refl) |}.
-
-Definition pcomp_pid_l {X Y : Ustar} (f : X →* Y) : pcomp (pid Y) f = f.
-Proof.
-  destruct f as [f fp]. unfold pcomp, pid. cbn.
-  exact (ap (fun q => (f; q)) (trans_1p _ @ ap_id fp)).
-Defined.
-
-Definition pcomp_pid_r {X Y : Ustar} (f : X →* Y) : pcomp f (pid X) = f.
-Proof.
-  destruct f as [f fp]. unfold pcomp, pid. cbn.
-  exact refl.
-Defined.
-
-Definition pcomp_assoc {X Y Z W : Ustar} (h : Z →* W) (g : Y →* Z) (f : X →* Y)
-  : pcomp h (pcomp g f) = pcomp (pcomp h g) f.
-Proof.
-  destruct X as [A a], Y as [B b], Z as [C c], W as [D d],
-    f as [f fp], g as [g gp], h as [h hp]. cbn in *.
-  revert d hp. refine (paths_ind_r _ _ _).
-  revert c gp h. refine (paths_ind_r _ _ _). intro h.
-  revert b fp g h. refine (paths_ind_r _ _ _). intros g h.
-  exact refl.
-Defined.
 
 Definition Hom_monoid `{Funext} (G : Group) : Monoid.
 Proof.
