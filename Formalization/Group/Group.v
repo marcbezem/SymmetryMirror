@@ -2,10 +2,11 @@
 
     ** Summary of this formalization
 
-    Section 4.1 is an overview without results.  Sections 4.2 - 4.5: the
+    Section 4.1 is an overview without results.  Sections 4.2 - 4.6: the
     type of groups ([S02_TypeOfGroups.v]), abstract groups
-    ([S03_AbstractGroups.v]), homomorphisms ([S04_Homomorphisms.v]) and
-    the sign homomorphism ([S05_Sign.v], partly), one file per section, each starting
+    ([S03_AbstractGroups.v]), homomorphisms ([S04_Homomorphisms.v]),
+    the sign homomorphism ([S05_Sign.v], partly) and bicycles
+    ([S06_Bicycles.v]), one file per section, each starting
     with its own summary.  They build on Chapters 2 and 3
     ([Circle.Circle]).  Everything compiles with nothing admitted. *)
 
@@ -13,4 +14,5 @@ From SymmetryMirror Require Export
   Group.S02_TypeOfGroups
   Group.S03_AbstractGroups
   Group.S04_Homomorphisms
-  Group.S05_Sign.
+  Group.S05_Sign
+  Group.S06_Bicycles.
