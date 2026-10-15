@@ -47,5 +47,6 @@ Group/S06_Bicycles.v
 Group/S07_InfinityGroups.v
 Group/Group.v
 Actions/S02_GSets.v
+Actions/S03_Subgroups.v
 Actions/Actions.v
 Symmetry.v
