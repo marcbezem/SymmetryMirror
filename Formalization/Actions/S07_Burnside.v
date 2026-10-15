@@ -22,20 +22,29 @@
     - Lemma [lem:burnside] ([burnside]):
       [Card(∑_g X^g) = Card(X/G) · Card(G)].
 
-    Left out (time limit per result)
-    - Example [exa:prep-burnside] and Fermat's Little Theorem (these need
-      the computation of the action of [C_p] on [Fin p → Fin n]).
+    Left out (statements only, no proofs yet; time limit per result)
+    - Example [exa:prep-burnside] ([exa_prep_burnside_stmt], with
+      [bitsC4]) and Fermat's Little Theorem ([fermat_little_stmt], with
+      the library's [IsPrime] and [NatDivides]); these need the
+      computation of the action of [C_p] on [Fin p → Fin n].
  *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
   Types.Forall Types.Paths Truncations.Core HFiber
-  Spaces.Finite.Fin Spaces.Finite.Finite Spaces.Nat.Core Projective.
+  Spaces.Finite.Fin Spaces.Finite.Finite Spaces.Nat.Core Spaces.Nat.Division Projective.
 From SymmetryMirror Require Export Actions.S06_Cayley.
 
 Local Open Scope uf_scope.
 
 (** ** 5.7 The lemma that is not Burnside's *)
+
+(** Example [exa:prep-burnside] (statement only): [C_4] acting on binary
+    sequences of length [4], [X(A, f) :≡ (A → Fin 2)], has [6] orbits. *)
+Definition bitsC4 `{Univalence} : GSet (CG 3)
+  := fun c => ((fst (fst (fst c)) -> Fin 2); Pi_isSet (fun _ => Fin_isSet 2)).
+
+Definition exa_prep_burnside_stmt `{Univalence} : Type := Orbits bitsC4 ≃ Fin 6.
 
 Section Burnside.
 
@@ -226,3 +235,7 @@ Section Burnside.
   Defined.
 
 End Burnside.
+
+(** Fermat's Little Theorem (statement only). *)
+Definition fermat_little_stmt : Type
+  := forall p n : ℕ, IsPrime p -> NatDivides p (nat_pow n p - n)%nat.

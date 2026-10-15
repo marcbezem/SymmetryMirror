@@ -32,22 +32,27 @@
       the Lagrange construction exists merely, by transitivity and finite
       choice.
 
-    Left out (time limit per result)
+    Left out (statements only, no proofs yet; time limit per result)
     - That [F] is an equivalence (lemma [lem:SubG=MonoG], exercise
-      [xca:SubG=MonoG]) and corollary [lem:setofsubgroups]; this needs
-      the object classifier [(∑_A (A → BG)) ≃ (BG → U)] restricted to
+      [xca:SubG=MonoG]: [lem_SubG_MonoG_stmt]) and corollary
+      [lem:setofsubgroups] ([lem_setofsubgroups_stmt]); this needs the
+      object classifier [(∑_A (A → BG)) ≃ (BG → U)] restricted to
       connected domains and set-valued fibers.
     - Examples [ex:Rm0-subgroup], [exa:fix1subSGn], [exa:C3subC6],
       [ex:SGninSGn+1], [exa:EforSG3], [ex:prodinclisGset], and exercises
       [xca:n-is-ptd-n+1], [xca:A-is-A-1+1], [xca:SG2subSG3],
       [xca:C3subSG3], [xca:lagrange-Z-action-Rm],
-      [xca:lagrange-if-subgr-not-normal].
+      [xca:lagrange-if-subgr-not-normal] (the [..._stmt] definitions of
+      the sections [SubgroupExamples] and [LagrangeExercises]); where an
+      example needs that a [G]-set is transitive, or that the wedge
+      [S1 ∨ S1] is a connected groupoid, this is a hypothesis.
  *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
   Types.Forall Types.Paths Truncations.Core Cubical.DPath HFiber
-  Spaces.Finite.Fin Spaces.Finite.Finite Spaces.Nat.Core Projective.
+  Spaces.Finite.Fin Spaces.Finite.FinNat Spaces.Finite.Finite Spaces.Nat.Core Projective
+  Colimits.Pushout Spaces.Circle.
 From SymmetryMirror Require Export Actions.S02_GSets.
 
 Local Open Scope uf_scope.
@@ -198,6 +203,91 @@ Section SubToMono.
 
 End SubToMono.
 
+(** Lemma [lem:SubG=MonoG] with exercise [xca:SubG=MonoG], and corollary
+    [lem:setofsubgroups] (statements only). *)
+Definition lem_SubG_MonoG_stmt `{Funext} : Type
+  := forall G : Group, isEquiv (fun S : SubGrp G => subgrp_to_mono S).
+
+Definition lem_setofsubgroups_stmt `{Univalence} : Type := forall G : Group, isSet (Mono G).
+
+(** Examples and exercises of this part (statements only). *)
+Section SubgroupExamples.
+
+  Context `{Univalence}.
+
+  (** Example [ex:Rm0-subgroup]: the symmetries of [ℤ] picked out by
+      [(R_m, 0)] are the [loop^{mk}]. *)
+  Definition ex_Rm0_subgroup_stmt : Type
+    := forall (k : ℕ) (p : base = base),
+         (trp (Rm k) p fin_zero = fin_zero)
+         <-> ptrunc {j : ℤ & p = loopZ (zmul (iplus (S k)) j)}.
+
+  (** Example [exa:fix1subSGn]: the subgroup [(X, k)] of [Σ_{n+1}] fixing
+      [k] has underlying group isomorphic to [Σ_n]. *)
+  Definition exa_fix1subSGn_stmt : Type
+    := forall (n : ℕ) (k : Fin (S n)) (t : istrans (std_SGset (S n))),
+         Iso (subgrp_group ((std_SGset (S n); (k; t)) : SubGrp (SG (S n)))) (SG n).
+
+  (** Exercises [xca:n-is-ptd-n+1] and [xca:A-is-A-1+1]. *)
+  Definition xca_n_is_ptd_stmt : Type
+    := forall n : ℕ, FinSet_n n ≃ {X : FinSet_n (S n) & fst (fst X)}.
+
+  Definition xca_A_is_A_1_1_stmt : Type
+    := forall A : Type, isDecSet A -> A ≃ {B : Type & A ≃ (B ⨿ True)}.
+
+  (** Example [exa:C3subC6]: [C_6] has a subgroup isomorphic to [C_3]. *)
+  Definition exa_C3subC6_stmt : Type
+    := {S : SubGrp (CG 5) & Iso (subgrp_group S) (CG 2)}.
+
+  (** Example [ex:SGninSGn+1]: [B ↦ B ⨿ T] gives a monomorphism
+      [Σ_S → Σ_{S ⨿ T}]. *)
+  Definition ex_SGninSGn1_stmt : Type
+    := forall S T : SetU, ismono (sum_hom S T).
+
+  (** Exercise [xca:SG2subSG3]: for a pointing path [π], the image of
+      [Ui_3] consists of the permutations fixing the point [π⁻¹(inr triv)];
+      here [Σ_3] is represented by the set [Fin 2 ⨿ 𝟙]. *)
+  Definition T1 : SetU := (True; prop_is_set True_isProp).
+
+  Definition X3 : SetU := sumSetU T1 (FinSetU 2).
+
+  Definition i3 (pp : sh (SG_S X3) = comp_map (FinSetU 2) (sumSetU T1) (sh (SG 2)))
+    : Hom (SG 2) (SG_S X3)
+    := mkhom ((comp_map (FinSetU 2) (sumSetU T1); pp) : BG (SG 2) →* BG (SG_S X3)).
+
+  Definition xca_SG2subSG3_stmt : Type
+    := forall (pp : sh (SG_S X3) = comp_map (FinSetU 2) (sumSetU T1) (sh (SG 2)))
+              (σ : USym (SG_S X3)),
+         let xpp := ptoe (ap (fun w : utype (BG (SG_S X3)) => fst (fst w)) pp)⁻¹ (inr triv) in
+         ptrunc (fiber (USymf (i3 pp)) σ)
+         <-> (ptoe (ap (fun w : utype (BG (SG_S X3)) => fst (fst w)) σ) xpp = xpp).
+
+  (** Example [exa:EforSG3]: [F] sends the standard [Σ_3]-set, pointed at
+      the added element, to [(Σ_2, i_3)] (with [π :≡ refl]). *)
+  Definition exa_EforSG3_stmt : Type
+    := forall (t : istrans (fun A : utype (BG (SG_S X3)) => fst A)) (m : ismono (i3 refl)),
+         subgrp_to_mono (((fun A : utype (BG (SG_S X3)) => fst A); (inr triv; t))
+                         : SubGrp (SG_S X3))
+         = ((SG 2; (i3 refl; m)) : Mono (SG_S X3)).
+
+  (** Exercise [xca:C3subSG3]. *)
+  Definition xca_C3subSG3_stmt : Type
+    := {j : Hom (CG 2) (SG 3) & {j' : Hom (CG 2) (SG 3) &
+         {m : ismono j & {m' : ismono j' &
+           (USymf j ≠ USymf j')
+           × (((CG 2; (j; m)) : Mono (SG 3)) = (CG 2; (j'; m')))}}}}.
+
+  (** Example [ex:prodinclisGset]: the [G × G']-set corresponding to
+      [i₁ : G → G × G'] is [princ_{G'} ∘ proj₂]. *)
+  Definition ex_prodinclisGset_stmt : Type
+    := forall (G G' : Group)
+              (t : istrans (fun z : utype (BG (prodG G G')) => princ G' (snd z))),
+         subgrp_to_mono (((fun z : utype (BG (prodG G G')) => princ G' (snd z));
+                          ((refl : el (princ G') (sh G')); t)) : SubGrp (prodG G G'))
+         = ((G; (inG1 G G'; inG1_ismono G G')) : Mono (prodG G G')).
+
+End SubgroupExamples.
+
 (** Definition [def:triv-proper-Mono]. *)
 Definition SubGrp_trivial {G : Group} (S : SubGrp G) : Type := isContr (TotG (sg_X S)).
 
@@ -294,3 +384,36 @@ Section LagrangeCount.
   Defined.
 
 End LagrangeCount.
+
+(** Exercises after [xca:lagrange] (statements only). *)
+Section LagrangeExercises.
+
+  Context `{Univalence}.
+
+  (** Exercise [xca:lagrange-Z-action-Rm]: [UZ ≃ Fin m × UH_m] for the
+      subgroup [(R_m, 0)] of [ℤ] (given its transitivity). *)
+  Definition RmZset (k : ℕ) : GSet ZZ := RmSet k.
+
+  Definition xca_lagrange_Z_Rm_stmt : Type
+    := forall (k : ℕ) (t : istrans (RmZset k)),
+         USym ZZ ≃ (Fin (S k) × USym (subgrp_group ((RmZset k; (fin_zero; t)) : SubGrp ZZ))).
+
+  (** Exercise [xca:lagrange-if-subgr-not-normal]: for the wedge group
+      (assumed a connected groupoid) acting on [Fin 3] by the cyclic
+      successor and the transposition [(0 1)], a choice map for the
+      Lagrange construction at the point [0]. *)
+  Definition fin3 (i : ℕ) (l : (i < 3)%nat) : Fin 3 := (equiv_fin_finnat 3)^-1 (i; l).
+
+  Definition t01 : Fin 3 ≃ Fin 3
+    := transpEqv (Fin_isDecSet 3) (fin3 0 _) (fin3 1 _).
+
+  Definition X3wedge : WedgeS1S1 -> SetU
+    := @Pushout_rec True S1 S1 (fun _ => base) (fun _ => base) SetU (S1_rec SetU (FinSetU 3) (path_SetU (S := FinSetU 3) (T := FinSetU 3) (finsuccEqv 2)))
+         (S1_rec SetU (FinSetU 3) (path_SetU (S := FinSetU 3) (T := FinSetU 3) t01)) (fun _ => refl).
+
+  Definition xca_lagrange_wedge_stmt : Type
+    := forall (c : isConn WedgeS1S1) (g : isGrpd WedgeS1S1),
+         let G := mkgroup (WedgeS1S1; (pushl base; (c; g))) in
+         forall x : Fin 3, {h : USym G & act (X3wedge : GSet G) h x = fin3 0 _}.
+
+End LagrangeExercises.

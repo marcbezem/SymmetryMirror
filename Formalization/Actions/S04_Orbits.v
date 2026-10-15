@@ -44,18 +44,31 @@
       [con:orbit-stabilizer] ([orbit_stabilizer]) and corollary
       [cor:action-subgrp-free] ([tildeG_free]).
 
-    Left out (time limit per section)
-    - The factorization through the quotient in [cor:orbit-equiv],
-      remarks [rem:orbit-fibs] and [rem:subgrp-is-stabsubgr], example
-      [exa:fixed-free-neither] and exercises [xca:fixed-free-neither],
-      [xca:Gset-A->B], [xca:fixed-free-neither-action-types], corollary
-      [lem:cosets-Gx.g], construction [con:preLagrange] and exercise
-      [xca:lagrange2].
+    Left out (statements only, no proofs yet; time limit per section)
+    - The factorization through the quotient in [cor:orbit-equiv]
+      ([cor_orbit_equiv_quot_stmt]), remarks [rem:orbit-fibs]
+      ([rem_orbit_fibs_stmt]) and [rem:subgrp-is-stabsubgr]
+      ([rem_subgrp_is_stabsubgr_stmt]), example [exa:fixed-free-neither]
+      ([exa_fixed_free_stmt]) and exercises [xca:fixed-free-neither]
+      ([xca_fixed_free_neither_stmt], first two parts), [xca:Gset-A->B]
+      ([xca_Gset_AB_stmt]), [xca:fixed-free-neither-action-types]
+      ([xca_fixed_free_action_types_stmt], first two parts), corollary
+      [lem:cosets-Gx.g] ([lem_cosets_Gx_g_stmt], as injectivity of
+      [h ↦ h · g]) and construction [con:preLagrange]
+      ([con_preLagrange_stmt]).
+    - The third parts of [xca:fixed-free-neither] and
+      [xca:fixed-free-neither-action-types] concern the example of
+      Section 5.7, which is itself left out there.
+
+    Left out (not formalized)
+    - Exercise [xca:lagrange2] asks for a different proof of
+      [lagrange_card] (Section 5.3), whose statement is formalized.
  *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
-  Types.Forall Types.Paths Truncations.Core Truncations.SeparatedTrunc Cubical.DPath.
+  Types.Forall Types.Paths Truncations.Core Truncations.SeparatedTrunc Cubical.DPath
+  Spaces.Finite.Fin.
 From SymmetryMirror Require Export Actions.S03_Subgroups.
 
 Local Open Scope uf_scope.
@@ -222,6 +235,17 @@ Section Orbits.
     := isContr_Eqv orbit_tr_eqv (conn_strunc_contr XhG (conn_of_trans X t)).
 
 End Orbits.
+
+(** Corollary [cor:orbit-equiv], last part (statement only): [[_]]
+    factors through the quotient of [X(sh_G)] by [∃_g (g · x = y)] by an
+    equivalence. *)
+Definition orbit_rel {G : Group} (X : GSet G) (x y : el X (sh G)) : PropU
+  := (Ex (fun g : USym G => act X g x = y); ptrunc_isProp).
+
+Definition cor_orbit_equiv_quot_stmt `{Univalence} : Type
+  := forall (G : Group) (X : GSet G),
+       {e : quot (orbit_rel X) ≃ Orbits X &
+         forall x, fst e (S22_SetOperations.cls (orbit_rel X) x) = orb X x}.
 
 (** ** Stabilizers, fixed and free elements *)
 Section Stabilizers.
@@ -414,6 +438,80 @@ Section Stabilizers.
 
 End Stabilizers.
 
+(** Remarks [rem:orbit-fibs] and [rem:subgrp-is-stabsubgr], example
+    [exa:fixed-free-neither] and exercise [xca:fixed-free-neither]
+    (statements only). *)
+Section StabilizerStatements.
+
+  Context `{Univalence}.
+
+  Definition Xorb {G : Group} (X : GSet G) (x : el X (sh G)) : GSet G
+    := GSet_sub X (orbit0_sub X (sh G; x)).
+
+  (** Remark [rem:orbit-fibs]: the action type of [X_{[x]}], pointed at
+      [(sh_G, x)], is [BG_x], and its underlying set is [G · x]. *)
+  Definition rem_orbit_fibs_stmt : Type
+    := forall (G : Group) (X : GSet G) (x : el X (sh G)),
+         {xp : fst (orbit0_sub X (sh G; x) (sh G) x) &
+           ((TotG (Xorb X x); ((sh G; (x; xp)) : TotG (Xorb X x))) ≃* BG (Gx X x))}
+         × (el (Xorb X x) (sh G) ≃ Gdot X x).
+
+  (** Remark [rem:subgrp-is-stabsubgr]. *)
+  Definition rem_subgrp_is_stabsubgr_stmt : Type
+    := (forall (G : Group) (X : GSet G) (x : el X (sh G))
+               (xp : fst (orbit0_sub X (sh G; x) (sh G) x))
+               (t : istrans (Xorb X x)) (m : ismono (ix X x)),
+          subgrp_to_mono ((Xorb X x; ((x; xp); t)) : SubGrp G) = (Gx X x; (ix X x; m)))
+       × (forall (G : Group) (X : GSet G) (t : istrans X) (x : el X (sh G))
+                 (m : ismono (ix X x)),
+            subgrp_to_mono ((X; (x; t)) : SubGrp G) = (Gx X x; (ix X x; m))).
+
+  (** Example [exa:fixed-free-neither]: elements of a trivial [G]-set are
+      fixed, and those of [princ G] are free. *)
+  Definition exa_fixed_free_stmt : Type
+    := (forall (G : Group) (S : SetU) (s : fst S), isFixed (trivG G S) s)
+       × (forall (G : Group) (g : USym G), isFree (princ G) g).
+
+  (** Exercise [xca:fixed-free-neither], first two parts:
+      [BG_s ≃ BG] for [triv_G S], and [BG_g] contractible for [princ G];
+      the third part concerns the action of [C_4] on [Fin 4 → Fin 2] of
+      Section 5.7. *)
+  Definition xca_fixed_free_neither_stmt : Type
+    := (forall (G : Group) (S : SetU) (s : fst S),
+          utype (BG (Gx (trivG G S) s)) ≃ utype (BG G))
+       × (forall (G : Group) (g : USym G), isContr (utype (BG (Gx (princ G) g)))).
+
+End StabilizerStatements.
+
+(** Exercise [xca:Gset-A->B] (statements only): for [G :≡ Σ_2 × Σ_2]
+    and [X(A, B) :≡ A → B] there are [2] orbits and no invariant maps; for
+    the constant [G]-set [𝟚 × 𝟚] there are [4] of each; for the
+    [Σ_2]-sets [X(-, 𝟚)] there are [3] orbits and [2] invariant maps, and
+    for [X(𝟚, -)] [2] orbits and none. *)
+Section GsetAB.
+
+  Context `{Univalence}.
+
+  Definition XAB : GSet (prodG (SG 2) (SG 2))
+    := fun z => ((el2 (fst z) -> el2 (snd z)); Pi_isSet (fun _ => el2_isSet (snd z))).
+
+  Definition X22 : GSet (prodG (SG 2) (SG 2))
+    := fun _ => ((Fin 2 × Fin 2); Sigma_isSet (Fin_isSet 2) (fun _ => Fin_isSet 2)).
+
+  Definition XA2 : GSet (SG 2)
+    := fun A => ((el2 A -> Fin 2); Pi_isSet (fun _ => Fin_isSet 2)).
+
+  Definition X2B : GSet (SG 2)
+    := fun B => ((Fin 2 -> el2 B); Pi_isSet (fun _ => el2_isSet B)).
+
+  Definition xca_Gset_AB_stmt : Type
+    := ((Orbits XAB ≃ Fin 2) × (XuhG XAB ≃ Fin 0))
+       × ((Orbits X22 ≃ Fin 4) × (XuhG X22 ≃ Fin 4))
+       × ((Orbits XA2 ≃ Fin 3) × (XuhG XA2 ≃ Fin 2))
+       × ((Orbits X2B ≃ Fin 2) × (XuhG X2B ≃ Fin 0)).
+
+End GsetAB.
+
 (** Exercise [xca:HomGsets-ev]: maps of [G]-sets are the fixed elements
     of the [G]-set [z ↦ (X(z) → Y(z))]. *)
 Definition funGSet `{Funext} {G : Group} (X Y : GSet G) : GSet G
@@ -469,3 +567,20 @@ Section OrbitStabilizer.
     := XhG_set_free tildeG (is_ntype_Eqv 0 (Eqv_inv orbit_stabilizer) Gdot_isSet).
 
 End OrbitStabilizer.
+
+(** Exercise [xca:fixed-free-neither-action-types], first two parts,
+    corollary [lem:cosets-Gx.g], construction [con:preLagrange]
+    (statements only).  Exercise [xca:lagrange2] asks for another proof
+    of [lagrange_card] (Section 5.3). *)
+Definition xca_fixed_free_action_types_stmt `{Univalence} : Type
+  := (forall (G : Group) (S : SetU) (s : fst S), isContr (TotG (tildeG (trivG G S) s)))
+     × (forall (G : Group) (g : USym G), TotG (tildeG (princ G) g) ≃ USym G).
+
+Definition lem_cosets_Gx_g_stmt `{Univalence} : Type
+  := forall (G : Group) (X : GSet G) (x : el X (sh G))
+            (g : el (tildeG X x) (sh (Gx X x))),
+       isInj (fun h : USym (Gx X x) => act (tildeG X x) h g).
+
+Definition con_preLagrange_stmt `{Univalence} : Type
+  := forall (G : Group) (S : SubGrp G),
+       el (sg_X S) (sh G) ≃ Orbits (tildeG (sg_X S) (sg_pt S)).

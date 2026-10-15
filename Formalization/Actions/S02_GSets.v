@@ -39,15 +39,18 @@
       and [std-action]; the standard [Σ_n]-set and the [Σ_n]-set of
       decidable subsets.
 
-    Left out (time limit per result)
-    - Exercise [xca:not-normal] (needs [S1 ∨ S1]), example
-      [ex:S2-acts-on-C3] and exercise [xca:AutC3], and transitivity of the
-      standard [Σ_n]-set.
+    - Example [ex:S2-acts-on-C3] ([S2onC3], with [EndoFam], [C3pt]).
+
+    Left out (statements only, no proofs yet; time limit per result)
+    - Exercise [xca:not-normal] ([xca_not_normal_stmt], with the wedge
+      [WedgeS1S1] assumed a connected groupoid), exercise [xca:AutC3]
+      ([xca_AutC3_stmt]), and transitivity of the standard [Σ_n]-set
+      ([std_SGset_trans_stmt]).
  *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
-  Types.Forall Types.Paths Truncations.Core Spaces.Circle.
+  Types.Forall Types.Paths Truncations.Core Spaces.Circle Colimits.Pushout Spaces.Nat.Core.
 From SymmetryMirror Require Export Group.Group.
 
 Local Open Scope uf_scope.
@@ -392,6 +395,18 @@ Definition ev_Hom_isInj `{Funext} {G : Group} {X Y : GSet G} (t : istrans X)
 Definition hom_of_path {G : Group} {X Y : GSet G} (e : X = Y) : HomGs X Y
   := fun z => trp (fun T : SetU => fst T) (ptw e z).
 
+(** Exercise [xca:not-normal] (statement only), for the group of the
+    wedge [S1 ∨ S1] (the pushout of the two base points, assumed a
+    connected groupoid here): a transitive [G]-set [X] with [X = X]
+    contractible, for which [ev_x] is not surjective. *)
+Definition WedgeS1S1 : Type := Pushout (fun _ : True => base) (fun _ : True => base).
+
+Definition xca_not_normal_stmt `{Univalence} : Type
+  := forall (c : isConn WedgeS1S1) (g : isGrpd WedgeS1S1),
+       let G := mkgroup (WedgeS1S1; (pushl base; (c; g))) in
+       {X : GSet G & istrans X × isContr (X = X)
+                     × {x : el X (sh G) & ¬ isSurj (fun e : X = X => hom_of_path e (sh G) x)}}.
+
 (** Definition [def:normal-action]. *)
 Definition ev_path {G : Group} {X : GSet G} {z : utype (BG G)} (x : el X z)
   : (X = X) -> el X z := fun e => hom_of_path e z x.
@@ -458,5 +473,48 @@ Definition std_action (G : Group) : ActionIn G (utype (BG G)) := idmap.
     [Fin n]. *)
 Definition std_SGset `{Univalence} (n : ℕ) : GSet (SG n) := fun A => fst A.
 
+(** The standard [Σ_n]-set is transitive for [n > 0] (statement only). *)
+Definition std_SGset_trans_stmt `{Univalence} : Type
+  := forall n : ℕ, (0 < n)%nat -> istrans (std_SGset n).
+
 Definition decsub_SGset `{Univalence} (n : ℕ) : GSet (SG n)
   := fun A => ((fst (fst A) -> Bool); Pi_isSet (fun _ => isSet_bool)).
+
+(** Example [ex:S2-acts-on-C3]: the action of [Σ_2] on [C_3], with
+    [G(S) :≡ Aut_{∑_{X:Set} S → X → X}(𝟙 ⨿ S, f)], [f_s(inl 0) :≡ inr s],
+    [f_s(inr s) :≡ inr(swap s)], [f_s(inr(swap s)) :≡ inl 0]. *)
+Section S2actsC3.
+
+  Context `{Univalence}.
+
+  Definition EndoFam (S : Type) : Type := {X : SetU & S -> fst X -> fst X}.
+
+  Definition EndoFam_isGrpd (S : Type) : isGrpd (EndoFam S)
+    := Sigma_ntype 1 SetU_isGrpd
+         (fun X => set_ntype 1 (Pi_isSet (fun _ => Pi_isSet (fun _ => snd X)))).
+
+  Definition BSG2_FinSet (S : BSG2) : FinSet_n 2
+    := (fst S; ptrunc_rec ptrunc_isProp (fun q => trunc (ap fst q)) (snd S)).
+
+  Definition f3 (S : BSG2) (s : el2 S) (x : True ⨿ el2 S) : True ⨿ el2 S
+    := match x with
+       | inl _ => inr s
+       | inr s' => match el2_dec S s' s with
+                   | inl _ => inr (other (BSG2_FinSet S) s)
+                   | inr _ => inl triv
+                   end
+       end.
+
+  Definition C3pt (S : BSG2) : EndoFam (el2 S)
+    := ((True ⨿ el2 S; sum_isSet (prop_is_set True_isProp) (el2_isSet S)); f3 S).
+
+  Definition S2onC3 (S : BSG2) : Group := AutG (EndoFam_isGrpd (el2 S)) (C3pt S).
+
+  (** Exercise [xca:AutC3] (statement only): this action identifies
+      [BΣ_2] with the component of [C_3] in [Group]. *)
+  Definition xca_AutC3_stmt : Type
+    := (S2onC3 (sh (SG 2)) = CG 2)
+       × (forall m : forall S, ptrunc (CG 2 = S2onC3 S),
+            isEquiv (fun S : BSG2 => ((S2onC3 S; m S) : component Group (CG 2)))).
+
+End S2actsC3.

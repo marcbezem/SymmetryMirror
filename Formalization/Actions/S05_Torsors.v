@@ -27,11 +27,14 @@
       ([induce_tors_ptd]) and the square [f_! P^G = P^H Bf]
       ([induce_tors_square]).
 
-    Left out (time limit per result)
-    - Exercise [xca:why-setTrunc_f_!], the first part of
-      [xca:adjunction-_!-^*] (for [f] an isomorphism), remarks
-      [rem:^*-_!-as-(pre)image] and [rem:coinduced-subset], and lemma
-      [lem:epifullyfaithful].
+    - Remarks [rem:^*-_!-as-(pre)image] and [rem:coinduced-subset]:
+      preimage, image and coinduced subset ([sub_preimage], [sub_image],
+      [sub_coinduced]); the remarks' claims hold by definition.
+
+    Left out (statements only, no proofs yet; time limit per result)
+    - Exercise [xca:why-setTrunc_f_!] ([xca_why_setTrunc_stmt]), the
+      first part of [xca:adjunction-_!-^*] ([xca_induce_iso_stmt]), and
+      lemma [lem:epifullyfaithful] ([lem_epifullyfaithful_stmt]).
  *)
 
 From HoTT Require Import
@@ -191,6 +194,31 @@ Section RestrictInduce.
 
 End RestrictInduce.
 
+(** Exercise [xca:why-setTrunc_f_!] (statement only): without the set
+    truncation, [f_!X] need not be an [H]-set.  (The book's solution:
+    [G :≡ ℤ], [H] trivial, [X] constant [𝟙], where the type is the
+    circle.) *)
+Definition xca_why_setTrunc_stmt `{Funext} : Type
+  := {G : Group & {K : Group & {f : Hom G K & {X : GSet G &
+       {w : utype (BG K) & ¬ isSet (induce_type f X w)}}}}}.
+
+(** Exercise [xca:adjunction-_!-^*], first part (statement only): for an
+    isomorphism [f], [f_!X ≃ X ∘ Bf⁻¹]. *)
+Definition xca_induce_iso_stmt `{Funext} : Type
+  := forall (G K : Group) (f : Hom G K) (i : isIso f) (X : GSet G) (w : utype (BG K)),
+       el (induce f X) w ≃ el X (eqinv i w).
+
+(** Remarks [rem:^*-_!-as-(pre)image] and [rem:coinduced-subset]: for
+    subsets, [f^*] is the preimage, [∃_f] (with propositional truncation)
+    the image, and [∀_f :≡ f_*] the coinduced subset. *)
+Definition sub_preimage {A B : Type} (f : A -> B) (Y : Sub B) : Sub A := fun a => Y (f a).
+
+Definition sub_image {A B : Type} (f : A -> B) (X : Sub A) : Sub B
+  := fun b => (Ex (fun a => (f a = b) × fst (X a)); ptrunc_isProp).
+
+Definition sub_coinduced `{Funext} {A B : Type} (f : A -> B) (X : Sub A) : Sub B
+  := fun b => ((forall a, f a = b -> fst (X a)); Pi_isProp (fun a => fun_isProp (snd (X a)))).
+
 (** Construction [con:inducedtorsor]. *)
 Section InducedTorsor.
 
@@ -239,3 +267,8 @@ Section InducedTorsor.
          (induce_tors (pathsp_tors G x)) (pathsp_tors K (Bf0 x)) (eta_path x).
 
 End InducedTorsor.
+
+(** Lemma [lem:epifullyfaithful] (statement only): if [Uf] is
+    surjective, then [f^*] is an injection. *)
+Definition lem_epifullyfaithful_stmt `{Funext} : Type
+  := forall (G K : Group) (f : Hom G K), isSurj (USymf f) -> isInj (restrict f).

@@ -16,10 +16,14 @@
       remark following the theorem: [g] is recovered from the action of
       [ρ_G(g)] on [refl_{sh_G}].
 
-    Left out (time limit per result)
-    - The proof via [lem:BGbytorsor], the description of the subgroup
-      [E(G, ρ_G)], remark [rem:CayleyOversize] and exercise
-      [xca:PP-fixed-permutations].
+    Left out (statements only, no proofs yet; time limit per result)
+    - The description of the subgroup [E(G, ρ_G)]
+      ([E_rho_symmetries_stmt]) and exercise [xca:PP-fixed-permutations]
+      ([xca_PP_fixed_stmt], with [PermSet] and [FixedPerms]).
+
+    Left out (not formalized)
+    - The proof via [lem:BGbytorsor] (the theorem is proved otherwise) and
+      remark [rem:CayleyOversize] (an explanation).
  *)
 
 From HoTT Require Import
@@ -86,5 +90,30 @@ Section Cayley.
     pose (e' := (USym_rho_act g (refl (sh G)))^ @ ap (fun r : utype (loops (BG (SG_S USymSet))) => trp F r (refl (sh G))) e @ USym_rho_act g' (refl (sh G))).
     exact ((symm_symm g)^ @ ap symm e' @ symm_symm g').
   Defined.
+
+  (** The description of the subgroup [E(G, ρ_G)] (statement only): its
+      symmetries are the right multiplications [x ↦ x g⁻¹]. *)
+  Definition E_rho_symmetries_stmt : Type
+    := forall σ : USym (SG_S USymSet),
+         ptrunc (fiber (USymf rho) σ) <-> Ex (fun g : USym G => forall x, trp F σ x = x ⋅ g⁻¹).
+
+  (** Exercise [xca:PP-fixed-permutations] (statement only): the
+      permutations of [UG] fixed by the action of [G] on
+      [z ↦ ((sh_G = z) ≃ (sh_G = z))] are those with
+      [π(g g') = g π(g')], and evaluation at [refl] is an equivalence from
+      them to [UG] turning composition into multiplication. *)
+  Definition PermSet (z : utype (BG G)) : SetU
+    := (((sh G = z) ≃ (sh G = z)); Eqv_sets_isSet (BG_isGrpd G (sh G) z)).
+
+  Definition FixedPerms : Type
+    := {pi : USym G ≃ USym G & forall g g' : USym G, fst pi (g ⋅ g') = g ⋅ fst pi g'}.
+
+  Definition xca_PP_fixed_stmt : Type
+    := (forall pi : USym G ≃ USym G,
+          (forall g : USym G, act PermSet g pi = pi)
+          <-> (forall g g' : USym G, fst pi (g ⋅ g') = g ⋅ fst pi g'))
+       × isEquiv (fun pi : FixedPerms => fst (fst pi) refl)
+       × (forall pi pi' : FixedPerms,
+            fst (fst pi) (fst (fst pi') refl) = fst (fst pi) refl ⋅ fst (fst pi') refl).
 
 End Cayley.
