@@ -32,19 +32,28 @@
       subsets as [S : A → Bool] with two elements), [PA],
       [LocalOrdering] and [SignOrdering].
 
-    Left out (time limit per section)
-    - The exercise on [Uμ_E] (product of values), definitions [def:sgn]
-      and [def:alternating-groups] (these need that [E(A)] is nonempty
-      for [n ≥ 2] and the standard sign ordering of [Fin n]),
-      [xca:isos_A3_C3], [def:sgn-permutation], [lem:sign-properties],
-      [cor:sign-defined], [xca:sign-by-crossings], and the count [n!/2]
-      of even permutations.
- *)
+    - The unpointed map [Bsgn : BΣ_n → BΣ_2], [Bsgn(A) :≡ Bμ_{E(A)}(P)]
+      ([Bsgn]); given a pointing [p], the sign homomorphism [sgn n p]
+      (definition [def:sgn]) and the alternating group [AG], with [BAG]
+      and [shAG] (definition [def:alternating-groups], given proofs that
+      [BAG] is a connected groupoid); definition [def:sgn-permutation]
+      ([sign], via [Bsgn] and [two_element_loops_Bool]).
+
+    Left out (statements only, no proofs yet; time limit per section)
+    - The pointing of [Bsgn] by the standard sign ordering of [Fin n]
+      ([Bsgn_pt_stmt]) and that [BAG] is a connected groupoid
+      ([BAG_isConn_stmt]).
+    - The exercise on [Uμ_E] ([xca_Umu_product_stmt]),
+      [xca:isos_A3_C3] ([xca_isos_A3_C3_stmt]), [lem:sign-properties]
+      ([lem_sign_properties_stmt]), [cor:sign-defined]
+      ([cor_sign_defined_stmt]), [xca:sign-by-crossings]
+      ([xca_sign_by_crossings_stmt], with [inversions]), and the count
+      [n!/2] of even permutations ([even_perms_count_stmt]). *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
   Types.Forall Types.Paths Types.Sum Types.Unit Truncations.Core Spaces.Nat.Core
-  Spaces.Finite.Fin Spaces.Finite.Finite Colimits.Quotient.
+  Spaces.Finite.Fin Spaces.Finite.FinNat Spaces.Finite.Finite Spaces.List.Core Colimits.Quotient.
 From SymmetryMirror Require Export Group.S04_Homomorphisms.
 
 Local Open Scope uf_scope.
@@ -427,3 +436,118 @@ Section SignOrdering.
   Definition SignOrdering : Type := SignQ PA.
 
 End SignOrdering.
+
+(** ** Left-out results of this section
+
+    Definition [def:sgn] needs a pointing of [Bsgn], from the standard
+    sign ordering of [Fin n]; we define the unpointed map [Bsgn] and state
+    the rest relative to a pointing [p] (statements only). *)
+Section Sign.
+
+  Context `{Univalence}.
+
+  Definition comp_isFinSet {n : ℕ} (A : utype (BG (SG n))) : isFinSet (fst (fst A))
+    := ptrunc_rec ptrunc_isProp (fun p => trunc (n; (ap fst p)⁻¹)) (snd A).
+
+  Definition comp_Finite {n : ℕ} (A : utype (BG (SG n))) : Finite (fst (fst A))
+    := isFinSet_Finite (comp_isFinSet A).
+
+  (** [Bsgn(A) :≡ Bμ_{E(A)}(P)]. *)
+  Definition Bsgn (n : ℕ) (A : utype (BG (SG n))) : utype (BG (SG 2))
+    := fst (Bf (mu_E (Finite_isFinSet (@EA_Finite _ (fst (fst A)) (comp_Finite A)))))
+         (@PA _ (fst (fst A)) (comp_Finite A)).
+
+  (** The pointing of [Bsgn] from the standard ordering of [Fin n]. *)
+  Definition Bsgn_pt_stmt : Type := forall n : ℕ, sh (SG 2) = Bsgn n (sh (SG n)).
+
+  (** The sign homomorphism, given a pointing. *)
+  Definition sgn (n : ℕ) (p : sh (SG 2) = Bsgn n (sh (SG n))) : Hom (SG n) (SG 2)
+    := mkhom ((Bsgn n; p) : BG (SG n) →* BG (SG 2)).
+
+  (** Definition [def:alternating-groups]: [BA_n :≡ ∑_{A:BΣ_n} Bsgn(A)],
+      pointed at [(Fin n, p(fin2_0))]; that it is connected (so that
+      [A_n] is a group) is stated only. *)
+  Definition BAG (n : ℕ) : Type := {A : utype (BG (SG n)) & el2 (Bsgn n A)}.
+
+  Definition shAG (n : ℕ) (p : sh (SG 2) = Bsgn n (sh (SG n))) : BAG n
+    := (sh (SG n); trp el2 p (fin2_0 : el2 (sh (SG 2)))).
+
+  Definition BAG_isConn_stmt : Type := forall n : ℕ, isConn (BAG n) × isGrpd (BAG n).
+
+  Definition AG (n : ℕ) (p : sh (SG 2) = Bsgn n (sh (SG n))) (c : isConn (BAG n))
+    (g : isGrpd (BAG n)) : Group
+    := mkgroup (BAG n; (shAG n p; (c; g))).
+
+  (** Exercise [xca:isos_A3_C3]. *)
+  Definition xca_isos_A3_C3_stmt : Type
+    := forall p c g, {i : Iso (AG 3 p c g) (CG 2) & {j : Iso (AG 3 p c g) (CG 2) & i ≠ j}}.
+
+  (** The identification of the symmetries of a [2]-element set with
+      [Bool] ([+1] is [yes]). *)
+  Definition loops2_Bool (T : utype (BG (SG 2))) : el2 T = el2 T -> Bool
+    := ptoe (two_element_loops_Bool
+               (fst T; ptrunc_rec ptrunc_isProp (fun q => trunc (ap fst q)) (snd T))).
+
+  (** Definition [def:sgn-permutation]: the sign of a permutation [σ] of
+      an [n]-element set [A], as the effect of [Bsgn] on [σ]. *)
+  Definition sign {n : ℕ} {A : utype (BG (SG n))} (σ : A = A) : Bool
+    := loops2_Bool (Bsgn n A) (ap (fun B => el2 (Bsgn n B)) σ).
+
+  (** A permutation of an element of [BΣ_n] from an equivalence. *)
+  Definition perm_of {n : ℕ} (A : utype (BG (SG n))) (e : fst (fst A) ≃ fst (fst A)) : A = A
+    := path_sigma_prop (fun _ => ptrunc_isProp) (u := A) (v := A)
+         (path_sigma_prop (fun X => isSet_isProp X) (u := fst A) (v := fst A) (etop e)).
+
+  (** Lemma [lem:sign-properties]. *)
+  Definition lem_sign_properties_stmt : Type
+    := (forall n (A : utype (BG (SG n))) (a b : fst (fst A)) (ne : a ≠ b),
+          sign (perm_of A (transpEqv (finset_isDecSet (comp_isFinSet A)) a b)) = no)
+       × (forall n (A : utype (BG (SG n))) (k : ℕ) (σ : fst (fst A) ≃ fst (fst A)),
+            isKCycle (finset_isDecSet (comp_isFinSet A)) k σ ->
+            sign (perm_of A σ) = even (pred k))
+       × (forall n (A : utype (BG (SG n))) (l : list (fst (fst A) × fst (fst A))),
+            all_pairs_ne l ->
+            (forall x, transpsL (finset_isDecSet (comp_isFinSet A)) l x = x) ->
+            even (length l) = true).
+
+  (** Corollary [cor:sign-defined]. *)
+  Definition cor_sign_defined_stmt : Type
+    := forall n (A : utype (BG (SG n))) (σ : fst (fst A) ≃ fst (fst A))
+              (l l' : list (fst (fst A) × fst (fst A))),
+         all_pairs_ne l -> all_pairs_ne l' ->
+         (forall x, fst σ x = transpsL (finset_isDecSet (comp_isFinSet A)) l x) ->
+         (forall x, fst σ x = transpsL (finset_isDecSet (comp_isFinSet A)) l' x) ->
+         (even (length l) = even (length l')) × (sign (perm_of A σ) = even (length l)).
+
+  (** Exercise [xca:sign-by-crossings]: the sign is [(-1)^{inv(σ)}],
+      counting inversions through [Fin n ≃ {k | k < n}]. *)
+  Definition inversions (n : ℕ) (σ : Fin n ≃ Fin n) : ℕ
+    := finadd (fun ij : Fin n * Fin n =>
+         let i := fst (equiv_fin_finnat n (Overture.fst ij)) in
+         let j := fst (equiv_fin_finnat n (Overture.snd ij)) in
+         let si := fst (equiv_fin_finnat n (fst σ (Overture.fst ij))) in
+         let sj := fst (equiv_fin_finnat n (fst σ (Overture.snd ij))) in
+         if dec ((i < j)%nat * (sj < si)%nat) then 1%nat else 0%nat).
+
+  Definition xca_sign_by_crossings_stmt : Type
+    := forall (n : ℕ) (σ : Fin n ≃ Fin n),
+         sign (perm_of (sh (SG n)) σ) = even (inversions n σ).
+
+  (** The number of even permutations is [n!/2] for [n ≥ 2]. *)
+  Definition even_perms_count_stmt : Type
+    := forall n : ℕ, (2 <= n)%nat ->
+         {h : isFinSet {σ : sh (SG n) = sh (SG n) & sign σ = yes} &
+           mul 2 (cardF h) = fact n}.
+
+  (** The exercise after [def:mu_E]: [Uμ_E] maps [s : E → {±1}] to the
+      product of its values. *)
+  Definition xca_Umu_product_stmt : Type
+    := forall (E : Type) (hE : isFinSet E) (s : E -> USym (SG 2)),
+         loops2_Bool (sh (SG 2))
+           (ap (fun B => el2 B)
+              (USymf (mu_E hE) (eqinv (snd (USym_PiG hE (fun _ => SG 2))) s)))
+         = even (@finadd E (isFinSet_Finite hE)
+                   (fun e => if loops2_Bool (sh (SG 2)) (ap (fun B => el2 B) (s e))
+                             then 0%nat else 1%nat)).
+
+End Sign.

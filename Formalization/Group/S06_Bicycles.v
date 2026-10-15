@@ -29,11 +29,18 @@
       [xca:normal-bicycle-equiv] ([normal_from_one]), and definition
       [def:cbid-bicycle] ([cbid], with [cbid_spec] and [cbid_refl]).
 
-    Left out (time limit per section)
-    - The equivalence [((X,a,b) = (X',a',b')) ≃ BicycEqv], the exercises
-      on [H_x], commuting bicycles, the equivalence relation on lists,
-      remark [rem:bicycle-list-concat], the frieze identifications and
-      the isomorphisms with [Σ_3].
+    - The two [6]-element bicycles of the last exercise ([HexagonBicyc],
+      [PrismBicyc], on an inductive type [Six], connected by
+      computation).
+
+    Left out (statements only, no proofs yet; time limit per section)
+    - The equivalence [((X,a,b) = (X',a',b')) ≃ BicycEqv]
+      ([path_to_BicycEqv_isEquiv_stmt]), the exercises on [H_x]
+      ([xca_normal_Hx_stmt]), commuting bicycles ([xca_commuting_stmt])
+      and the equivalence relation on lists ([xca_lists_equiv_stmt]),
+      remark [rem:bicycle-list-concat] ([rem_bicycle_list_concat_stmt]),
+      the frieze identification ([xca_frieze_stmt]) and the isomorphisms
+      with [Σ_3] ([xca_six_bicycles_stmt]).
  *)
 
 From HoTT Require Import
@@ -412,3 +419,155 @@ Section BicycleIds.
     := eqinv_l (nB x) (path_to_BicycEqv refl).
 
 End BicycleIds.
+
+(** ** Left-out results of this section (statements only) *)
+Section BicycleStatements.
+
+  Context `{Univalence}.
+
+  (** Identifications of bicycles are the equivalences commuting with
+      [a] and [b]. *)
+  Definition path_to_BicycEqv_isEquiv_stmt : Type
+    := forall B B' : Bicyc, isEquiv (@path_to_BicycEqv _ B B').
+
+  (** [H_x], the lists [ℓ] with [⟦ℓ⟧(x) = x]; the exercise: a bicycle is
+      normal iff [H_x = H_y] for all [x, y]. *)
+  Definition Hx (B : Bicyc) (x : bX B) (l : list (ℤ ⨿ ℤ)) : Type
+    := sem (ba B) (bb B) l x = x.
+
+  Definition xca_normal_Hx_stmt : Type
+    := forall B : Bicyc, isNormal B <-> (forall x y l, Hx B x l <-> Hx B y l).
+
+  (** Commuting bicycles are normal, and [Cyc × Cyc] is equivalent to the
+      type of commuting bicycles, via [(X,t),(Y,u) ↦ (X × Y, t × id, id × u)]. *)
+  Definition isCommuting (B : Bicyc) : Type := fst (ba B) ∘ fst (bb B) = fst (bb B) ∘ fst (ba B).
+
+  Definition xca_commuting_stmt : Type
+    := (forall B : Bicyc, isCommuting B -> isNormal B)
+       × {e : Cyc × Cyc ≃ {B : Bicyc & isCommuting B} &
+           forall c : Cyc × Cyc,
+             bX (fst (fst e c)) = fst (fst (fst c)) × fst (fst (snd c))}.
+
+  (** Lists are equivalent (have the same value at [x₀]) iff they have the
+      same meaning, for a normal bicycle. *)
+  Definition xca_lists_equiv_stmt : Type
+    := forall (B : Bicyc) (nB : isNormal B) (x0 : bX B) (l l' : list (ℤ ⨿ ℤ)),
+         sem (ba B) (bb B) l x0 = sem (ba B) (bb B) l' x0
+         <-> sem (ba B) (bb B) l = sem (ba B) (bb B) l'.
+
+  (** Remark [rem:bicycle-list-concat]. *)
+  Definition rem_bicycle_list_concat_stmt : Type
+    := forall (B : Bicyc) (nB : isNormal B) (x0 : bX B) (l l' : list (ℤ ⨿ ℤ)),
+         (fst (fst (cbid nB x0 (sem (ba B) (bb B) l x0)))
+            ∘ fst (fst (cbid nB x0 (sem (ba B) (bb B) l' x0)))
+          = fst (fst (cbid nB x0 (sem (ba B) (bb B) (app l' l) x0))))
+         × (fst (fst (cbid nB (sem (ba B) (bb B) l x0) x0))
+              ∘ fst (fst (cbid nB (sem (ba B) (bb B) l' x0) x0))
+            = fst (fst (cbid nB (sem (ba B) (bb B) (app l l') x0) x0))).
+
+  (** Remark [rem:inf-dihedral-frieze] and the exercise after it: the
+      infinite dihedral bicycle is identified with [(X, T, R)], where
+      [T :≡ x ↦_{a x₀} x₀] and [R :≡ x ↦_{b x₀} x₀] (given normality). *)
+  Definition xca_frieze_stmt : Type
+    := forall nD : isNormal DihedralBicyc,
+         let x0 := inl (iplus 0) : bX DihedralBicyc in
+         let T := fst (cbid nD (fst (ba DihedralBicyc) x0) x0) in
+         let R := fst (cbid nD (fst (bb DihedralBicyc) x0) x0) in
+         {e : bX DihedralBicyc ≃ bX DihedralBicyc &
+           (fst e ∘ fst (ba DihedralBicyc) = fst T ∘ fst e)
+           × (fst e ∘ fst (bb DihedralBicyc) = fst R ∘ fst e)}.
+
+End BicycleStatements.
+
+(** The two [6]-element bicycles of the last exercise: the hexagon, with
+    [a = (0 1)(2 3)(4 5)] and [b = (1 2)(3 4)(5 0)], and the prism, with
+    [a] rotating the inner triangle [p0 ← p1 ← p2 ← p0] and the outer one
+    [p3 → p4 → p5 → p3], and [b] swapping [pᵢ] and [p(i+3)]. *)
+Inductive Six : Type0 := p0 | p1 | p2 | p3 | p4 | p5.
+
+Section SixBicycles.
+
+  Context `{Univalence}.
+
+  Definition six_eqb (k l : Six) : Bool
+    := match k, l with
+       | p0, p0 | p1, p1 | p2, p2 | p3, p3 | p4, p4 | p5, p5 => true
+       | _, _ => false end.
+
+  Definition Six_isDecSet : isDecSet Six.
+  Proof.
+    apply hedberg. intros k l.
+    destruct (dec_paths (six_eqb k l) true) as [e|n].
+    - left. destruct k, l; try exact refl; destruct (false_ne_true e).
+    - right. intro p. destruct p. destruct k; exact (n refl).
+  Defined.
+
+  Definition Six_isSet : isSet Six := fun k l => fst (Six_isDecSet k l).
+
+  Definition ha (k : Six) : Six
+    := match k with p0 => p1 | p1 => p0 | p2 => p3 | p3 => p2 | p4 => p5 | p5 => p4 end.
+
+  Definition hb (k : Six) : Six
+    := match k with p0 => p5 | p5 => p0 | p1 => p2 | p2 => p1 | p3 => p4 | p4 => p3 end.
+
+  Definition haEqv : Six ≃ Six.
+  Proof. refine (mkEqv ha ha _ _); intros []; exact refl. Defined.
+
+  Definition hbEqv : Six ≃ Six.
+  Proof. refine (mkEqv hb hb _ _); intros []; exact refl. Defined.
+
+  Definition hexagon_connBy : isConnBy haEqv hbEqv.
+  Proof.
+    refine (connBy_from_base _ _ Six_isSet p0 _).
+    intros []; apply trunc.
+    - exact (nil; refl).
+    - exact (cons (inl (iplus 1)) nil; refl).
+    - exact (cons (inr (iplus 1)) (cons (inl (iplus 1)) nil); refl).
+    - exact (cons (inl (iplus 1)) (cons (inr (iplus 1)) (cons (inl (iplus 1)) nil)); refl).
+    - exact (cons (inr (iplus 1)) (cons (inl (iplus 1)) (cons (inr (iplus 1))
+               (cons (inl (iplus 1)) nil))); refl).
+    - exact (cons (inr (iplus 1)) nil; refl).
+  Defined.
+
+  Definition HexagonBicyc : Bicyc
+    := ((Six; Six_isSet); (haEqv; (hbEqv; (trunc p0; hexagon_connBy)))).
+
+  Definition pa (k : Six) : Six
+    := match k with p1 => p0 | p2 => p1 | p0 => p2 | p3 => p4 | p4 => p5 | p5 => p3 end.
+
+  Definition pa' (k : Six) : Six
+    := match k with p0 => p1 | p1 => p2 | p2 => p0 | p4 => p3 | p5 => p4 | p3 => p5 end.
+
+  Definition pb (k : Six) : Six
+    := match k with p0 => p3 | p3 => p0 | p1 => p4 | p4 => p1 | p2 => p5 | p5 => p2 end.
+
+  Definition paEqv : Six ≃ Six.
+  Proof. refine (mkEqv pa pa' _ _); intros []; exact refl. Defined.
+
+  Definition pbEqv : Six ≃ Six.
+  Proof. refine (mkEqv pb pb _ _); intros []; exact refl. Defined.
+
+  Definition prism_connBy : isConnBy paEqv pbEqv.
+  Proof.
+    refine (connBy_from_base _ _ Six_isSet p0 _).
+    intros []; apply trunc.
+    - exact (nil; refl).
+    - exact (cons (inl (iplus 2)) nil; refl).
+    - exact (cons (inl (iplus 1)) nil; refl).
+    - exact (cons (inr (iplus 1)) nil; refl).
+    - exact (cons (inr (iplus 1)) (cons (inl (iplus 2)) nil); refl).
+    - exact (cons (inr (iplus 1)) (cons (inl (iplus 1)) nil); refl).
+  Defined.
+
+  Definition PrismBicyc : Bicyc
+    := ((Six; Six_isSet); (paEqv; (pbEqv; (trunc p0; prism_connBy)))).
+
+  (** The exercise (statement only): the two bicycles are in different
+      components, but their automorphism groups are isomorphic to each
+      other and to [Σ_3]. *)
+  Definition xca_six_bicycles_stmt : Type
+    := ¬ ptrunc (HexagonBicyc = PrismBicyc)
+       × Iso (AutG Bicyc_isGrpd HexagonBicyc) (AutG Bicyc_isGrpd PrismBicyc)
+       × Iso (AutG Bicyc_isGrpd HexagonBicyc) (SG 3).
+
+End SixBicycles.

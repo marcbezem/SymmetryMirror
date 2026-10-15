@@ -46,16 +46,23 @@
       [Copy] has no definitional eta rule, so [mkgroup(BG_÷, sh_G)] is
       not judgmentally [G].
 
-    Left out (time limit per result)
     - Example [ex:groups-morphisms](1) for [Σ_m → Σ_{m+n}] and
-      [Σ_m → Σ_{mn}] (only the general [_ ⨿ T] and [_ × T]), and (4)
-      ([mod_m : ℤ → C_m]).
-    - The remark that [id_{Σ_3} ≠ τ̃] in [Hom(Σ_3, Σ_3)].
+      [Σ_m → Σ_{mn}] ([SG_sum_hom], [SG_prod_hom], given the
+      identifications of finite sets), and (4) ([mod_hom], with
+      [forget_cyc_hom] and [Rm_hom]).
+
+    Left out (statements only, no proofs yet; time limit per result)
+    - The identifications [Fin(m+n) = Fin(m) ⨿ Fin(n)] and
+      [Fin(mn) = Fin(m) × Fin(n)] ([fin_sum_eqv_stmt],
+      [fin_prod_eqv_stmt]), and the factorization of [R_m] through
+      [mod_m] ([mod_factor_stmt]).
+    - The remark that [id_{Σ_3} ≠ τ̃] in [Hom(Σ_3, Σ_3)]
+      ([id_ne_tau_stmt], with [tau3]).
  *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
-  Types.Forall Types.Paths Truncations.Core Spaces.Circle.
+  Types.Forall Types.Paths Truncations.Core Spaces.Circle Spaces.Finite.Fin.
 From SymmetryMirror Require Export Group.S03_AbstractGroups.
 
 Local Open Scope uf_scope.
@@ -307,6 +314,65 @@ Section PermHoms.
     := @mkhom (SG_S S) (SG_S (prodSetU S)) (comp_map prodSetU; refl).
 
 End PermHoms.
+
+(** Identifications of sets from equivalences. *)
+Definition path_SetU0 `{Univalence} {S T : SetU} (e : fst S ≃ fst T) : S = T
+  := path_sigma_prop (fun A => isSet_isProp A) (u := S) (v := T) (etop e).
+
+(** The homomorphisms [Σ_m → Σ_{m+n}] and [Σ_m → Σ_{mn}] of example
+    [ex:groups-morphisms](1), from identifications
+    [Fin(m+n) = Fin(m) ⨿ Fin(n)] and [Fin(mn) = Fin(m) × Fin(n)]; these
+    equivalences themselves are stated only. *)
+Definition SG_sum_hom `{Univalence} (m n : ℕ)
+  (e : fst (sumSetU (FinSetU n) (FinSetU m)) ≃ fst (FinSetU (add m n)))
+  : Hom (SG m) (SG (add m n))
+  := trp (fun S => Hom (SG m) (SG_S S)) (path_SetU0 (S := sumSetU (FinSetU n) (FinSetU m)) (T := FinSetU (add m n)) e)
+       (sum_hom (FinSetU m) (FinSetU n)).
+
+Definition SG_prod_hom `{Univalence} (m n : ℕ)
+  (e : fst (prodSetU (FinSetU n) (FinSetU m)) ≃ fst (FinSetU (mul m n)))
+  : Hom (SG m) (SG (mul m n))
+  := trp (fun S => Hom (SG m) (SG_S S)) (path_SetU0 (S := prodSetU (FinSetU n) (FinSetU m)) (T := FinSetU (mul m n)) e)
+       (prod_hom (FinSetU m) (FinSetU n)).
+
+Definition fin_sum_eqv_stmt : Type := forall m n : ℕ, Fin m ⨿ Fin n ≃ Fin (add m n).
+
+Definition fin_prod_eqv_stmt : Type := forall m n : ℕ, Fin m × Fin n ≃ Fin (mul m n).
+
+(** Example [ex:groups-morphisms](4): [mod_m : ℤ → C_m], with
+    [Bmod_m(base) :≡ (Fin m, zs)] and [Bmod_m(loop) := (zs, !)], pointed
+    by [refl]; and the homomorphism [C_m → Σ_m] forgetting the cycle
+    structure.  That [R_m : ℤ → Σ_m] factors as their composite is stated
+    only. *)
+Definition mod_hom `{Univalence} (k : ℕ) : Hom ZZ (CG k)
+  := mkhom ((S1_rec (utype (BG (CG k))) (sh (CG k))
+               (path_sigma_prop (fun _ => ptrunc_isProp) (u := sh (CG k)) (v := sh (CG k))
+                  (cyc_path (Fincyc k) (Fincyc k) (endo_path (finsuccEqv k) refl)));
+             refl) : BG ZZ →* BG (CG k)).
+
+Definition forget_cyc_hom `{Univalence} (k : ℕ) : Hom (CG k) (SG (S k))
+  := mkhom (((fun w : component Cyc (Fincyc k) =>
+                (fst (fst w); ptrunc_rec ptrunc_isProp (fun p => trunc (ap fst p)) (snd w))
+                : component SetU (FinSetU (S k)));
+             refl) : BG (CG k) →* BG (SG (S k))).
+
+Definition Rm_hom `{Univalence} (k : ℕ) : Hom ZZ (SG (S k))
+  := mkhom (((fun z => (RmSet k z; ptrunc_rec ptrunc_isProp
+                                     (fun p : base = z => trunc (ap (RmSet k) p)) (S1_base_paths z))
+                       : component SetU (FinSetU (S k)));
+             refl) : BG ZZ →* BG (SG (S k))).
+
+Definition mod_factor_stmt `{Univalence} : Type
+  := forall k : ℕ, compG (forget_cyc_hom k) (mod_hom k) = Rm_hom k.
+
+(** The remark that [id_{Σ_3} ≠ τ̃ :≡ (id, τ)] in [Hom(Σ_3, Σ_3)], for
+    a transposition [τ] (statement only). *)
+Definition tau3 `{Univalence} : sh (SG 3) = sh (SG 3)
+  := path_sigma_prop (fun _ => ptrunc_isProp) (u := sh (SG 3)) (v := sh (SG 3))
+       (path_SetU0 (S := FinSetU 3) (T := FinSetU 3) (Eqv_of_Equiv (fin_transpose_last_two 1))).
+
+Definition id_ne_tau_stmt `{Univalence} : Type
+  := idG (SG 3) ≠ mkhom ((idmap; tau3) : BG (SG 3) →* BG (SG 3)).
 
 (** Example [exa:conj-concrete]: moving the shape along [p : sh_G = y].
     [(id, p⁻¹) : BG ≃* (BG_÷, y)] gives an isomorphism, and its [Ω] is
