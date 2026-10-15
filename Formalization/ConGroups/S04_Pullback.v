@@ -1,15 +1,14 @@
-(** * Section 7.4 The pullback
+(** * Section 8.4 The pullback
 
-    Part of Chapter 7 ([congp.tex]); see [ConGroups.v] for an overview
+    Part of Chapter 8 ([congp.tex]); see [ConGroups.v] for an overview
     of the chapter and [Symmetry.v] for the conventions.
 
     ** Summary of this formalization
 
-    - Definition [def:pullback] ([pullback], [prB], [prC]).
-    - Exercise [xca:univpropofpullback] ([pullback_univ_map],
-      [pullback_univ_isEquiv]); the book's formula [(f(a), g(a), p(a))]
-      should read [(β(a), γ(a), p(a))].  NOTE for the book text.
-    - Example: the preimage as a pullback ([pullback_point_eqv]).
+    - Definition [def:pullback], exercise [xca:univpropofpullback] and
+      the example of the preimage: formalized in Section 6.8
+      ([Cats/S08_Limits.v]), since [cats.tex] repeats them (with the same
+      labels; NOTE for the book text).
     - Definition [def:intersectionand unionofsets] ([sub_inter],
       [sub_union]); the book's union [A(s) + B(s)] is not a family of
       propositions, so we truncate it.  NOTE for the book text.
@@ -32,46 +31,7 @@ From SymmetryMirror Require Export ConGroups.S03_Wreath.
 
 Local Open Scope uf_scope.
 
-(** ** 7.4 The pullback *)
-
-(** Definition [def:pullback]: [∏(f,g) :≡ ∑_{(b,c):B×C} (f(b) = g(c))]. *)
-Definition pullback {B C D : Type} (f : B -> D) (g : C -> D) : Type
-  := {bc : B × C & f (fst bc) = g (snd bc)}.
-
-Definition prB {B C D : Type} {f : B -> D} {g : C -> D} (w : pullback f g) : B
-  := fst (fst w).
-
-Definition prC {B C D : Type} {f : B -> D} {g : C -> D} (w : pullback f g) : C
-  := snd (fst w).
-
-(** Exercise [xca:univpropofpullback]. *)
-Definition pullback_univ_map {A B C D : Type} (f : B -> D) (g : C -> D)
-  (w : pullback (fun β : A -> B => f ∘ β) (fun γ : A -> C => g ∘ γ))
-  : A -> pullback f g
-  := fun a => ((fst (fst w) a; snd (fst w) a); ptw (snd w) a).
-
-Definition pullback_univ_isEquiv `{Funext} {A B C D : Type} (f : B -> D) (g : C -> D)
-  : isEquiv (@pullback_univ_map A B C D f g).
-Proof.
-  refine (iso_to_isEquiv _
-            (fun h => (((fun a => prB (h a)); (fun a => prC (h a)));
-                       ptw_inv (fun a => snd (h a)))) _ _).
-  - intros [[β γ] p]. cbn.
-    exact (ap (fun q => (((β; γ) : (A -> B) × (A -> C)); q)) (eqinv_l (funext _ _) p)).
-  - intro h. apply ptw_inv. intro a. unfold pullback_univ_map. cbn.
-    exact (ap (fun q => (((prB (h a); prC (h a)) : B × C); q))
-              (ptw (eqinv_r (funext _ _) (fun a => snd (h a))) a)).
-Defined.
-
-(** Example: the preimage as a pullback, [B ×_D 1 ≃ f⁻¹(d)]. *)
-Definition pullback_point_eqv {B D : Type} (f : B -> D) (d : D)
-  : pullback f (fun _ : True => d) ≃ fiber f d.
-Proof.
-  refine (mkEqv (fun w => (prB w; (snd w)⁻¹))
-                (fun v => (((fst v; triv) : B × True); (snd v)⁻¹)) _ _).
-  - intros [[b []] p]. exact (ap (fun q => (((b; triv) : B × True); q)) (symm_symm p)).
-  - intros [b p]. exact (ap (fun q => (b; q)) (symm_symm p)).
-Defined.
+(** ** 8.4 The pullback *)
 
 (** Definition [def:intersectionand unionofsets]: intersection and union
     of subsets (the union is the propositional truncation of the sum, so
