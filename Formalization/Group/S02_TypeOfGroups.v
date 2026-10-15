@@ -47,8 +47,8 @@
       with [xca:CG2isSG2] and [xca:RmloopCGm], [xca:klein-not-cyclic],
       that [Σ_3] is not abelian, [xca:bigproductfunext](2), and the
       chain of identifications in [ex:cyclicgroups].
-    - [xca:typegroupisgroupoid] is postponed to Section 4.4, where it
-      follows from [lem:hom-is-set].
+    - [xca:typegroupisgroupoid] is postponed to Section 4.4
+      ([Group_isGrpd]), where it follows from [lem:hom-is-set].
     - Size issues: [UUscone] and [Group] are not universe polymorphic, so
       [Aut_Group(G)] is not a group in the same [Group].
  *)
