@@ -49,5 +49,6 @@ Group/Group.v
 Actions/S02_GSets.v
 Actions/S03_Subgroups.v
 Actions/S04_Orbits.v
+Actions/S05_Torsors.v
 Actions/Actions.v
 Symmetry.v
