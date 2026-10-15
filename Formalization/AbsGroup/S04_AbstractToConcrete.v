@@ -43,9 +43,11 @@
       action [h · b :≡ b(h⁻¹ ·)]), and exercise [xca:phi^*-|phi_*]
       ([abs_adj_restrict_coinduce]).
 
-    Left out (time limit per result)
-    - Definition [def:phi_!] (via a set quotient), exercises
-      [xca:phi_!-OK] and [xca:phi_!-|phi^*].
+    Left out (statements only, no proofs yet; time limit per result)
+    - Definition [def:phi_!] (via a set quotient; [def_phi_shriek_stmt],
+      with the relation [phi_rel]), exercises [xca:phi_!-OK]
+      ([xca_phi_OK_stmt]) and [xca:phi_!-|phi^*]
+      ([xca_phi_shriek_adj_stmt]).
  *)
 
 From HoTT Require Import
@@ -529,3 +531,36 @@ Section AbsRestrict.
   Defined.
 
 End AbsRestrict.
+
+Section PhiShriek.
+
+  Context `{Uv : Univalence} {G H : AbsGroup} (φ : absHom G H).
+
+  (** Definition [def:phi_!] and exercises [xca:phi_!-OK],
+      [xca:phi_!-|phi^*] (statements only).  The relation on [T × X]:
+      [(t, x) ∼ (u, y) :≡ ∃_g (t φ(g) = u) × (x = g ·_X y)]; [φ_!X] is the
+      quotient with [h · [(t, x)] :≡ [(h t, x)]]. *)
+  Definition phi_rel (X : absGSet G) (w w' : ag_S H × gset X) : PropU
+    := (Ex (fun g : ag_S G => (fst w · fst φ g = fst w') × (snd w = gact X g (snd w')));
+        ptrunc_isProp).
+
+  Definition xca_phi_OK_stmt : Type
+    := forall X : absGSet G,
+         (forall w, fst (phi_rel X w w))
+         × (forall w w', fst (phi_rel X w w') -> fst (phi_rel X w' w))
+         × (forall w w' w'', fst (phi_rel X w w') -> fst (phi_rel X w' w'') -> fst (phi_rel X w w''))
+         × (forall (h : ag_S H) w w', fst (phi_rel X w w')
+              -> fst (phi_rel X ((h · fst w; snd w) : ag_S H × gset X) (h · fst w'; snd w'))).
+
+  Definition def_phi_shriek_stmt : Type
+    := {F : absGSet G -> absGSet H &
+         forall X, {e : gset (F X) ≃ quot (phi_rel X) &
+                     forall h t x, fst e (gact (F X) h (eqinv (snd e) (S22_SetOperations.cls (phi_rel X) (t; x))))
+                                   = S22_SetOperations.cls (phi_rel X) (h · t; x)}}.
+
+  Definition xca_phi_shriek_adj_stmt : Type
+    := forall F : absGSet G -> absGSet H,
+       forall X : absGSet G, forall Y : absGSet H,
+       (forall X', gset (F X') ≃ quot (phi_rel X')) ->
+       absHomG H (F X) Y ≃ absHomG G X (abs_restrict φ Y).
+End PhiShriek.

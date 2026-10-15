@@ -23,9 +23,10 @@
       converse, it suffices that [id · id] is a homomorphism
       ([isAb_of_ptw_mul_hom]).
 
-    Left out (time limit per result)
+    Left out (statements only, no proofs yet; time limit per result)
     - In example [ex:conjhom]: transport along [conj^g] in
-      [absHom(H, -)], and [abstr(Binn)(g) = conj^g].
+      [absHom(H, -)] ([conjhom_trp_stmt]), and [abstr(Binn)(g) = conj^g]
+      ([abstr_Binn_stmt]).
  *)
 
 From HoTT Require Import
@@ -145,6 +146,22 @@ Defined.
 (** Example [ex:conjhom]: conjugation as an abstract homomorphism. *)
 Definition conj_absHom (G : AbsGroup) (g : ag_S G) : absHom G G
   := (conj G g; conj_mul G g).
+
+(** The rest of example [ex:conjhom] (statements only): transport along
+    [conj^g] is postcomposition with [conj^g] in [absHom(H, -)] and
+    precomposition with [conj^{h⁻¹}] in [absHom(-, G)]; and
+    [abstr(Binn)(g) = conj^g]. *)
+Definition conjhom_trp_stmt `{Univalence} : Type
+  := (forall (H G : AbsGroup) (g : ag_S G) (f : absHom H G),
+        trp (absHom H) (conj_path G g) f = absHom_comp (conj_absHom G g) f)
+     × (forall (H G : AbsGroup) (h : ag_S H) (f : absHom H G),
+          trp (fun K => absHom K G) (conj_path H h) f
+          = absHom_comp f (conj_absHom H (ag_inv H h))).
+
+Definition abstr_Binn_stmt `{Univalence} : Type
+  := forall (G : Group) (g : USym G),
+       ap (fun c : component Group G => abstr (fst c)) (loops_fun (Binn G) g)
+       = conj_path (abstr G) g.
 
 (** Exercise [xca:abs-homgroup]: the pointwise product of homomorphisms
     into [G] is again a homomorphism for all [f, g] (and all [H]) iff [G]

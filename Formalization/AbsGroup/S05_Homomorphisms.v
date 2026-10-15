@@ -15,9 +15,15 @@
       book) we use that a pointed map [k] gives another section of [C]
       ([ck_prop]), so it agrees with the centers, and [ptw_star].
 
-    Left out (time limit per result)
-    - The functor [concr] on morphisms (it uses [φ_!]), exercise
-      [xca:Bconcr-OK] and theorem [thm:concr-equiv-cats].
+    - The category of abstract groups ([AbsGroupCat]) and the functor
+      [abstr] ([AbstrFun]), fully faithful by [abstr_hom_eqv]
+      ([AbstrFun_ff]).
+
+    Left out (statements only, no proofs yet; time limit per result)
+    - The functor [concr] on morphisms (it uses [φ_!]) and exercise
+      [xca:Bconcr-OK] ([xca_Bconcr_OK_stmt]); theorem
+      [thm:concr-equiv-cats], stated for [abstr]
+      ([thm_concr_equiv_cats_stmt]).
  *)
 
 From HoTT Require Import
@@ -138,3 +144,31 @@ Definition abstr_hom_isEquiv `{fe : Funext} (G H : Group) : isEquiv (@abstr_hom 
 
 Definition abstr_hom_eqv `{fe : Funext} (G H : Group) : Hom G H ≃ absHom (abstr G) (abstr H)
   := (abstr_hom; abstr_hom_isEquiv G H).
+
+(** The category of abstract groups and the functor [abstr] (now that
+    categories are available, Chapter 6).  By [abstr_hom_eqv], [abstr] is
+    fully faithful. *)
+Definition AbsGroupCat `{Funext} : WildPreCat
+  := Build_WildPreCat AbsGroup absHom absHom_id (fun G H K g f => absHom_comp g f)
+       (fun G H f => path_absHom (absHom_comp (absHom_id H) f) f (fun s => refl))
+       (fun G H f => path_absHom (absHom_comp f (absHom_id G)) f (fun s => refl))
+       (fun G H K L f g h => path_absHom (absHom_comp h (absHom_comp g f))
+                               (absHom_comp (absHom_comp h g) f) (fun s => refl)).
+
+Definition AbstrFun `{Funext} : Functor GroupCat AbsGroupCat
+  := Build_Functor GroupCat AbsGroupCat abstr (fun G H f => abstr_hom f)
+       abstr_id (fun G0 G1 G2 f0 f1 => abstr_comp f0 f1).
+
+Definition AbstrFun_ff `{Funext} : isFullyFaithful AbstrFun
+  := fun G H => abstr_hom_isEquiv G H.
+
+(** Exercise [xca:Bconcr-OK] and theorem [thm:concr-equiv-cats]
+    (statements only).  [concr] on morphisms uses [φ_!] (Section 7.4,
+    stated only), so we state the theorem for [abstr], whose inverse
+    [concr] is. *)
+Definition xca_Bconcr_OK_stmt `{Univalence} : Type
+  := (forall (G H : AbsGroup) (φ : absHom G H) (F : absGSet G -> absGSet H),
+        (forall X, gset (F X) ≃ quot (phi_rel φ X)) -> F (absprtor G) = absprtor H)
+     × {C : Functor AbsGroupCat GroupCat & forall G, fob C G = concr G}.
+
+Definition thm_concr_equiv_cats_stmt `{Funext} : Type := isCatEquiv AbstrFun.

@@ -14,9 +14,11 @@
       underlying set of [ev(X)] is [X(sh_G)] by definition
       ([actions_eqv_set]).
 
-    Left out (time limit per result)
-    - Example [ex:abstrandconj] and lemma [lem:abstrandconj], exercises
-      [xca:f^*-abs(f)^*] and [xca:f_!-abs(f)_!].
+    Left out (statements only, no proofs yet; time limit per result)
+    - Example [ex:abstrandconj] and lemma [lem:abstrandconj]
+      ([lem_abstrandconj_stmt]), exercises [xca:f^*-abs(f)^*]
+      ([xca_restrict_abstr_stmt]) and [xca:f_!-abs(f)_!]
+      ([xca_induce_abstr_stmt]).
  *)
 
 From HoTT Require Import
@@ -77,3 +79,25 @@ Defined.
 Definition actions_eqv_set `{Univalence} (G : Group) (X : GSet G)
   : fst (fst (fst (actions_eqv G) X)) = el X (sh G)
   := refl.
+
+(** Example [ex:abstrandconj] and lemma [lem:abstrandconj] (statement
+    only): [ev] sends the [G]-set [Hom(H,G)] to [absHom(abstr H, abstr G)]
+    with [g] acting by postcomposition with [conj^g]. *)
+Definition lem_abstrandconj_stmt `{Univalence} : Type
+  := forall H G : Group,
+       {e : gset (fst (actions_eqv G) (HomG_set H G)) ≃ absHom (abstr H) (abstr G) &
+         forall (g : USym G) f,
+           fst e (gact (fst (actions_eqv G) (HomG_set H G)) g f)
+           = absHom_comp (conj_absHom (abstr G) g) (fst e f)}.
+
+(** Exercises [xca:f^*-abs(f)^*] and [xca:f_!-abs(f)_!] (statements
+    only): [ev] commutes with restriction and with induction (the latter
+    for any [φ_!] as in Section 7.4). *)
+Definition xca_restrict_abstr_stmt `{Univalence} : Type
+  := forall (G H : Group) (f : Hom G H) (Y : GSet H),
+       fst (actions_eqv G) (restrict f Y) = abs_restrict (abstr_hom f) (fst (actions_eqv H) Y).
+
+Definition xca_induce_abstr_stmt `{Univalence} : Type
+  := forall (G H : Group) (f : Hom G H) (F : absGSet (abstr G) -> absGSet (abstr H)),
+       (forall X, gset (F X) ≃ quot (phi_rel (abstr_hom f) X)) ->
+       forall X : GSet G, fst (actions_eqv H) (induce f X) = F (fst (actions_eqv G) X).

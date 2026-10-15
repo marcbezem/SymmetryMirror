@@ -14,10 +14,15 @@
     - The symmetry groups of the endpoints are merely equal
       ([heap_groups_merely_eq]).
 
-    Left out (time limit per result)
-    - The group of symmetries [r ↦ p q⁻¹ r] of [USym(H)], abelian heaps,
-      and exercise [xca:heap-variety] (heaps as a variety with a ternary
-      operation).
+    - The heap operation [heap_op], abelian heaps ([isAbHeap]) and the
+      structure map [heap_struct].
+
+    Left out (statements only, no proofs yet; time limit per result)
+    - The group of symmetries [r ↦ p q⁻¹ r] of [USym(H)]
+      ([heap_maps_stmt]), the isomorphism of the endpoint groups of an
+      abelian heap ([abheap_iso_stmt]), and exercise [xca:heap-variety]
+      (heaps as a variety with a ternary operation;
+      [xca_heap_variety_stmt]).
  *)
 
 From HoTT Require Import
@@ -113,3 +118,37 @@ Proof.
   refine (ptrunc_rec ptrunc_isProp _ (snd cA a a')). intro p. destruct p.
   exact (trunc refl).
 Defined.
+
+(** The heap operation [(p, q, r) ↦ p q⁻¹ r] on [USym(H)]. *)
+Definition heap_op (H : Heap) (p q r : USymH H) : USymH H := p ⋅ (q⁻¹ ⋅ r).
+
+(** The maps [r ↦ p q⁻¹ r] of [USym(H)] (statement only): they are
+    exactly the left multiplications by symmetries of the end shape, so
+    they form the symmetry group of the end point. *)
+Definition heap_maps_stmt : Type
+  := forall (H : Heap) (φ : USymH H -> USymH H),
+       Ex (fun pq : USymH H × USymH H => φ = heap_op H (fst pq) (snd pq))
+       <-> Ex (fun l : hend H = hend H => φ = fun r => l ⋅ r).
+
+(** Abelian heaps, whose endpoint groups are (purely) isomorphic
+    (statement only). *)
+Definition isAbHeap (H : Heap) : Type := forall p q r : USymH H, heap_op H p q r = heap_op H r q p.
+
+Definition abheap_iso_stmt `{Funext} : Type
+  := forall H : Heap, isAbHeap H -> Iso (heap_start_group H) (heap_end_group H).
+
+(** Exercise [xca:heap-variety] (statement only): the fibers of [USym]
+    over a set are sets, and the fibers of [H ↦ (USym(H), p q⁻¹ r)] are
+    propositions, inhabited iff [S] is nonempty and [t] satisfies the
+    heap equations. *)
+Definition heap_struct (H : Heap) : {S : SetU & fst S -> fst S -> fst S -> fst S}
+  := ((USymH H; USymH_isSet H); heap_op H).
+
+Definition xca_heap_variety_stmt `{Univalence} : Type
+  := (forall S : SetU, isSet {H : Heap & fst S = USymH H})
+     × (forall (S : SetU) (t : fst S -> fst S -> fst S -> fst S),
+          isProp (fiber heap_struct (S; t))
+          × (fiber heap_struct (S; t)
+             <-> ptrunc (fst S)
+                 × (forall p q r s u, t (t p q r) s u = t p q (t r s u))
+                 × (forall p q, t p p q = q) × (forall p q, t p q q = p))).

@@ -35,10 +35,11 @@
       equivalence [group_shear_eqv], with [ā̄ = a] ([sg_bar_bar]) as in
       the hint.
 
-    Left out (time limit per result)
+    Left out (statements only, no proofs yet; time limit per result)
     - The converse of [path_AbsGroup], i.e. that [(G = H) ≃ AbsIso(G,H)]
-      (the full "analysis" of [rem:abs-iso]).
-    - Exercise on Furstenberg groups.
+      (the full "analysis" of [rem:abs-iso]; [path_AbsGroup_isEquiv_stmt]).
+    - Exercise on Furstenberg groups ([Furstenberg],
+      [xca_furstenberg_stmt]).
  *)
 
 From HoTT Require Import
@@ -294,6 +295,12 @@ Definition Sigma_isGrpd {A : Type} {B : A -> Type} (gA : isGrpd A)
   := @IsTrunc_isGrpd _ (@istrunc_sigma _ _ _ (isGrpd_IsTrunc gA)
                                (fun a => isGrpd_IsTrunc (gB a))).
 
+(** The converse of [path_AbsGroup] (statement only): it is an
+    equivalence [AbsIso(G,H) ≃ (G = H)], the full analysis of remark
+    [rem:abs-iso]. *)
+Definition path_AbsGroup_isEquiv_stmt `{Univalence} : Type
+  := forall G K : AbsGroup, isEquiv (@path_AbsGroup _ G K).
+
 Definition set_isGrpd {A : Type} (sA : isSet A) : isGrpd A := set_ntype 1 sA.
 
 Definition prop_isGrpd {A : Type} (pA : isProp A) : isGrpd A
@@ -465,3 +472,14 @@ Proof.
               (sg_bar_bar {| sg_S := S; sg_isSet := sS; sg_e := e; sg_op := op;
                              sg_lunit := lu; sg_self := sf; sg_shear := sh |} a)).
 Defined.
+(** Exercise on Furstenberg groups (statement only): a nonempty set with
+    [∘] such that [(a ∘ c) ∘ (b ∘ c) = a ∘ b] and every [a ∘ - ] hits
+    every [c]. *)
+Definition Furstenberg : Type
+  := {S : SetU & {op : fst S -> fst S -> fst S &
+       ptrunc (fst S)
+       × (forall a b c, op (op a c) (op b c) = op a b)
+       × (forall a c, Ex (fun b => op a b = c))}}.
+
+Definition xca_furstenberg_stmt `{Univalence} : Type := Furstenberg ≃ AbsGroup.
+
