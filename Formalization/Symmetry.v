@@ -12,8 +12,9 @@
       [Circle/Circle.v] (Chapter 3, [circle.tex], Sections 3.1 - 3.9),
       [Group/Group.v] (Chapter 4, [group.tex], Sections 4.2 - 4.7) and
       [Actions/Actions.v] (Chapter 5, [actions.tex], Sections 5.2 - 5.7)
-      and [AbsGroup/AbsGroup.v] (Chapter 6, [absgroup.tex], Sections
-      6.2 - 6.7).
+      [AbsGroup/AbsGroup.v] (Chapter 6, [absgroup.tex], Sections
+      6.2 - 6.7) and [ConGroups/ConGroups.v] (Chapter 7, [congp.tex],
+      Sections 7.2 - 7.4, 7.6, 7.7).
     - One file per section, [S<nn>_<Name>.v], each starting with a summary
       of what is formalized, what differs from the text, and NOTEs for the
       book text.  Each section exports the previous one, and the first
@@ -42,4 +43,5 @@ From SymmetryMirror Require Export
   Circle.Circle
   Group.Group
   Actions.Actions
-  AbsGroup.AbsGroup.
+  AbsGroup.AbsGroup
+  ConGroups.ConGroups.

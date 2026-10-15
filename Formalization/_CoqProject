@@ -60,4 +60,10 @@ AbsGroup/S05_Homomorphisms.v
 AbsGroup/S06_Actions.v
 AbsGroup/S07_Heaps.v
 AbsGroup/AbsGroup.v
+ConGroups/S02_Semidirect.v
+ConGroups/S03_Wreath.v
+ConGroups/S04_Pullback.v
+ConGroups/S06_Sums.v
+ConGroups/S07_FreeGroups.v
+ConGroups/ConGroups.v
 Symmetry.v
