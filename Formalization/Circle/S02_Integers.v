@@ -25,8 +25,10 @@
       operations with those of the library's [Int] ([toInt_zadd],
       [toInt_zmul]) and reusing its lemmas.
     - The order [z ≤ y :≡ ∑_n (y = z + ι₊(n))], which extends [≤] on [ℕ].
-    - Left out: the alternative form of [ℤ]-induction (giving [f(0)],
-      [g'] and [h']), a remark without a precise statement.
+    - The alternative form of [ℤ]-induction from [f(0)], [g'] and [h']
+      ([ℤ_ind']), with the computation rules by [refl]; the value at [-0]
+      is [f(0)] transported along [zeq], so [f(-0) ≡ f(0)] holds only
+      over [zeq].
     - Numerals in patterns are written [O], since [0] in patterns refers
       to [trunc_index]. *)
 
@@ -285,6 +287,27 @@ Defined.
 (** Exercise [xca:addition-on-Z-and-N], for multiplication. *)
 Definition iplus_mul (n m : ℕ) : iplus (mul n m) = zmul (iplus n) (iplus m)
   := toInt_inj (x := iplus (mul n m)) ((int_nat_mul n m)^ @ (toInt_zmul (iplus n) (iplus m))^).
+
+(** The alternative form of [ℤ]-induction: given [f(0)], [g'] and [h'],
+    with [f(z+1) ≡ g'(z, f(z))] for [z ≥ 0] and [f(z-1) ≡ h'(z, f(z))] for
+    [z ≤ 0]; the value at [-0] is [f(0)] transported along [zeq]. *)
+Definition ℤ_ind' (T : ℤ -> Type) (f0 : T (iplus 0))
+  (g' : forall n, T (iplus n) -> T (iplus (S n)))
+  (h' : forall n, T (iminus (negN n)) -> T (iminus (negN (S n))))
+  : forall z, T z
+  := ℤ_ind T (fun n => nat_rect (fun n => T (iplus n)) f0 g' n)
+       (fun m => match m with
+                 | negN n => nat_rect (fun n => T (iminus (negN n))) (trp T zeq⁻¹ f0) h' n
+                 end)
+       (transport_pV T zeq f0).
+
+Definition ℤ_ind'_0 T f0 g' h' : ℤ_ind' T f0 g' h' (iplus 0) = f0 := refl.
+
+Definition ℤ_ind'_plus T f0 g' h' (n : ℕ)
+  : ℤ_ind' T f0 g' h' (iplus (S n)) = g' n (ℤ_ind' T f0 g' h' (iplus n)) := refl.
+
+Definition ℤ_ind'_minus T f0 g' h' (n : ℕ)
+  : ℤ_ind' T f0 g' h' (iminus (negN (S n))) = h' n (ℤ_ind' T f0 g' h' (iminus (negN n))) := refl.
 
 (** Exercise [xca:commutative-add-Z]. *)
 Definition zadd_comm (x y : ℤ) : zadd x y = zadd y x

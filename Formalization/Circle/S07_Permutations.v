@@ -44,16 +44,21 @@
       ([peelEqv], [peel_factor]) and write each as transpositions by
       [xca:perm-prod-transpositions].
 
-    Left out
-    - The remaining claims of [rem:cycle-vs-cycle]: that cyclic
-      permutations move only finitely many elements, so that they do not
-      include the infinite cycle [(ℤ, zs)], and that turning a
-      transposition into a cycle requires decidability (a statement about
-      what cannot be proved).
-    - In the corollary we do not record that each pair [(a, b)] in the
-      list has [a ≠ b] (it holds for the pairs we produce, but is not
-      proved).
-    - The exercise on binomial coefficients and the number of [k]-cycles. *)
+    - Remark [rem:cycle-vs-cycle]: a cyclic permutation moves only the
+      elements of its list ([cyc_fixes]).
+
+    Left out (statements only, no proofs yet)
+    - That [(ℤ, zs)] is not a cyclic permutation ([zs_not_cyc_stmt]).
+    - The corollary with [a ≠ b] for each pair [(a, b)] in the list
+      ([perm_transpositions_ne_stmt]); it holds for the pairs we produce.
+    - The exercise on binomial coefficients and the number of [k]-cycles
+      ([xca_binomial_subsets_stmt], [xca_kcycles_stmt], with
+      [isKCycle]).
+
+    Left out (not formalized)
+    - The claim in [rem:cycle-vs-cycle] that turning a transposition
+      into a cycle requires decidability (a statement about what cannot
+      be proved). *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
@@ -204,7 +209,18 @@ Section Permutations.
       exact (IH (snd (fst dr); snd (snd dr)) _).
   Defined.
 
+  (** Remark [rem:cycle-vs-cycle]: a cyclic permutation moves only the
+      elements of its list. *)
+  Definition cyc_fixes (a1 : A) (r : list A) (x : A) (n : notin x (cons a1 r))
+    : cyc a1 r x = x
+    := next_notin (cons a1 r) a1 x n.
+
 End Permutations.
+
+(** Hence the infinite cycle [(ℤ, zs)] is not a cyclic permutation
+    (statement only). *)
+Definition zs_not_cyc_stmt : Type
+  := forall (dZ : isDecSet ℤ) (a1 : ℤ) (r : list ℤ), ¬ (forall x, zs x = cyc dZ a1 r x).
 
 (** Exercise [xca:factorial]: a finite set of cardinality [n] has [n!]
     permutations, via the library's [fcard_aut]. *)
@@ -779,3 +795,32 @@ Definition perm_transpositions `{Univalence} {X : Type} (h : isFinSet X) (σ : X
                           (Eqv_comp (idtoeqv (snd w)) (Eqv_of_Equiv (equiv_fin_finnat (fst w))))
                           σ))
        h.
+
+(** The corollary with genuine transpositions, i.e. with [a ≠ b] for each
+    pair [(a, b)] in the list (statement only). *)
+Fixpoint all_pairs_ne {X : Type} (l : list (X × X)) : Type
+  := match l with nil => Unit | cons p l' => (fst p ≠ snd p) × all_pairs_ne l' end.
+
+Definition perm_transpositions_ne_stmt `{Univalence} : Type
+  := forall (X : Type) (h : isFinSet X) (σ : X ≃ X),
+       ptrunc {l : list (X × X) & all_pairs_ne l
+                 × (forall x, fst σ x = transpsL (finset_isDecSet h) l x)}.
+
+(** The exercise on binomial coefficients (statements only): a set of
+    cardinality [n] has [n!/(k!(n-k)!)] subsets with [k] elements, and
+    [n!/(k!(n-k)!) ⋅ (k-1)!] [k]-cycle permutations for [k ≥ 1]; we avoid
+    division by multiplying out. *)
+Definition xca_binomial_subsets_stmt `{Univalence} : Type
+  := forall (A : Type) (h : isFinSet A) (k : ℕ), (k <= cardF h)%nat ->
+       {hS : isFinSet {P : Sub A & ptrunc (Fin k = carrier P :> Type)} &
+         mul (cardF hS) (mul (fact k) (fact (cardF h - k))) = fact (cardF h)}.
+
+Definition isKCycle {A : Type} (dA : isDecSet A) (k : ℕ) (σ : A ≃ A) : Type
+  := ptrunc {a1 : A & {r : list A & (length r = pred k) × distinct (cons a1 r)
+                                    × (forall x, fst σ x = cyc dA a1 r x)}}.
+
+Definition xca_kcycles_stmt `{Univalence} : Type
+  := forall (A : Type) (h : isFinSet A) (k : ℕ), (1 <= k)%nat -> (k <= cardF h)%nat ->
+       {hC : isFinSet {σ : A ≃ A & isKCycle (finset_isDecSet h) k σ} &
+         mul (cardF hC) (mul (fact k) (fact (cardF h - k)))
+         = mul (fact (cardF h)) (fact (pred k))}.

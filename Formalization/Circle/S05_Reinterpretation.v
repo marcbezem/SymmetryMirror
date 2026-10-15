@@ -19,10 +19,13 @@
       proof ([ev_0 (ap_c (loop^n)) = -n]).
     - Exercise [xca:TTYoneda], first part ([yoneda_eqv]).
 
-    Left out
+    Left out (statements only, no proofs yet)
+    - The second part of [xca:TTYoneda] ([xca_TTYoneda_inj_stmt]).
+
+    Left out (not formalized)
     - The first proof of [thm:S1bysymmetries] (via diagram
-      [eq:setbundle-Sc-univ-comp]) and the second part of
-      [xca:TTYoneda]. *)
+      [eq:setbundle-Sc-univ-comp]); the theorem itself is proved by the
+      second proof. *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
@@ -239,5 +242,10 @@ Section Reinterpretation.
     refine (mkEqv (fun u y p => trp F p u) (fun k => k x refl) (fun u => refl) _).
     intro k. apply ptw_inv. intro y. apply ptw_inv. intro p. destruct p. exact refl.
   Defined.
+
+  (** Exercise [xca:TTYoneda], second part (statement only): the map
+      [x ↦ (y ↦ (x = y))] is an injection. *)
+  Definition xca_TTYoneda_inj_stmt : Type
+    := forall X : Type, isInj (fun x : X => fun y : X => x = y).
 
 End Reinterpretation.

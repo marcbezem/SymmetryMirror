@@ -18,8 +18,9 @@
       [l ↦ (ve(a,l), refl_a)]).
     - Remark [rem:dep-univ-prop-circle]: the dependent universal property.
     - [lem:circleisconnected].
-    - Left out: the remark that [∏_{z:S1}(base = z)] contradicts
-      univalence (this needs [loop ≠ refl], from Section 3.4). *)
+    - The remark that [∏_{z:S1}(base = z)] contradicts univalence
+      ([no_base_paths]), via [loop ≠ refl] ([loop_ne_refl], using the
+      loop [swap] of [Bool] in the universe). *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
@@ -161,6 +162,27 @@ Section DepUnivProp.
   Defined.
 
 End DepUnivProp.
+
+(** [loop ≠ refl], via the loop [swap] of [Bool] in the universe. *)
+Definition loop_ne_refl `{Univalence} : loop ≠ refl.
+Proof.
+  intro e.
+  pose (F := S1_rec Type Bool (etop swapEqv)).
+  assert (q : ap F loop = etop swapEqv) by exact (S1_rec_loop _ _ _).
+  apply yes_ne_no.
+  refine (_ @ ptw (ap fst (ptoe_etop swapEqv)) yes).
+  exact (ap (fun r => ptoe r yes) (q^ @ ap (ap F) e))^.
+Defined.
+
+(** The remark after [lem:circleisconnected]: an element of
+    [∏_{z:S1}(base = z)] contradicts univalence. *)
+Definition no_base_paths `{Univalence} : (forall z : S1, base = z) -> False.
+Proof.
+  intro c. apply loop_ne_refl.
+  pose (d := apD c loop).
+  rewrite transport_paths_r in d.
+  exact (cancelL (c base) _ _ (d @ (concat_p1 _)^)).
+Defined.
 
 (** Lemma [lem:circleisconnected]. *)
 Definition S1_base_paths : forall z : S1, ptrunc (base = z)

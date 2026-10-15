@@ -25,11 +25,11 @@
     - Exercise [xca:S1=S1-components], first part: [-id_S1] and [id_S1]
       are not in the same component ([id_negid_not_conn]).
 
-    Left out
+    Left out (statements only, no proofs yet)
     - The second part of [xca:S1=S1-components]
-      ([∏_{t:S1≃S1} ‖id = t‖ ⨿ ‖-id = t‖]), which needs that the degree
-      of an automorphism is [±1], and exercise
-      [xca:(S1->S1)_(f)-eqv-S1]. *)
+      ([xca_S1S1_components_stmt]), which needs that the degree of an
+      automorphism is [±1], and exercise [xca:(S1->S1)_(f)-eqv-S1]
+      ([xca_S1S1_component_eqv_stmt]). *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
@@ -277,5 +277,14 @@ Section SymmetriesCircle.
     pose (l := cancelL q _ _ ((loop_comm q)^ @ r) : loop = loop^).
     exact (iplus1_ne_iminus1 (wdg_loop^ @ ap (fst wdg) l @ wdg_loopV)).
   Defined.
+
+  (** Exercise [xca:S1=S1-components], second part (statement only):
+      every automorphism of [S1] is merely [id] or [-id]. *)
+  Definition xca_S1S1_components_stmt : Type
+    := forall t : S1 ≃ S1, ptrunc (idmap = fst t) ⨿ ptrunc (negid = fst t).
+
+  (** Exercise [xca:(S1->S1)_(f)-eqv-S1] (statement only). *)
+  Definition xca_S1S1_component_eqv_stmt : Type
+    := forall f : S1 -> S1, S1 ≃ component (S1 -> S1) f.
 
 End SymmetriesCircle.

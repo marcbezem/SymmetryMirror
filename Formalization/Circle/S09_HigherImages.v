@@ -34,9 +34,12 @@
       [Factorization]; [n_image_fact] is the [n]-image factorization.
     - Exercise [xca:im_preserves_conn] ([im_preserves_conn]).
 
-    Left out (not yet formalized)
-    - Theorem [thm:image-Z-to-Cm] with its exercise, and exercise
-      [xca:image-Cmd-to-Cm]; these need [X/m] and [thm:fiber-cdg] (3.8). *)
+    Left out (statements only, no proofs yet)
+    - Theorem [thm:image-Z-to-Cm] ([thm_image_Z_to_Cm_stmt], with [modm])
+      and exercise [xca:image-Cmd-to-Cm] ([xca_image_Cmd_to_Cm_stmt], for
+      finite orders [d]); they need [X/m] and [thm:fiber-cdg] (3.8).  The
+      exercise attached to the proof of [thm:image-Z-to-Cm] is not stated
+      separately. *)
 
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
@@ -256,3 +259,30 @@ Proof.
   - intro z. exact (istrunc_leq (trunc_index_leq_minus_two_n k : (-1 <= k.+1)%trunc)).
   - intros [a e]. revert b e. refine (paths_ind_r _ _ _). exact (trunc (a; refl)).
 Defined.
+
+(** Theorem [thm:image-Z-to-Cm] (statement only): the [0]-image
+    factorization of [-/m : Cyc_0 → Set] goes through [Cyc_m], with
+    [r : Cyc_m → Set] the underlying set.  Since [X/m] is a quotient by a
+    [Prop]-valued relation, it lives in a larger universe than [X], so
+    [r ∘ q] and [-/m] can only be compared by an equivalence of underlying
+    sets, not by an identification in one universe of sets. *)
+Definition modm `{Univalence} (k : ℕ) (c : Cyc0) : SetU
+  := (Xm k (fst (snd (fst c))); quot_isSet _).
+
+Definition thm_image_Z_to_Cm_stmt `{Univalence} : Type
+  := forall k : ℕ,
+       {q : Cyc0 -> Cycm k &
+         (forall c, fst (fst (fst (q c))) ≃ fst (modm k c))
+         × isnConnMap 0 q × isnTruncMap 0 (fun c : Cycm k => fst (fst c))}.
+
+(** Exercise [xca:image-Cmd-to-Cm] (statement only), for orders
+    [d = j+1]: [-/m] on [Cyc_{md}] is the family of fibers of
+    [ρ_m : Cyc_d → Cyc_{md}]; it lifts to a [0]-connected
+    [q : Cyc_{md} → Cyc_m] whose fiber at the standard [m]-cycle is
+    [Cyc_d]. *)
+Definition xca_image_Cmd_to_Cm_stmt `{Univalence} : Type
+  := forall k j : ℕ,
+       {q : Cycm (jmn k j) -> Cycm k &
+         (forall c, fiber (rho_Cycm k j) c ≃ fst (fst (fst (q c))))
+         × isnConnMap 0 q
+         × (fiber q (Fincyc k; trunc refl) ≃ Cycm j)}.

@@ -42,16 +42,17 @@
     - Functoriality: the function underlying a composite identification
       in [Endo] is the composite ([endo_fun_concat]).
 
-    Left out (not yet formalized)
-    - [con:psi-alpha-m] and [cor:dgm-conncov] (the book leaves the
-      inverse of [ψ_m] as an exercise).
-    - [cor:id-m-cycle]: the evaluation map is an instance of
-      [ConnCycles], and the compatibility with [zs] follows from
-      [endo_fun_concat]; the instantiation at [Fin m] ran into universe
-      constraints and was not finished.
-    - [lem:componentsofcoversofS1] (LPO implies that every decidable
-      cycle has a principal order), which needs Euclidean division on
-      [ℤ] and the computation of [H] for the standard cycles.
+    Left out (statements only, no proofs yet)
+    - [con:psi-alpha-m] and [cor:dgm-conncov] ([con_psi_alpha_m_stmt],
+      [cor_dgm_conncov_stmt]; the book leaves the inverse of [ψ_m] as an
+      exercise).
+    - [cor:id-m-cycle] ([cor_id_m_cycle_stmt]): the evaluation map is an
+      instance of [ConnCycles], and the compatibility with [zs] follows
+      from [endo_fun_concat]; the instantiation at [Fin m] ran into
+      universe constraints and was not finished.
+    - [lem:componentsofcoversofS1] ([lem_componentsofcoversofS1_stmt],
+      with [ConnDecCovS1]), which needs Euclidean division on [ℤ] and the
+      computation of [H] for the standard cycles.
  *)
 
 From HoTT Require Import
@@ -294,6 +295,15 @@ Section FinCycle.
     := fun z => is_ntype_Eqv 0 (fst_fiber_eqv Rm z) (Rm_isSet z).
 
 End FinCycle.
+
+(** Construction [con:psi-alpha-m] and corollary [cor:dgm-conncov]
+    (statements only), for [m = k+1]. *)
+Definition con_psi_alpha_m_stmt `{Univalence} : Type
+  := forall k : ℕ, {ψ : Tot (Rm k) ≃ S1 & dg (S k) ∘ fst ψ = fst (powm k)}.
+
+Definition cor_dgm_conncov_stmt `{Univalence} : Type
+  := forall k : ℕ, isConnCovering (dg (S k))
+                   × (forall z : S1, ptrunc (fiber (dg (S k)) z = Fin (S k))).
 
 (** Exercise [xca:preim-eq]. *)
 Definition comp_l_isEquiv {X : Type} {a b c : X} (r : b = c)
@@ -590,6 +600,17 @@ Section IdCycle.
   Defined.
 
 End IdCycle.
+
+(** Corollary [cor:id-m-cycle] (statement only): for the cycles
+    [(Fin m, zs)], evaluation at [0] is an equivalence
+    [((Fin m, zs) = (Fin m, zs)) ≃ Fin m], sending [refl] to [0], under
+    which composition with [(zs, !)] corresponds to [zs]. *)
+Definition cor_id_m_cycle_stmt `{Univalence} : Type
+  := forall k : ℕ,
+       let zsk := fst (finsuccEqv k) in
+       {e : (((Fin (S k); zsk) : Endo) = (Fin (S k); zsk)) ≃ Fin (S k) &
+         (fst e refl = fin_zero)
+         × (forall p, fst e (endo_path (finsuccEqv k) refl ⋅ p) = zsk (fst e p))}.
 
 (** Exercise [xca:map-of-cycles]. *)
 Section MapOfCycles.
@@ -940,3 +961,13 @@ Proof.
          @ (endo_fun_trp q _)^).
 Defined.
 
+
+(** Lemma [lem:componentsofcoversofS1] (statement only): under LPO, the
+    connected decidable coverings of the circle are the component of the
+    universal covering and those of the [m]-fold coverings. *)
+Definition ConnDecCovS1 : Type
+  := {E : S1 -> SetU & isConn {z : S1 & fst (E z)} × (forall z, isDecSet (fst (E z)))}.
+
+Definition lem_componentsofcoversofS1_stmt `{Univalence} : Type
+  := LPO -> ConnDecCovS1 ≃ (component (S1 -> SetU) RSet
+                             ⨿ {k : ℕ & component (S1 -> SetU) (fun z => (Rm k z; Rm_isSet k z))}).
