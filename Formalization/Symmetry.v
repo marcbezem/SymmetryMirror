@@ -8,8 +8,9 @@
 
     - [Symmetry.v] (this file) exports all chapters.
     - One directory per chapter, with a chapter file that exports its
-      sections: [IntroUF/IntroUF.v] (Chapter 2, [intro-uf.tex]) and
-      [Circle/Circle.v] (Chapter 3, [circle.tex], Sections 3.1 - 3.9).
+      sections: [IntroUF/IntroUF.v] (Chapter 2, [intro-uf.tex]),
+      [Circle/Circle.v] (Chapter 3, [circle.tex], Sections 3.1 - 3.9) and
+      [Group/Group.v] (Chapter 4, [group.tex]).
     - One file per section, [S<nn>_<Name>.v], each starting with a summary
       of what is formalized, what differs from the text, and NOTEs for the
       book text.  Each section exports the previous one, and the first
@@ -35,4 +36,5 @@
 
 From SymmetryMirror Require Export
   IntroUF.IntroUF
-  Circle.Circle.
+  Circle.Circle
+  Group.Group.
