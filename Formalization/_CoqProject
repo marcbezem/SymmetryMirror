@@ -55,4 +55,9 @@ Actions/S07_Burnside.v
 Actions/Actions.v
 AbsGroup/S02_Monoids.v
 AbsGroup/S03_AbstractHomomorphisms.v
+AbsGroup/S04_AbstractToConcrete.v
+AbsGroup/S05_Homomorphisms.v
+AbsGroup/S06_Actions.v
+AbsGroup/S07_Heaps.v
+AbsGroup/AbsGroup.v
 Symmetry.v
