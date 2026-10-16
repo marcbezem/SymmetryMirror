@@ -76,7 +76,7 @@ Section Burnside.
     := sigma_comm (USym G) S0 (fun g x => act X g x = x).
 
   (** [X/G] is finite: it is the quotient of [X(sh_G)] by the decidable
-      equivalence relation [∃_g (g · x = y)] (corollary [cor:orbit-equiv]). *)
+      equivalence relation [∃_g (g · x = y)] (corollary [cor:orbit-equiv] of 5.4). *)
   Definition Rorb (x y : S0) : PropU := ptrunc_PropU {g : USym G & act X g x = y}.
 
   Definition Rorb_refl (x : S0) : fst (Rorb x x) := trunc (refl; refl).
@@ -200,7 +200,7 @@ Section Burnside.
       exact (tot (fun x => fst (Ex x)); tot_isEquiv _ (fun x => snd (Ex x))).
     Defined.
 
-    (** Construction [cor:lagrange-dep-sum] for the orbit of [x₀]. *)
+    (** Construction [cor:lagrange-dep-sum] of 5.3, for the orbit of [x₀]. *)
     Definition orbit_count_eqv
       : ptrunc (USym G ≃ {x : S0 & StabZ (orb X x0) x})
       := Trunc_functor (-1) (fun f => Eqv_comp (lagrange_dep orbit_subgrp f) orbit_sum_eqv)

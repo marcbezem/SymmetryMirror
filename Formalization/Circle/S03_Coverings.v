@@ -63,7 +63,7 @@ Definition isPtdCovering {A B : Ustar} (f : A →* B) : Type := isCovering (fst 
 Definition SetBundle (B : Type) : Type
   := {A : Type & {f : A -> B & forall b, isSet (fiber f b)}}.
 
-(** The equivalence with [B → Set] from [lem:Prop-Set-pointed-families],
+(** The equivalence with [B → Set] from [lem:Prop-Set-pointed-families] of 2.25,
     in the direction [f(A,h) :≡ (b ↦ h⁻¹(b))] (the restriction of
     [preim]), so that it computes by definition. *)
 Section SetBundleFamilies.
@@ -279,7 +279,8 @@ Section TwoS1Coverings.
 
 End TwoS1Coverings.
 
-(** Theorem [thm:coveringsofS1perms].  The second row:
+(** Theorem [thm:coveringsofS1perms], with remark [rem:subtype-diagram]
+    for its squares.  The second row:
     [preim : ∑_{A:U}(A → S1) ≃ (S1 → U)] and
     [g(S) :≡ (S(base), trp^{id_U}_{S(loop)})], an equivalence by
     [lem:freeloopspace] and univalence; the third row: their restrictions

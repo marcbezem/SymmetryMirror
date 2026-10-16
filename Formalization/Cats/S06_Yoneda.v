@@ -110,19 +110,17 @@ Section Yoneda.
     intro f. apply (path_NatTrans SetCat_isPreCat). intro A. exact refl.
   Defined.
 
+  (** Corollary [cor:yo-emb-obj] (statement only): for a category, [yo]
+      is injective on objects. *)
+  Definition cor_yo_emb_obj_stmt : Type := isUnivalent C -> isInj (fob yo).
+
   (** Definition [def:repr]. *)
   Definition isRepr (F : Ob PSh) : Type := {C0 : Ob C & IsoC (C := PSh) (yo_ob C0) F}.
 
+  (** Corollary [cor:repr-prop] (statement only). *)
+  Definition cor_repr_prop_stmt : Type := isUnivalent C -> forall F : Ob PSh, isProp (isRepr F).
+
 End Yoneda.
-
-(** Corollary [cor:yo-emb-obj] (statement only): for a category, [yo] is
-    injective on objects. *)
-Definition cor_yo_emb_obj_stmt `{Funext} : Type
-  := forall (C : Cat), isInj (fob (yo (fst C) (fst (snd C)))).
-
-(** Corollary [cor:repr-prop] (statement only). *)
-Definition cor_repr_prop_stmt `{Funext} : Type
-  := forall (C : Cat) (F : Ob (PSh (fst C))), isProp (isRepr (fst C) (fst (snd C)) F).
 
 (** Lemma [lem:adj-via-repr] (statement only): a map on objects [G] with
     natural isomorphisms [Hom_D(F -, D) ≅ yo(G(D))] extends uniquely to a

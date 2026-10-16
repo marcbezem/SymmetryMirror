@@ -131,7 +131,9 @@ Section AbsGSets.
 
   Definition absGTor : Type := component absGSet absprtor.
 
-  (** Maps and isomorphisms of [G]-sets (definition [def:Hom-absG]). *)
+  (** Definition [def:Hom-absG]: maps and isomorphisms of [G]-sets.
+      (Placed here, before [def:concr], since the identifications of
+      [G]-sets below are given by isomorphisms.) *)
   Definition isGHom (X Y : absGSet) (f : gset X -> gset Y) : Type
     := forall s x, f (gact X s x) = gact Y s (f x).
 
@@ -208,12 +210,6 @@ Arguments idtogIso {_ G X Y} p.
 Arguments path_gIso {_ G X Y} f g h.
 Arguments path_absGSet {_ G X Y} f.
 
-(** Definition [def:concr]: the group classified by [(absGTor, absprtor)].
-    Since [absGTor] contains the type of sets, [concr G] lives in the
-    universe above the one of [G]. *)
-Definition concr `{Univalence} (G : AbsGroup) : Group
-  := AutG (absGSet_isGrpd G) (absprtor G).
-
 (** Exercise [xca:absprtorsor]: the principal torsor is identified with
     [(S, g ↦ (s ↦ s · g⁻¹))], via the inverse. *)
 Section RightTorsor.
@@ -237,6 +233,13 @@ Section RightTorsor.
   Defined.
 
 End RightTorsor.
+
+(** Definition [def:concr]: the group classified by [(absGTor, absprtor)].
+    Since [absGTor] contains the type of sets, [concr G] lives in the
+    universe above the one of [G]. *)
+Definition concr `{Univalence} (G : AbsGroup) : Group
+  := AutG (absGSet_isGrpd G) (absprtor G).
+
 
 (** Example [ex:BqG], definition [def:qG-concr-abstr] and lemma
     [lem:Groupsareidentitytypes]. *)
@@ -322,9 +325,10 @@ Section ConcrAbstr.
 
 End ConcrAbstr.
 
-(** The isomorphism [r_G : G ≅ abstr(concr(G))] of the proof of theorem
-    [thm:Groupsareidentitytypes] (abstract Cayley, footnote
-    [ft:abstract-Cayley]). *)
+(** The isomorphism [r_G : G ≅ abstr(concr(G))] (abstract Cayley,
+    footnote [ft:abstract-Cayley]) of the proof of theorem
+    [thm:Groupsareidentitytypes].
+    (Placed before the theorem, whose proof uses it.) *)
 Section AbstrConcr.
 
   Context `{Univalence} (G : AbsGroup).
@@ -433,6 +437,46 @@ Section AbsRestrict.
     intros s t. exact (ap (fst (snd Y)) (snd φ s t) @ snd (snd Y) _ _).
   Defined.
 
+End AbsRestrict.
+
+
+Section PhiShriek.
+
+  Context `{Uv : Univalence} {G H : AbsGroup} (φ : absHom G H).
+
+  (** Definition [def:phi_!] and exercises [xca:phi_!-OK],
+      [xca:phi_!-|phi^*] (statements only).  The relation on [T × X]:
+      [(t, x) ∼ (u, y) :≡ ∃_g (t φ(g) = u) × (x = g ·_X y)]; [φ_!X] is the
+      quotient with [h · [(t, x)] :≡ [(h t, x)]]. *)
+  Definition phi_rel (X : absGSet G) (w w' : ag_S H × gset X) : PropU
+    := (Ex (fun g : ag_S G => (fst w · fst φ g = fst w') × (snd w = gact X g (snd w')));
+        ptrunc_isProp).
+
+  Definition xca_phi_OK_stmt : Type
+    := forall X : absGSet G,
+         (forall w, fst (phi_rel X w w))
+         × (forall w w', fst (phi_rel X w w') -> fst (phi_rel X w' w))
+         × (forall w w' w'', fst (phi_rel X w w') -> fst (phi_rel X w' w'') -> fst (phi_rel X w w''))
+         × (forall (h : ag_S H) w w', fst (phi_rel X w w')
+              -> fst (phi_rel X ((h · fst w; snd w) : ag_S H × gset X) (h · fst w'; snd w'))).
+
+  Definition def_phi_shriek_stmt : Type
+    := {F : absGSet G -> absGSet H &
+         forall X, {e : gset (F X) ≃ quot (phi_rel X) &
+                     forall h t x, fst e (gact (F X) h (eqinv (snd e) (S22_SetOperations.cls (phi_rel X) (t; x))))
+                                   = S22_SetOperations.cls (phi_rel X) (h · t; x)}}.
+
+  Definition xca_phi_shriek_adj_stmt : Type
+    := forall F : absGSet G -> absGSet H,
+       forall X : absGSet G, forall Y : absGSet H,
+       (forall X', gset (F X') ≃ quot (phi_rel X')) ->
+       absHomG H (F X) Y ≃ absHomG G X (abs_restrict φ Y).
+End PhiShriek.
+
+Section AbsCoinduce.
+
+  Context `{Uv : Univalence} {G H : AbsGroup} (φ : absHom G H).
+
   (** Definition [def:phi_*]: [φ_*(X) :≡ {b : T → X | b(t φ(s⁻¹)) = s b(t)}],
       with action [h · b :≡ b(h⁻¹ ·)]. *)
   Definition coind_pred (X : absGSet G) (b : ag_S H -> gset X) : Type
@@ -490,16 +534,16 @@ Section AbsRestrict.
       [Hom_G(φ^* Y, X) ≃ Hom_H(Y, φ_* X)]. *)
   Context (Y : absGSet H) (X : absGSet G).
 
-  Definition adj_fw_elt (F : absHomG G (abs_restrict Y) X) (y : gset Y) : coind_set X.
+  Definition adj_fw_elt (F : absHomG G (abs_restrict φ Y) X) (y : gset Y) : coind_set X.
   Proof.
     refine ((fun t => fst F (gact Y (ag_inv H t) y)); _).
     intros s t. refine (_ @ snd F s _). apply (ap (fst F)).
-    change (gact (abs_restrict Y) s ?z) with (gact Y (fst φ s) z).
+    change (gact (abs_restrict φ Y) s ?z) with (gact Y (fst φ s) z).
     rewrite <- !gact_mul. apply (ap (fun g => gact Y g y)).
     rewrite ag_inv_mul, (absHom_inv (fst φ) (snd φ)), ag_inv_inv. exact refl.
   Defined.
 
-  Definition adj_fw (F : absHomG G (abs_restrict Y) X) : absHomG H Y (abs_coinduce X).
+  Definition adj_fw (F : absHomG G (abs_restrict φ Y) X) : absHomG H Y (abs_coinduce X).
   Proof.
     refine (adj_fw_elt F; _).
     intros h y. apply path_coind. intro t. cbn. apply (ap (fst F)).
@@ -507,7 +551,7 @@ Section AbsRestrict.
     rewrite ?ag_inv_mul, ?ag_inv_inv. exact refl.
   Defined.
 
-  Definition adj_bw (k : absHomG H Y (abs_coinduce X)) : absHomG G (abs_restrict Y) X.
+  Definition adj_bw (k : absHomG H Y (abs_coinduce X)) : absHomG G (abs_restrict φ Y) X.
   Proof.
     refine ((fun y => fst (fst k y) (ag_e H)); _).
     intros s y. cbn.
@@ -517,7 +561,7 @@ Section AbsRestrict.
   Defined.
 
   Definition abs_adj_restrict_coinduce
-    : absHomG G (abs_restrict Y) X ≃ absHomG H Y (abs_coinduce X).
+    : absHomG G (abs_restrict φ Y) X ≃ absHomG H Y (abs_coinduce X).
   Proof.
     refine (mkEqv adj_fw adj_bw _ _).
     - intro F. refine (path_sigma_prop (fun f => isGHom_isProp G _ _ f) _).
@@ -530,37 +574,5 @@ Section AbsRestrict.
       rewrite ag_inv_inv. exact (ag_runit H t).
   Defined.
 
-End AbsRestrict.
+End AbsCoinduce.
 
-Section PhiShriek.
-
-  Context `{Uv : Univalence} {G H : AbsGroup} (φ : absHom G H).
-
-  (** Definition [def:phi_!] and exercises [xca:phi_!-OK],
-      [xca:phi_!-|phi^*] (statements only).  The relation on [T × X]:
-      [(t, x) ∼ (u, y) :≡ ∃_g (t φ(g) = u) × (x = g ·_X y)]; [φ_!X] is the
-      quotient with [h · [(t, x)] :≡ [(h t, x)]]. *)
-  Definition phi_rel (X : absGSet G) (w w' : ag_S H × gset X) : PropU
-    := (Ex (fun g : ag_S G => (fst w · fst φ g = fst w') × (snd w = gact X g (snd w')));
-        ptrunc_isProp).
-
-  Definition xca_phi_OK_stmt : Type
-    := forall X : absGSet G,
-         (forall w, fst (phi_rel X w w))
-         × (forall w w', fst (phi_rel X w w') -> fst (phi_rel X w' w))
-         × (forall w w' w'', fst (phi_rel X w w') -> fst (phi_rel X w' w'') -> fst (phi_rel X w w''))
-         × (forall (h : ag_S H) w w', fst (phi_rel X w w')
-              -> fst (phi_rel X ((h · fst w; snd w) : ag_S H × gset X) (h · fst w'; snd w'))).
-
-  Definition def_phi_shriek_stmt : Type
-    := {F : absGSet G -> absGSet H &
-         forall X, {e : gset (F X) ≃ quot (phi_rel X) &
-                     forall h t x, fst e (gact (F X) h (eqinv (snd e) (S22_SetOperations.cls (phi_rel X) (t; x))))
-                                   = S22_SetOperations.cls (phi_rel X) (h · t; x)}}.
-
-  Definition xca_phi_shriek_adj_stmt : Type
-    := forall F : absGSet G -> absGSet H,
-       forall X : absGSet G, forall Y : absGSet H,
-       (forall X', gset (F X') ≃ quot (phi_rel X')) ->
-       absHomG H (F X) Y ≃ absHomG G X (abs_restrict φ Y).
-End PhiShriek.

@@ -276,6 +276,25 @@ Section Stabilizers.
   Definition splitting_orbits : {O : Orbits X & fiber (orb X) O} ≃ el X (sh G)
     := sum_of_fibers (orb X).
 
+  (** Remark [rem:orbit-fibs] (statement only): the action type of
+      [X_{[x]}], pointed at [(sh_G, x)], is [BG_x], and its underlying set
+      is [G · x]. *)
+  Definition Xorb (x : el X (sh G)) : GSet G := GSet_sub X (orbit0_sub X (sh G; x)).
+
+  Definition rem_orbit_fibs_stmt : Type
+    := forall x : el X (sh G),
+         {xp : fst (orbit0_sub X (sh G; x) (sh G) x) &
+           ((TotG (Xorb x); ((sh G; (x; xp)) : TotG (Xorb x))) ≃* BG (Gx x))}
+         × (el (Xorb x) (sh G) ≃ Gdot x).
+
+  (** Remark [rem:subgrp-is-stabsubgr] (statement only). *)
+  Definition rem_subgrp_is_stabsubgr_stmt : Type
+    := (forall (x : el X (sh G)) (xp : fst (orbit0_sub X (sh G; x) (sh G) x))
+               (t : istrans (Xorb x)) (m : ismono (ix x)),
+          subgrp_to_mono ((Xorb x; ((x; xp); t)) : SubGrp G) = (Gx x; (ix x; m)))
+       × (forall (t : istrans X) (x : el X (sh G)) (m : ismono (ix x)),
+            subgrp_to_mono ((X; (x; t)) : SubGrp G) = (Gx x; (ix x; m))).
+
   (** Definition [def:fixed-free]. *)
   Definition isFixed (x : el X (sh G)) : Type := isIso (ix x).
 
@@ -445,34 +464,16 @@ Section StabilizerStatements.
 
   Context `{Univalence}.
 
-  Definition Xorb {G : Group} (X : GSet G) (x : el X (sh G)) : GSet G
-    := GSet_sub X (orbit0_sub X (sh G; x)).
-
-  (** Remark [rem:orbit-fibs]: the action type of [X_{[x]}], pointed at
-      [(sh_G, x)], is [BG_x], and its underlying set is [G · x]. *)
-  Definition rem_orbit_fibs_stmt : Type
-    := forall (G : Group) (X : GSet G) (x : el X (sh G)),
-         {xp : fst (orbit0_sub X (sh G; x) (sh G) x) &
-           ((TotG (Xorb X x); ((sh G; (x; xp)) : TotG (Xorb X x))) ≃* BG (Gx X x))}
-         × (el (Xorb X x) (sh G) ≃ Gdot X x).
-
-  (** Remark [rem:subgrp-is-stabsubgr]. *)
-  Definition rem_subgrp_is_stabsubgr_stmt : Type
-    := (forall (G : Group) (X : GSet G) (x : el X (sh G))
-               (xp : fst (orbit0_sub X (sh G; x) (sh G) x))
-               (t : istrans (Xorb X x)) (m : ismono (ix X x)),
-          subgrp_to_mono ((Xorb X x; ((x; xp); t)) : SubGrp G) = (Gx X x; (ix X x; m)))
-       × (forall (G : Group) (X : GSet G) (t : istrans X) (x : el X (sh G))
-                 (m : ismono (ix X x)),
-            subgrp_to_mono ((X; (x; t)) : SubGrp G) = (Gx X x; (ix X x; m))).
-
   (** Example [exa:fixed-free-neither]: elements of a trivial [G]-set are
-      fixed, and those of [princ G] are free. *)
+      fixed, and those of [princ G] are free.  (Placed after the section on
+      stabilizers, which fixes one [G]-set [X], since it concerns the
+      particular [G]-sets [triv_G S] and [princ G].) *)
   Definition exa_fixed_free_stmt : Type
     := (forall (G : Group) (S : SetU) (s : fst S), isFixed (trivG G S) s)
        × (forall (G : Group) (g : USym G), isFree (princ G) g).
 
-  (** Exercise [xca:fixed-free-neither], first two parts:
+  (** Exercise [xca:fixed-free-neither], first two parts (placed here for
+      the same reason):
       [BG_s ≃ BG] for [triv_G S], and [BG_g] contractible for [princ G];
       the third part concerns the action of [C_4] on [Fin 4 → Fin 2] of
       Section 5.7. *)
@@ -571,7 +572,8 @@ End OrbitStabilizer.
 (** Exercise [xca:fixed-free-neither-action-types], first two parts,
     corollary [lem:cosets-Gx.g], construction [con:preLagrange]
     (statements only).  Exercise [xca:lagrange2] asks for another proof
-    of [lagrange_card] (Section 5.3). *)
+    of [lagrange_card] (Section 5.3).
+    (The exercise is placed after the section on the Orbit–Stabilizer construction, which fixes [X] and [x], since it concerns the particular [G]-sets [triv_G S] and [princ G].) *)
 Definition xca_fixed_free_action_types_stmt `{Univalence} : Type
   := (forall (G : Group) (S : SetU) (s : fst S), isContr (TotG (tildeG (trivG G S) s)))
      × (forall (G : Group) (g : USym G), TotG (tildeG (princ G) g) ≃ USym G).

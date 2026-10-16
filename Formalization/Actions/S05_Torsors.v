@@ -108,7 +108,8 @@ Section Torsors.
     := (pathsp_tors; @path_sigma_prop (GSet G) (fun X => ptrunc (princ G = X))
                        (fun _ => ptrunc_isProp) (princ G; trunc refl) (pathsp_tors (sh G)) refl).
 
-  (** The transport in [P_] is precomposition with the inverse. *)
+  (** Remark [rem:pathsptransport]: the transport in [P_] is
+      precomposition with the inverse. *)
   Definition hom_of_path_pathsp {y z : utype (BG G)} (q : y = z) (w : utype (BG G))
     (p : y = w) : hom_of_path (ap pathsp q) w p = p ⋅ q⁻¹.
   Proof. destruct q. exact (trans_1p p)^. Defined.
@@ -163,35 +164,6 @@ Section RestrictInduce.
   Definition induce (X : GSet G) : GSet K
     := fun w => (strunc (induce_type X w); strunc_isSet).
 
-  (** Remark [rem:coinduced-Hset]: the coinduced [H]-set. *)
-  Definition coinduce (X : GSet G) : GSet K
-    := fun w => ((forall z, Bf0 z = w -> el X z);
-                 Pi_isSet (fun z => Pi_isSet (fun _ => el_isSet X z))).
-
-  (** Exercise [xca:adjunction-_!-^*], second part. *)
-  Definition adj_induce_restrict (X : GSet G) (Y : GSet K)
-    : HomGs (induce X) Y ≃ HomGs X (restrict Y).
-  Proof.
-    refine (Eqv_comp (Pi_eqv (fun w => strunc_univ_prop (induce_type X w) (el_isSet Y w))) _).
-    refine (mkEqv (fun (h : forall w, induce_type X w -> el Y w) z x => h (Bf0 z) (z; (refl; x)))
-                  (fun (k : HomGs X (restrict Y)) w (u : induce_type X w) =>
-                     trp (el Y) (fst (snd u)) (k (fst u) (snd (snd u)))) _ _).
-    - intro h. apply ptw_inv. intro w. apply ptw_inv. intros [z [p x]].
-      destruct p. exact refl.
-    - intro k. exact refl.
-  Defined.
-
-  (** Exercise [xca:adjunction-^*-_*]. *)
-  Definition adj_restrict_coinduce (Y : GSet K) (X : GSet G)
-    : HomGs (restrict Y) X ≃ HomGs Y (coinduce X).
-  Proof.
-    refine (mkEqv (fun h w y z p => h z (trp (el Y) p⁻¹ y))
-                  (fun k z y => k (Bf0 z) y z refl) _ _).
-    - intro h. exact refl.
-    - intro k. apply ptw_inv. intro w. apply ptw_inv. intro y.
-      apply ptw_inv. intro z. apply ptw_inv. intro p. destruct p. exact refl.
-  Defined.
-
 End RestrictInduce.
 
 (** Exercise [xca:why-setTrunc_f_!] (statement only): without the set
@@ -208,16 +180,69 @@ Definition xca_induce_iso_stmt `{Funext} : Type
   := forall (G K : Group) (f : Hom G K) (i : isIso f) (X : GSet G) (w : utype (BG K)),
        el (induce f X) w ≃ el X (eqinv i w).
 
-(** Remarks [rem:^*-_!-as-(pre)image] and [rem:coinduced-subset]: for
-    subsets, [f^*] is the preimage, [∃_f] (with propositional truncation)
-    the image, and [∀_f :≡ f_*] the coinduced subset. *)
+Section AdjInduce.
+
+  Context `{Funext} {G K : Group} (f : Hom G K).
+
+  Local Notation Bf0 := (fst (Bf f)).
+
+  (** Exercise [xca:adjunction-_!-^*], second part. *)
+  Definition adj_induce_restrict (X : GSet G) (Y : GSet K)
+    : HomGs (induce f X) Y ≃ HomGs X (restrict f Y).
+  Proof.
+    refine (Eqv_comp (Pi_eqv (fun w => strunc_univ_prop (induce_type f X w) (el_isSet Y w))) _).
+    refine (mkEqv (fun (h : forall w, induce_type f X w -> el Y w) z x => h (Bf0 z) (z; (refl; x)))
+                  (fun (k : HomGs X (restrict f Y)) w (u : induce_type f X w) =>
+                     trp (el Y) (fst (snd u)) (k (fst u) (snd (snd u)))) _ _).
+    - intro h. apply ptw_inv. intro w. apply ptw_inv. intros [z [p x]].
+      destruct p. exact refl.
+    - intro k. exact refl.
+  Defined.
+
+End AdjInduce.
+
+(** Remark [rem:^*-_!-as-(pre)image]: for subsets, [f^*] is the preimage
+    and [∃_f] (with propositional truncation) the image. *)
 Definition sub_preimage {A B : Type} (f : A -> B) (Y : Sub B) : Sub A := fun a => Y (f a).
 
 Definition sub_image {A B : Type} (f : A -> B) (X : Sub A) : Sub B
   := fun b => (Ex (fun a => (f a = b) × fst (X a)); ptrunc_isProp).
 
+Section Coinduce.
+
+  Context `{Funext} {G K : Group} (f : Hom G K).
+
+  Local Notation Bf0 := (fst (Bf f)).
+
+  (** Remark [rem:coinduced-Hset]: the coinduced [H]-set. *)
+  Definition coinduce (X : GSet G) : GSet K
+    := fun w => ((forall z, Bf0 z = w -> el X z);
+                 Pi_isSet (fun z => Pi_isSet (fun _ => el_isSet X z))).
+
+End Coinduce.
+
+(** Remark [rem:coinduced-subset]: [∀_f :≡ f_*] on subsets. *)
 Definition sub_coinduced `{Funext} {A B : Type} (f : A -> B) (X : Sub A) : Sub B
   := fun b => ((forall a, f a = b -> fst (X a)); Pi_isProp (fun a => fun_isProp (snd (X a)))).
+
+Section AdjCoinduce.
+
+  Context `{Funext} {G K : Group} (f : Hom G K).
+
+  Local Notation Bf0 := (fst (Bf f)).
+
+  (** Exercise [xca:adjunction-^*-_*]. *)
+  Definition adj_restrict_coinduce (Y : GSet K) (X : GSet G)
+    : HomGs (restrict f Y) X ≃ HomGs Y (coinduce f X).
+  Proof.
+    refine (mkEqv (fun h w y z p => h z (trp (el Y) p⁻¹ y))
+                  (fun k z y => k (Bf0 z) y z refl) _ _).
+    - intro h. exact refl.
+    - intro k. apply ptw_inv. intro w. apply ptw_inv. intro y.
+      apply ptw_inv. intro z. apply ptw_inv. intro p. destruct p. exact refl.
+  Defined.
+
+End AdjCoinduce.
 
 (** Construction [con:inducedtorsor]. *)
 Section InducedTorsor.

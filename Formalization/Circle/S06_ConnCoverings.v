@@ -194,7 +194,8 @@ Section CycsetConnS1cover.
 
   (** Corollary [thm:cycset-connS1cover]: the covering [(∑_{z:S1} E(z), fst)]
       is connected iff [(X,t)] is a cycle, i.e. [X] is nonempty and any
-      two elements are connected by [t]. *)
+      two elements are connected by [t].
+    (Placed before [def:Cyc], in the section of the construction [con:cycset-connS1cover] that it uses.) *)
   Definition isCycle : Type := ptrunc X × (forall x x' : X, fst (R x x')).
 
   Definition conn_isCycle (c : isConn AE) : isCycle.
@@ -612,6 +613,18 @@ Definition cor_id_m_cycle_stmt `{Univalence} : Type
          (fst e refl = fin_zero)
          × (forall p, fst e (endo_path (finsuccEqv k) refl ⋅ p) = zsk (fst e p))}.
 
+(** Corollary [cor:set-trunc-cyc], first half: each [H_t] contains [0] and
+    is closed under addition and negation. *)
+Definition Ht_subgroup `{Univalence} {X : Type} (sX : isSet X) (t : X ≃ X)
+  : fst (Ht sX t (iplus 0))
+    × (forall n m, fst (Ht sX t n) -> fst (Ht sX t m) -> fst (Ht sX t (zadd n m)))
+    × (forall n, fst (Ht sX t n) -> fst (Ht sX t (zneg n))).
+Proof.
+  refine ((refl; fun n m hn hm => ptw_inv (fun x => _)); fun n hn => ptw_inv (fun x => _)).
+  - exact (tpow_add sX t n m x @ ap (tpow t m) (ptw hn x) @ ptw hm x).
+  - exact (ap (tpow t (zneg n)) (ptw hn x)^ @ tpow_neg sX t n x).
+Defined.
+
 (** Exercise [xca:map-of-cycles]. *)
 Section MapOfCycles.
 
@@ -642,18 +655,6 @@ Section MapOfCycles.
   Defined.
 
 End MapOfCycles.
-
-(** Corollary [cor:set-trunc-cyc], first half: each [H_t] contains [0] and
-    is closed under addition and negation. *)
-Definition Ht_subgroup `{Univalence} {X : Type} (sX : isSet X) (t : X ≃ X)
-  : fst (Ht sX t (iplus 0))
-    × (forall n m, fst (Ht sX t n) -> fst (Ht sX t m) -> fst (Ht sX t (zadd n m)))
-    × (forall n, fst (Ht sX t n) -> fst (Ht sX t (zneg n))).
-Proof.
-  refine ((refl; fun n m hn hm => ptw_inv (fun x => _)); fun n hn => ptw_inv (fun x => _)).
-  - exact (tpow_add sX t n m x @ ap (tpow t m) (ptw hn x) @ ptw hm x).
-  - exact (ap (tpow t (zneg n)) (ptw hn x)^ @ tpow_neg sX t n x).
-Defined.
 
 (** Definition [def:Order]: [Order :≡ ‖Cyc‖₀], with [ord :≡ |_|₀]; the
     subset [H] of an order, and divisibility [d | k] iff [H_k ⊆ H_d]. *)
@@ -731,71 +732,10 @@ End FinIsCycle.
 Definition principal_order `{Univalence} (n : ℕ) : Order
   := match n with O => ord Zcyc | S k => ord (Fincyc k) end.
 
-(** The Limited Principle of Omniscience ([LPO]): for [P : ℕ → 𝟚], either
-    there is a smallest [n₀] with [P(n₀) = yes], or [P] is constantly [no]. *)
-Definition LPO : Type
-  := forall P : ℕ -> Bool,
-       {n0 : ℕ & Pmin (fun n => ((P n = yes); isSet_bool _ _)) n0} ⨿ (forall n, P n = no).
-
-Definition Bool_dec_yes (b : Bool) : isDecidable (b = yes)
-  := match b as b' return isDecidable (b' = yes) with
-     | yes => inl refl
-     | no => inr (fun e => yes_ne_no e^)
-     end.
-
-Definition not_yes_no (b : Bool) : ¬ (b = yes) -> b = no
-  := match b as b' return ¬ (b' = yes) -> b' = no with
-     | yes => fun n => match n refl with end
-     | no => fun _ => refl
-     end.
-
-(** The Law of Excluded Middle implies LPO. *)
-Definition LEM_LPO `{Funext} (lem : LEM) : LPO.
-Proof.
-  intro P. pose (Q := fun n => ((P n = yes); isSet_bool (P n) yes) : PropU).
-  destruct (lem (ptrunc {n : ℕ & P n = yes}) ptrunc_isProp) as [w|nw].
-  - exact (inl (min Q (fun n => Bool_dec_yes (P n)) w)).
-  - exact (inr (fun n => not_yes_no (P n) (fun e => nw (trunc (n; e))))).
-Defined.
-
-(** Exercise [xca:not-not-lpoP]. *)
-Definition not_not_LPO (P : ℕ -> Bool)
-  : ¬ ¬ ({n0 : ℕ & Pmin (fun n => ((P n = yes); isSet_bool _ _)) n0} ⨿ (forall n, P n = no)).
-Proof.
-  intro nq. apply nq. right. intro n.
-  apply not_yes_no. intro e.
-  apply nq. left.
-  exact (mu (fun n => ((P n = yes); isSet_bool _ _)) (fun n => Bool_dec_yes (P n)) (S n);
-         mu_Pmin (fun n => ((P n = yes); isSet_bool _ _)) (fun n => Bool_dec_yes (P n)) n e).
-Defined.
-
-(** Remark [rem:flipthecircle]: the orientation reversing map [r :≡ -id_S1]
-    and [id_S1] give the same covering, since [r] is an equivalence. *)
-Definition cov_eq `{Univalence} {A A' C : Type} (e : A ≃ A') (f : A' -> C)
-  : ((A; f ∘ fst e) : {B : Type & B -> C}) = (A'; f).
-Proof.
-  refine (pathpair (Y := fun B : Type => B -> C) (etop e) (ptw_inv (fun y => _))).
-  refine (transport_arrow_toconst (etop e) (f ∘ fst e) y @ ap f _).
-  exact ((ptw (ap fst (ptoe_etop e)) _)^ @ transport_pV idmap (etop e) y).
-Defined.
-
-Definition negid_negid `{Univalence} (x : S1) : negid (negid x) = x.
-Proof.
-  refine (S1_htpy (f := fun x => negid (negid x)) (g := idmap) refl _ x).
-  refine (ap_compose negid negid loop @ ap (ap negid) (S1_rec_loop S1 base loop⁻¹)
-          @ ap_V negid loop @ ap inverse (S1_rec_loop S1 base loop⁻¹) @ inv_V loop @ _).
-  exact ((trans_1p _ @ ap_idmap loop)^).
-Defined.
-
-Definition negidEqv `{Univalence} : S1 ≃ S1 := mkEqv negid negid negid_negid negid_negid.
-
-Definition flip_cover `{Univalence}
-  : ((S1; negid) : {B : Type & B -> S1}) = (S1; idmap)
-  := cov_eq negidEqv idmap.
-
 (** Corollary [cor:set-trunc-cyc], second half, and [def:standard-cycle]:
     for [H ⊆ ℤ] containing [0] and closed under addition and negation, the
-    cycle [(ℤ/∼_H, zs)], with [z ∼_H z'] iff [z - z' ∈ H], has [H_t = H]. *)
+    cycle [(ℤ/∼_H, zs)], with [z ∼_H z'] iff [z - z' ∈ H], has [H_t = H].
+    (Placed after [def:standard-cycle], which it uses.) *)
 Section StandardCycle.
 
   Context `{Univalence} (Hs : ℤ -> PropU) (h0 : fst (Hs (iplus 0)))
@@ -933,6 +873,44 @@ Proof.
             fun n hn => fst (hc _) (snd sg n (snd (hc n) hn))).
 Defined.
 
+(** The Limited Principle of Omniscience ([LPO]): for [P : ℕ → 𝟚], either
+    there is a smallest [n₀] with [P(n₀) = yes], or [P] is constantly [no]. *)
+Definition LPO : Type
+  := forall P : ℕ -> Bool,
+       {n0 : ℕ & Pmin (fun n => ((P n = yes); isSet_bool _ _)) n0} ⨿ (forall n, P n = no).
+
+Definition Bool_dec_yes (b : Bool) : isDecidable (b = yes)
+  := match b as b' return isDecidable (b' = yes) with
+     | yes => inl refl
+     | no => inr (fun e => yes_ne_no e^)
+     end.
+
+Definition not_yes_no (b : Bool) : ¬ (b = yes) -> b = no
+  := match b as b' return ¬ (b' = yes) -> b' = no with
+     | yes => fun n => match n refl with end
+     | no => fun _ => refl
+     end.
+
+(** The Law of Excluded Middle implies LPO. *)
+Definition LEM_LPO `{Funext} (lem : LEM) : LPO.
+Proof.
+  intro P. pose (Q := fun n => ((P n = yes); isSet_bool (P n) yes) : PropU).
+  destruct (lem (ptrunc {n : ℕ & P n = yes}) ptrunc_isProp) as [w|nw].
+  - exact (inl (min Q (fun n => Bool_dec_yes (P n)) w)).
+  - exact (inr (fun n => not_yes_no (P n) (fun e => nw (trunc (n; e))))).
+Defined.
+
+(** Exercise [xca:not-not-lpoP]. *)
+Definition not_not_LPO (P : ℕ -> Bool)
+  : ¬ ¬ ({n0 : ℕ & Pmin (fun n => ((P n = yes); isSet_bool _ _)) n0} ⨿ (forall n, P n = no)).
+Proof.
+  intro nq. apply nq. right. intro n.
+  apply not_yes_no. intro e.
+  apply nq. left.
+  exact (mu (fun n => ((P n = yes); isSet_bool _ _)) (fun n => Bool_dec_yes (P n)) (S n);
+         mu_Pmin (fun n => ((P n = yes); isSet_bool _ _)) (fun n => Bool_dec_yes (P n)) n e).
+Defined.
+
 (** Functoriality of the identification of [lem:IdCycle]: the underlying
     function of a composite of identifications in [Endo] is the composite. *)
 Definition endo_fun `{Univalence} {X Y : Type} {t : X -> X} {u : Y -> Y}
@@ -971,3 +949,27 @@ Definition ConnDecCovS1 : Type
 Definition lem_componentsofcoversofS1_stmt `{Univalence} : Type
   := LPO -> ConnDecCovS1 ≃ (component (S1 -> SetU) RSet
                              ⨿ {k : ℕ & component (S1 -> SetU) (fun z => (Rm k z; Rm_isSet k z))}).
+
+(** Remark [rem:flipthecircle]: the orientation reversing map [r :≡ -id_S1]
+    and [id_S1] give the same covering, since [r] is an equivalence. *)
+Definition cov_eq `{Univalence} {A A' C : Type} (e : A ≃ A') (f : A' -> C)
+  : ((A; f ∘ fst e) : {B : Type & B -> C}) = (A'; f).
+Proof.
+  refine (pathpair (Y := fun B : Type => B -> C) (etop e) (ptw_inv (fun y => _))).
+  refine (transport_arrow_toconst (etop e) (f ∘ fst e) y @ ap f _).
+  exact ((ptw (ap fst (ptoe_etop e)) _)^ @ transport_pV idmap (etop e) y).
+Defined.
+
+Definition negid_negid `{Univalence} (x : S1) : negid (negid x) = x.
+Proof.
+  refine (S1_htpy (f := fun x => negid (negid x)) (g := idmap) refl _ x).
+  refine (ap_compose negid negid loop @ ap (ap negid) (S1_rec_loop S1 base loop⁻¹)
+          @ ap_V negid loop @ ap inverse (S1_rec_loop S1 base loop⁻¹) @ inv_V loop @ _).
+  exact ((trans_1p _ @ ap_idmap loop)^).
+Defined.
+
+Definition negidEqv `{Univalence} : S1 ≃ S1 := mkEqv negid negid negid_negid negid_negid.
+
+Definition flip_cover `{Univalence}
+  : ((S1; negid) : {B : Type & B -> S1}) = (S1; idmap)
+  := cov_eq negidEqv idmap.

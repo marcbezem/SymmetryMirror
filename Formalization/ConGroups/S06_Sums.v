@@ -114,12 +114,6 @@ Proof.
            (fun a => ptrunc_isProp _ _)).
 Defined.
 
-(** Lemma [lem:wedgeofgpoidisgpoid] (statement only): the wedge of the
-    classifying types of decidable groups is a groupoid. *)
-Definition lem_wedgeofgpoidisgpoid_stmt : Type
-  := forall G1 G2 : Group, isDecSet (USym G1) -> isDecSet (USym G2) ->
-       isGrpd (wedgeT (BG G1) (BG G2)).
-
 (** Definition [def:sumofgroup].  The book takes [Aut_{A_1 ∨ A_2}(a_12)],
     which needs that the wedge of groupoids is a groupoid (proved in the
     book only for decidable groups, lemma [lem:wedgeofgpoidisgpoid]); we
@@ -191,3 +185,9 @@ Definition wedge_incl (G : Group) : wedge (BG G) (BG G) →* BGxBG G
 Definition xca_whatAREabeliangroups_stmt : Type
   := forall G : Group,
        isAb G <-> {e : BGxBG G →* BG G & pcomp e (wedge_incl G) = fold_map G}.
+
+(** Lemma [lem:wedgeofgpoidisgpoid] (statement only): the wedge of the
+    classifying types of decidable groups is a groupoid. *)
+Definition lem_wedgeofgpoidisgpoid_stmt : Type
+  := forall G1 G2 : Group, isDecSet (USym G1) -> isDecSet (USym G2) ->
+       isGrpd (wedgeT (BG G1) (BG G2)).

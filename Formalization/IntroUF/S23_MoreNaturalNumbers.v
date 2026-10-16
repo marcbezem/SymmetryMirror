@@ -320,7 +320,8 @@ Proof.
 Defined.
 
 (** Exercise [xca:finite-types], part 3: [Fin(n) ≃ ∑_k (k < n)], via the
-    library's [equiv_fin_finnat]. *)
+    library's [equiv_fin_finnat].
+    (From 2.24; placed here since [cor:Fin-n-injective] uses it.) *)
 Definition Fin_lt_eqv `{Funext} (n : ℕ) : Fin n ≃ {k : ℕ & lt k n}
   := Eqv_comp (Eqv_of_Equiv (equiv_fin_finnat n))
        (tot (fun k (l : (k < n)%nat) => ltlib_lt l);
@@ -328,12 +329,14 @@ Definition Fin_lt_eqv `{Funext} (n : ℕ) : Fin n ≃ {k : ℕ & lt k n}
                                        (lt_isProp k n) ltlib_lt lt_ltlib))).
 
 (** Exercise [xca:finite-types], part 4: [Fin m = Fin n] implies [m = n],
-    via the library's [nat_eq_fin_equiv]. *)
+    via the library's [nat_eq_fin_equiv].
+    (From 2.24; placed here since [cor:Fin-n-injective] uses it.) *)
 Definition Fin_paths_eq {m n : ℕ} (e : Fin m = Fin n :> Type) : m = n
   := nat_eq_fin_equiv m n (Equiv_of_Eqv (idtoeqv e)).
 
 (** Corollary [cor:Fin-n-injective].  We derive it from part 4 of
-    [xca:finite-types] rather than from the pigeonhole principle. *)
+    [xca:finite-types] rather than from the pigeonhole principle.
+    (Placed after [xca:finite-types], which it uses.) *)
 Definition Fin_n_injective `{Funext} {m n : ℕ} (l : lt m n)
   : ({k : ℕ & lt k m} = {k : ℕ & lt k n}) -> False.
 Proof.

@@ -90,7 +90,8 @@ Section Univalence.
   Context `{Funext}.
 
   (** [ptoe] turns composition of paths into composition of
-      equivalences ([xca:trp-compose]). *)
+      equivalences ([xca:trp-compose]).
+    (Exercise [xca:trp-compose] of 2.5, for the universe; placed here since it uses univalence.) *)
   Definition idtoeqv_trans {X Y Z : Type} (p : X = Y) (q : Y = Z)
     : idtoeqv (q ⋅ p) = Eqv_comp (idtoeqv p) (idtoeqv q)
     := path_Eqv (idtoeqv (q ⋅ p)) (Eqv_comp (idtoeqv p) (idtoeqv q))

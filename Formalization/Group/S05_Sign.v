@@ -452,7 +452,8 @@ Section Sign.
   Definition comp_Finite {n : ℕ} (A : utype (BG (SG n))) : Finite (fst (fst A))
     := isFinSet_Finite (comp_isFinSet A).
 
-  (** [Bsgn(A) :≡ Bμ_{E(A)}(P)]. *)
+  (** Definition [def:sgn], without the pointing:
+      [Bsgn(A) :≡ Bμ_{E(A)}(P)]. *)
   Definition Bsgn (n : ℕ) (A : utype (BG (SG n))) : utype (BG (SG 2))
     := fst (Bf (mu_E (Finite_isFinSet (@EA_Finite _ (fst (fst A)) (comp_Finite A)))))
          (@PA _ (fst (fst A)) (comp_Finite A)).
@@ -540,7 +541,7 @@ Section Sign.
            mul 2 (cardF h) = fact n}.
 
   (** The exercise after [def:mu_E]: [Uμ_E] maps [s : E → {±1}] to the
-      product of its values. *)
+      product of its values.  (Placed here since it uses [loops2_Bool].) *)
   Definition xca_Umu_product_stmt : Type
     := forall (E : Type) (hE : isFinSet E) (s : E -> USym (SG 2)),
          loops2_Bool (sh (SG 2))

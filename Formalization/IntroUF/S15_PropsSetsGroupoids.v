@@ -37,7 +37,8 @@ Local Open Scope uf_scope.
 
 (** ** 2.15 Propositions, sets and groupoids *)
 
-(** Definition [def:isSet]. *)
+(** Definition [def:isSet].
+    (The book introduces these notions informally at the start of the section and formalizes them later in [def:isSet]; placed first since everything in the section uses them.) *)
 Definition isProp (P : Type) : Type := forall a b : P, a = b.
 Definition isSet (S : Type) : Type := forall x y : S, isProp (x = y).
 Definition isGrpd (G : Type) : Type := forall g h : G, isSet (g = h).

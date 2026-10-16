@@ -66,7 +66,7 @@ Section UnitCounit.
   Local Notation α A B := (fst (adjeqv adj A B)).
   Local Notation αinv A B := (eqinv (snd (adjeqv adj A B))).
 
-  (** The unit [η] and counit [ε] (eq:adj-unit-counit). *)
+  (** The unit [η] and counit [ε] ([eq:adj-unit-counit]). *)
   Definition adj_unit (A : Ob C) : homC A (fob G (fob F A)) := α A (fob F A) (idC (fob F A)).
 
   Definition adj_counit (B : Ob D) : homC (fob F (fob G B)) B := αinv (fob G B) B (idC (fob G B)).

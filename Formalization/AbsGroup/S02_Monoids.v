@@ -173,7 +173,8 @@ Section GroupFacts.
   Defined.
 
   (** Exercise [xca:left-inv-involution]: [e = g⁻¹ · g] is [ag_linv]
-      (Section 4.3), and [g = (g⁻¹)⁻¹]. *)
+      (Section 4.3), and [g = (g⁻¹)⁻¹].
+    (Placed with the other facts on inverses, before [rem:abs-iso], which uses them.) *)
   Definition ag_inv_inv (g : S) : ag_inv G (ag_inv G g) = g
     := (ag_inv_unique (ag_inv G g) g (ag_linv G g))^.
 
@@ -288,50 +289,11 @@ Proof.
   destruct pμ. apply path_AbsGroup_mul.
 Defined.
 
-(** Exercise [xca:typemonoidisgroupoid]: the types of monoids and of
-    abstract groups are groupoids, as [Σ]-types over [Set] of sets. *)
-Definition Sigma_isGrpd {A : Type} {B : A -> Type} (gA : isGrpd A)
-  (gB : forall a, isGrpd (B a)) : isGrpd {a : A & B a}
-  := @IsTrunc_isGrpd _ (@istrunc_sigma _ _ _ (isGrpd_IsTrunc gA)
-                               (fun a => isGrpd_IsTrunc (gB a))).
-
 (** The converse of [path_AbsGroup] (statement only): it is an
     equivalence [AbsIso(G,H) ≃ (G = H)], the full analysis of remark
     [rem:abs-iso]. *)
 Definition path_AbsGroup_isEquiv_stmt `{Univalence} : Type
   := forall G K : AbsGroup, isEquiv (@path_AbsGroup _ G K).
-
-Definition set_isGrpd {A : Type} (sA : isSet A) : isGrpd A := set_ntype 1 sA.
-
-Definition prop_isGrpd {A : Type} (pA : isProp A) : isGrpd A
-  := set_isGrpd (prop_is_set pA).
-
-Definition AbsGroup_isGrpd `{Univalence} : isGrpd AbsGroup.
-Proof.
-  refine (is_ntype_Eqv 1 (Eqv_comp (Eqv_inv (sigma_assoc _ _ _))
-                            (Eqv_of_Equiv issig_AbsGroup)) _).
-  refine (Sigma_isGrpd SetU_isGrpd _). intros [S sS]. cbn.
-  apply set_isGrpd.
-  refine (Sigma_isSet sS _). intro e.
-  refine (Sigma_isSet (Pi_isSet (fun _ => Pi_isSet (fun _ => sS))) _). intro μ.
-  refine (Sigma_isSet (Pi_isSet (fun _ => sS)) _). intro ι.
-  apply prop_is_set.
-  repeat refine (prod_isProp _ _);
-    repeat (apply Pi_isProp; intro); apply sS.
-Defined.
-
-Definition Monoid_isGrpd `{Univalence} : isGrpd Monoid.
-Proof.
-  refine (is_ntype_Eqv 1 (Eqv_comp (Eqv_inv (sigma_assoc _ _ _))
-                            (Eqv_of_Equiv issig_Monoid)) _).
-  refine (Sigma_isGrpd SetU_isGrpd _). intros [S sS]. cbn.
-  apply set_isGrpd.
-  refine (Sigma_isSet sS _). intro e.
-  refine (Sigma_isSet (Pi_isSet (fun _ => Pi_isSet (fun _ => sS))) _). intro μ.
-  apply prop_is_set.
-  repeat refine (prod_isProp _ _);
-    repeat (apply Pi_isProp; intro); apply sS.
-Defined.
 
 (** Exercise [xca:op-abs-group]: the opposite group, and the inverse as an
     isomorphism [G ≅ G^op]. *)
@@ -386,6 +348,45 @@ Definition conj_iso (G : AbsGroup) (g : ag_S G) : AbsIso G G
 
 Definition conj_path `{Univalence} (G : AbsGroup) (g : ag_S G) : G = G
   := path_AbsGroup (conj_iso G g).
+
+(** Exercise [xca:typemonoidisgroupoid]: the types of monoids and of
+    abstract groups are groupoids, as [Σ]-types over [Set] of sets. *)
+Definition Sigma_isGrpd {A : Type} {B : A -> Type} (gA : isGrpd A)
+  (gB : forall a, isGrpd (B a)) : isGrpd {a : A & B a}
+  := @IsTrunc_isGrpd _ (@istrunc_sigma _ _ _ (isGrpd_IsTrunc gA)
+                               (fun a => isGrpd_IsTrunc (gB a))).
+
+Definition set_isGrpd {A : Type} (sA : isSet A) : isGrpd A := set_ntype 1 sA.
+
+Definition prop_isGrpd {A : Type} (pA : isProp A) : isGrpd A
+  := set_isGrpd (prop_is_set pA).
+
+Definition AbsGroup_isGrpd `{Univalence} : isGrpd AbsGroup.
+Proof.
+  refine (is_ntype_Eqv 1 (Eqv_comp (Eqv_inv (sigma_assoc _ _ _))
+                            (Eqv_of_Equiv issig_AbsGroup)) _).
+  refine (Sigma_isGrpd SetU_isGrpd _). intros [S sS]. cbn.
+  apply set_isGrpd.
+  refine (Sigma_isSet sS _). intro e.
+  refine (Sigma_isSet (Pi_isSet (fun _ => Pi_isSet (fun _ => sS))) _). intro μ.
+  refine (Sigma_isSet (Pi_isSet (fun _ => sS)) _). intro ι.
+  apply prop_is_set.
+  repeat refine (prod_isProp _ _);
+    repeat (apply Pi_isProp; intro); apply sS.
+Defined.
+
+Definition Monoid_isGrpd `{Univalence} : isGrpd Monoid.
+Proof.
+  refine (is_ntype_Eqv 1 (Eqv_comp (Eqv_inv (sigma_assoc _ _ _))
+                            (Eqv_of_Equiv issig_Monoid)) _).
+  refine (Sigma_isGrpd SetU_isGrpd _). intros [S sS]. cbn.
+  apply set_isGrpd.
+  refine (Sigma_isSet sS _). intro e.
+  refine (Sigma_isSet (Pi_isSet (fun _ => Pi_isSet (fun _ => sS))) _). intro μ.
+  apply prop_is_set.
+  repeat refine (prod_isProp _ _);
+    repeat (apply Pi_isProp; intro); apply sS.
+Defined.
 
 (** Exercise [xca:cheapgroup]: sheargroups, with [ā :≡ a * e]. *)
 Record Sheargroup : Type := {

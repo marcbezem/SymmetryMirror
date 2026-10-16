@@ -72,7 +72,8 @@ Section Reinterpretation.
   Defined.
 
   (** The base point [(ℤ, zs)] and the type of infinite cycles
-      ([def:S1toC]): the component of [Endo] containing [(ℤ, zs)]. *)
+      ([def:S1toC]): the component of [Endo] containing [(ℤ, zs)].
+    (Part of [def:S1toC]; placed before [lem:IdCisZet], which uses it.) *)
   Definition Zs : Endo := (ℤ; zs).
 
   Definition InfCyc : Type := component Endo Zs.
@@ -156,6 +157,19 @@ Section Reinterpretation.
 
   Definition c : S1 -> InfCyc := S1_rec InfCyc c0 cloop.
 
+  (** Exercise [xca:TTYoneda], first part. *)
+  Definition yoneda_eqv {X : Type} (F : X -> Type) (x : X)
+    : F x ≃ (forall y : X, x = y -> F y).
+  Proof.
+    refine (mkEqv (fun u y p => trp F p u) (fun k => k x refl) (fun u => refl) _).
+    intro k. apply ptw_inv. intro y. apply ptw_inv. intro p. destruct p. exact refl.
+  Defined.
+
+  (** Exercise [xca:TTYoneda], second part (statement only): the map
+      [x ↦ (y ↦ (x = y))] is an injection. *)
+  Definition xca_TTYoneda_inj_stmt : Type
+    := forall X : Type, isInj (fun x : X => fun y : X => x = y).
+
   (** Lemma [lem:conn-eq-f-ap-f-x] is [conn_isEquiv_iff_point] from 2.17. *)
   Definition conn_eq_f_ap_f_x `{Funext} {X Y : Type} (cX : isConn X)
     (cY : isConn Y) (x : X) (f : X -> Y)
@@ -234,18 +248,5 @@ Section Reinterpretation.
              (Q := fun e : X ≃ Y => fst e ∘ t = u ∘ fst e)
              (Equiv_of_Eqv (idtoeqv; ua X Y)))).
   Defined.
-
-  (** Exercise [xca:TTYoneda], first part. *)
-  Definition yoneda_eqv {X : Type} (F : X -> Type) (x : X)
-    : F x ≃ (forall y : X, x = y -> F y).
-  Proof.
-    refine (mkEqv (fun u y p => trp F p u) (fun k => k x refl) (fun u => refl) _).
-    intro k. apply ptw_inv. intro y. apply ptw_inv. intro p. destruct p. exact refl.
-  Defined.
-
-  (** Exercise [xca:TTYoneda], second part (statement only): the map
-      [x ↦ (y ↦ (x = y))] is an injection. *)
-  Definition xca_TTYoneda_inj_stmt : Type
-    := forall X : Type, isInj (fun x : X => fun y : X => x = y).
 
 End Reinterpretation.

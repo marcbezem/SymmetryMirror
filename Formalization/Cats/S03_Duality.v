@@ -177,18 +177,10 @@ End MonoEpi.
 Definition isMono_Op_isEpi (C : WildPreCat) {A B : Ob C} (f : homC A B)
   : @isMono (Op C) B A f = isEpi f := refl.
 
-(** Exercise [xca:monos-epis-preorder]: in a preorder every morphism is
-    both a mono and an epi. *)
-Definition prop_map_isInj {A B : Type} (hA : isProp A) (hB : isProp B) (f : A -> B) : isInj f
-  := fun b u v => path_sigma_prop (fun a => prop_is_set hB _ _) (u := u) (v := v) (hA _ _).
-
-Definition preorder_isMono (C : WildPreCat) (p : isPreorder C) {A B : Ob C} (f : homC A B)
-  : isMono f
-  := fun D => prop_map_isInj (p D A) (p D B) _.
-
-Definition preorder_isEpi (C : WildPreCat) (p : isPreorder C) {A B : Ob C} (f : homC A B)
-  : isEpi f
-  := fun D => prop_map_isInj (p B D) (p A D) _.
+(** Exercise [xca:mono-cat-grp]: the monomorphisms in the category of
+    groups are those of definition [def:typeofmono] (statement only). *)
+Definition xca_mono_cat_grp_stmt `{Funext} : Type
+  := forall (H G : Group) (f : Hom H G), isMono (C := GroupCat) f <-> ismono f.
 
 (** Exercise [xca:monos-epis-sets-types], first part: the monomorphisms
     in the wild category of types are the injections. *)
@@ -231,7 +223,15 @@ Defined.
 Definition isEpi_SetCat_isSurj_stmt `{Funext} : Type
   := forall (A B : Ob SetCat) (f : homC A B), isEpi f -> isSurj f.
 
-(** Exercise [xca:mono-cat-grp]: the monomorphisms in the category of
-    groups are those of definition [def:typeofmono] (statement only). *)
-Definition xca_mono_cat_grp_stmt `{Funext} : Type
-  := forall (H G : Group) (f : Hom H G), isMono (C := GroupCat) f <-> ismono f.
+(** Exercise [xca:monos-epis-preorder]: in a preorder every morphism is
+    both a mono and an epi. *)
+Definition prop_map_isInj {A B : Type} (hA : isProp A) (hB : isProp B) (f : A -> B) : isInj f
+  := fun b u v => path_sigma_prop (fun a => prop_is_set hB _ _) (u := u) (v := v) (hA _ _).
+
+Definition preorder_isMono (C : WildPreCat) (p : isPreorder C) {A B : Ob C} (f : homC A B)
+  : isMono f
+  := fun D => prop_map_isInj (p D A) (p D B) _.
+
+Definition preorder_isEpi (C : WildPreCat) (p : isPreorder C) {A B : Ob C} (f : homC A B)
+  : isEpi f
+  := fun D => prop_map_isInj (p B D) (p A D) _.

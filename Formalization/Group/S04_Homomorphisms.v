@@ -143,10 +143,6 @@ Definition idG (G : Group) : Hom G G := mkhom (pid (BG G)).
 
 Definition idG_isIso (G : Group) : isIso (idG G) := id_isEquiv _.
 
-(** Definition [def:group-homomorphism-composition]. *)
-Definition compG {G G' G'' : Group} (f' : Hom G' G'') (f : Hom G G') : Hom G G''
-  := mkhom (pcomp (Bf f') (Bf f)).
-
 (** Remark [remark:groupsasunivalenttype]: [(G = H) ≃ Iso(G,H)]. *)
 Definition Iso_pEqv (G H : Group) : Iso G H ≃ (BG G ≃* BG H).
 Proof.
@@ -163,6 +159,10 @@ Proof.
   exact (Eqv_comp (Eqv_of_Equiv (equiv_concat_lr (inc_out G) (inc_out K)^))
            (path_inc_eqv (B G) (B K))).
 Defined.
+
+(** Definition [def:group-homomorphism-composition]. *)
+Definition compG {G G' G'' : Group} (f' : Hom G' G'') (f : Hom G G') : Hom G G''
+  := mkhom (pcomp (Bf f') (Bf f)).
 
 (** Lemma [lem:hom-is-set], in the general form of footnote
     [ft:ptd-decr-h-lev]: [X →* Y] is a set when [X] is connected and [Y]
@@ -190,61 +190,6 @@ Definition Iso_isSet `{Funext} (G H : Group) : isSet (Iso G H)
     identity types of groups are sets, so [Group] is a groupoid. *)
 Definition Group_isGrpd `{Univalence} : isGrpd Group
   := fun G K => is_ntype_Eqv 0 (Eqv_inv (path_Group_Iso_eqv G K)) (Iso_isSet G K).
-
-(** Construction [def:loops-compose], pointwise, by induction on the
-    pointing paths. *)
-Definition loops_fun_pcomp {X Y Z : Ustar} (g : Y →* Z) (f : X →* Y)
-  (p : pt X = pt X) : loops_fun (pcomp g f) p = loops_fun g (loops_fun f p).
-Proof.
-  destruct X as [A x], Y as [B y], Z as [C z], f as [f0 fp], g as [g0 gp].
-  cbn in *. revert z gp. refine (paths_ind_r _ _ _).
-  revert y fp g0. refine (paths_ind_r _ _ _). intro g0.
-  unfold loops_fun, pcomp; cbn.
-  refine (trans_1p _ @ _ @ (trans_1p _ @ ap (ap g0) (trans_1p _))^).
-  exact (ap_compose f0 g0 p).
-Defined.
-
-Definition loops_pcomp `{Funext} {X Y Z : Ustar} (g : Y →* Z) (f : X →* Y)
-  : loops_fun (pcomp g f) = loops_fun g ∘ loops_fun f
-  := ptw_inv (loops_fun_pcomp g f).
-
-(** Corollary [cor:USym-compose]. *)
-Definition USym_compose `{Funext} {G H K : Group} (φ : Hom G H) (ψ : Hom H K)
-  : USymf (compG ψ φ) = USymf ψ ∘ USymf φ
-  := loops_pcomp (Bf ψ) (Bf φ).
-
-(** Example [ex:Zinitial]: [ev : (S1, base) →* BG ≃ UG], [ev(f) :≡ Ωf(loop)];
-    this is [evp] of Section 3.1, and [Hom(ℤ, G) ≃ UG]. *)
-Section ZInitial.
-
-  Context `{Univalence}.
-
-  Definition evG (G : Group) (k : BG ZZ →* BG G) : USym G := loops_fun k loop.
-
-  Definition evG_is_evp (G : Group) (k : BG ZZ →* BG G) : evG G k = evp (sh G) k
-    := refl.
-
-  Definition evG_isEquiv (G : Group) : isEquiv (evG G) := evp_isEquiv (sh G).
-
-  Definition Hom_ZZ_eqv (G : Group) : Hom ZZ G ≃ USym G
-    := Eqv_comp (Copy_eqv _) (evG G; evG_isEquiv G).
-
-  (** [ve(g)(base) ≡ sh_G], pointed by [refl]. *)
-  Definition veG (G : Group) (g : USym G) : Hom ZZ G
-    := @mkhom ZZ G (evp_inv (sh G) g).
-
-  Definition veG_base (G : Group) (g : USym G) : fst (Bf (veG G g)) base = sh G := refl.
-
-  Definition veG_pt (G : Group) (g : USym G) : snd (Bf (veG G g)) = refl := refl.
-
-  (** Lemma [lem:Znatural]. *)
-  Definition Znatural (G K : Group) (f : Hom G K) (k : Hom ZZ G)
-    : fst (Hom_ZZ_eqv K) (compG f k) = USymf f (fst (Hom_ZZ_eqv G) k).
-  Proof.
-    destruct k as [k]. exact (loops_fun_pcomp (Bf f) k loop).
-  Defined.
-
-End ZInitial.
 
 (** ** Example [ex:groups-morphisms] *)
 
@@ -374,40 +319,60 @@ Definition tau3 `{Univalence} : sh (SG 3) = sh (SG 3)
 Definition id_ne_tau_stmt `{Univalence} : Type
   := idG (SG 3) ≠ mkhom ((idmap; tau3) : BG (SG 3) →* BG (SG 3)).
 
-(** Example [exa:conj-concrete]: moving the shape along [p : sh_G = y].
-    [(id, p⁻¹) : BG ≃* (BG_÷, y)] gives an isomorphism, and its [Ω] is
-    conjugation [g ↦ p g p⁻¹]. *)
-Definition regroup (G : Group) (y : utype (BG G)) : Group
-  := mkgroup (fst (B G); (y; snd (snd (B G)))).
-
-Definition conj_hom (G : Group) {y : utype (BG G)} (p : sh G = y) : Hom G (regroup G y)
-  := @mkhom G (regroup G y) (idmap; p⁻¹).
-
-Definition conj_hom_isIso (G : Group) {y : utype (BG G)} (p : sh G = y)
-  : isIso (conj_hom G p)
-  := id_isEquiv _.
-
-Definition conj_hom_USym (G : Group) {y : utype (BG G)} (p : sh G = y) (g : USym G)
-  : USymf (conj_hom G p) g = p ⋅ (g ⋅ p⁻¹).
-Proof. destruct p. exact (ap (fun q => q ⋅ refl) (ap_idmap g)). Defined.
-
-(** Definition [def:inner-autos]: [Binn : BG →* BAut(G)], [y ↦ mkgroup(BG_÷, y)].
-    [BAut(G)] is the component of [G] in [Group]; since [Group] is not
-    universe polymorphic, we do not wrap it as a group.  The pointing path
-    is [inc_out G] rather than [refl], since [Copy] has no definitional
-    eta rule. *)
-Definition BAutG (G : Group) : Ustar := (component Group G; (G; trunc refl)).
-
-Definition Binn (G : Group) : BG G →* BAutG G.
+(** Construction [def:loops-compose], pointwise, by induction on the
+    pointing paths. *)
+Definition loops_fun_pcomp {X Y Z : Ustar} (g : Y →* Z) (f : X →* Y)
+  (p : pt X = pt X) : loops_fun (pcomp g f) p = loops_fun g (loops_fun f p).
 Proof.
-  refine ((fun y => (regroup G y;
-                     ptrunc_rec ptrunc_isProp
-                       (fun p : sh G = y => trunc (ap (regroup G) p ⋅ (inc_out G)⁻¹))
-                       (snd (BG_isConn G) (sh G) y)) : component Group G); _).
-  refine (@path_sigma_prop Group (fun K => ptrunc (G = K)) (fun _ => ptrunc_isProp)
-            (G; trunc refl) (regroup G (sh G); _) _).
-  exact (inc_out G)⁻¹.
+  destruct X as [A x], Y as [B y], Z as [C z], f as [f0 fp], g as [g0 gp].
+  cbn in *. revert z gp. refine (paths_ind_r _ _ _).
+  revert y fp g0. refine (paths_ind_r _ _ _). intro g0.
+  unfold loops_fun, pcomp; cbn.
+  refine (trans_1p _ @ _ @ (trans_1p _ @ ap (ap g0) (trans_1p _))^).
+  exact (ap_compose f0 g0 p).
 Defined.
+
+Definition loops_pcomp `{Funext} {X Y Z : Ustar} (g : Y →* Z) (f : X →* Y)
+  : loops_fun (pcomp g f) = loops_fun g ∘ loops_fun f
+  := ptw_inv (loops_fun_pcomp g f).
+
+(** Corollary [cor:USym-compose]. *)
+Definition USym_compose `{Funext} {G H K : Group} (φ : Hom G H) (ψ : Hom H K)
+  : USymf (compG ψ φ) = USymf ψ ∘ USymf φ
+  := loops_pcomp (Bf ψ) (Bf φ).
+
+(** Example [ex:Zinitial]: [ev : (S1, base) →* BG ≃ UG], [ev(f) :≡ Ωf(loop)];
+    this is [evp] of Section 3.1, and [Hom(ℤ, G) ≃ UG]. *)
+Section ZInitial.
+
+  Context `{Univalence}.
+
+  Definition evG (G : Group) (k : BG ZZ →* BG G) : USym G := loops_fun k loop.
+
+  Definition evG_is_evp (G : Group) (k : BG ZZ →* BG G) : evG G k = evp (sh G) k
+    := refl.
+
+  Definition evG_isEquiv (G : Group) : isEquiv (evG G) := evp_isEquiv (sh G).
+
+  Definition Hom_ZZ_eqv (G : Group) : Hom ZZ G ≃ USym G
+    := Eqv_comp (Copy_eqv _) (evG G; evG_isEquiv G).
+
+  (** [ve(g)(base) ≡ sh_G], pointed by [refl]. *)
+  Definition veG (G : Group) (g : USym G) : Hom ZZ G
+    := @mkhom ZZ G (evp_inv (sh G) g).
+
+  Definition veG_base (G : Group) (g : USym G) : fst (Bf (veG G g)) base = sh G := refl.
+
+  Definition veG_pt (G : Group) (g : USym G) : snd (Bf (veG G g)) = refl := refl.
+
+  (** Lemma [lem:Znatural]. *)
+  Definition Znatural (G K : Group) (f : Hom G K) (k : Hom ZZ G)
+    : fst (Hom_ZZ_eqv K) (compG f k) = USymf f (fst (Hom_ZZ_eqv G) k).
+  Proof.
+    destruct k as [k]. exact (loops_fun_pcomp (Bf f) k loop).
+  Defined.
+
+End ZInitial.
 
 (** Exercise [xca:BGtotype]. *)
 Section BGtoType.
@@ -466,3 +431,39 @@ Section BGtoType.
                                           (Eqv_inv (Copy_eqv _))))).
 
 End BGtoType.
+
+(** Example [exa:conj-concrete]: moving the shape along [p : sh_G = y].
+    [(id, p⁻¹) : BG ≃* (BG_÷, y)] gives an isomorphism, and its [Ω] is
+    conjugation [g ↦ p g p⁻¹]. *)
+Definition regroup (G : Group) (y : utype (BG G)) : Group
+  := mkgroup (fst (B G); (y; snd (snd (B G)))).
+
+Definition conj_hom (G : Group) {y : utype (BG G)} (p : sh G = y) : Hom G (regroup G y)
+  := @mkhom G (regroup G y) (idmap; p⁻¹).
+
+Definition conj_hom_isIso (G : Group) {y : utype (BG G)} (p : sh G = y)
+  : isIso (conj_hom G p)
+  := id_isEquiv _.
+
+Definition conj_hom_USym (G : Group) {y : utype (BG G)} (p : sh G = y) (g : USym G)
+  : USymf (conj_hom G p) g = p ⋅ (g ⋅ p⁻¹).
+Proof. destruct p. exact (ap (fun q => q ⋅ refl) (ap_idmap g)). Defined.
+
+(** Definition [def:inner-autos]: [Binn : BG →* BAut(G)], [y ↦ mkgroup(BG_÷, y)].
+    [BAut(G)] is the component of [G] in [Group]; since [Group] is not
+    universe polymorphic, we do not wrap it as a group.  The pointing path
+    is [inc_out G] rather than [refl], since [Copy] has no definitional
+    eta rule. *)
+Definition BAutG (G : Group) : Ustar := (component Group G; (G; trunc refl)).
+
+Definition Binn (G : Group) : BG G →* BAutG G.
+Proof.
+  refine ((fun y => (regroup G y;
+                     ptrunc_rec ptrunc_isProp
+                       (fun p : sh G = y => trunc (ap (regroup G) p ⋅ (inc_out G)⁻¹))
+                       (snd (BG_isConn G) (sh G) y)) : component Group G); _).
+  refine (@path_sigma_prop Group (fun K => ptrunc (G = K)) (fun _ => ptrunc_isProp)
+            (G; trunc refl) (regroup G (sh G); _) _).
+  exact (inc_out G)⁻¹.
+Defined.
+

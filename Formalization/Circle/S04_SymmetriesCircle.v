@@ -45,8 +45,9 @@ Section SymmetriesCircle.
 
   Context `{Univalence}.
 
-  (** Transport in [R] along [loop] is the successor, along [loop⁻¹] the
-      predecessor (with univalence transparent, [R(loop) = zs]). *)
+  (** Remark [rem:univalence-transparent], applied: transport in [R]
+      along [loop] is the successor, along [loop⁻¹] the predecessor (with
+      univalence transparent, [R(loop) = zs]). *)
   Definition trp_R_loop (y : ℤ) : trp R loop y = zs y.
   Proof.
     refine (transport_compose idmap R loop y @ _).

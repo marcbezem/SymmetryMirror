@@ -202,18 +202,6 @@ Definition Cat : Type := {C : WildPreCat & isPreCat C × isUnivalent C}.
 Definition isSet_Eqv {X Y : Type} (e : X ≃ Y) (h : isSet X) : isSet Y
   := IsHSet_isSet (@istrunc_equiv_istrunc X Y (Equiv_of_Eqv e) 0 (isSet_IsHSet h)).
 
-(** In a precategory the hom-types of isomorphisms are sets. *)
-Definition IsoC_isSet `{Funext} {C : WildPreCat} (pc : isPreCat C) (A B : Ob C)
-  : isSet (IsoC A B)
-  := Sigma_isSet (pc A B) (fun f => prop_is_set (isIsoC_isProp f)).
-
-(** Lemma [lem:obj-gpd]: the type of objects of a category is a groupoid. *)
-Definition Ob_isGrpd `{Funext} (C : Cat) : isGrpd (Ob (fst C)).
-Proof.
-  intros A B. refine (isSet_Eqv _ (IsoC_isSet (fst (snd C)) A B)).
-  exact (Eqv_inv (idtoiso; snd (snd C) A B)).
-Defined.
-
 (** *** Examples *)
 
 (** The wild category of types: all laws hold by [refl]. *)
@@ -295,7 +283,8 @@ Definition FamCat (X : Type) : WildPreCat
         rhoC := fun A B f => refl;
         alphaC := fun A B C D f g h => refl |}.
 
-(** Definition [def:full-subcat]: the full subcategory on a predicate. *)
+(** Definition [def:full-subcat]: the full subcategory on a predicate.
+    (Placed among the examples after [def:category], before the category of sets, which is defined as a full subcategory.) *)
 Definition FullSub (C : WildPreCat) (P : Ob C -> PropU) : WildPreCat
   := {| Ob := {A : Ob C & fst (P A)};
         homC := fun A B => homC (fst A) (fst B);
@@ -366,6 +355,154 @@ Definition GSetCat (G : Group) : WildPreCat
         lamC := fun X Y f => refl;
         rhoC := fun X Y f => refl;
         alphaC := fun X Y Z W f g h => refl |}.
+
+(** The category of groups is univalent: compare with
+    [path_Group_Iso_eqv] (Section 4.4). *)
+Definition GroupCat_isIso_isIso `{fe : Funext} {G H : Group} (f : Hom G H)
+  (i : isIsoC (C := GroupCat) f) : isIso f.
+Proof.
+  destruct i as [[g s] [h r]].
+  refine (fst (isIsoC_isEquiv (fst (Bf f)))
+            ((fst (Bf g); ap (fun u : Hom H H => fst (Bf u)) s);
+             (fst (Bf h); ap (fun u : Hom G G => fst (Bf u)) r))).
+Defined.
+
+Definition GroupCat_idtoiso_hom `{Univalence} {G K : Group} (p : G = K)
+  : fst (idtoiso (C := GroupCat) p) = fst (fst (path_Group_Iso_eqv G K) p).
+Proof. destruct p. destruct G as [X]. exact refl. Defined.
+
+Definition GroupCat_isUnivalent `{Univalence} : isUnivalent GroupCat.
+Proof.
+  intros G K.
+  pose (Φ := path_Group_Iso_eqv G K).
+  pose (toC := fun (f : Hom G K) (t : isIso f) =>
+                 let p := eqinv (snd Φ) ((f; t) : Iso G K) in
+                 trp (fun u => isIsoC (C := GroupCat) u)
+                   (GroupCat_idtoiso_hom p @ ap fst (eqinv_r (snd Φ) ((f; t) : Iso G K)))
+                   (snd (idtoiso (C := GroupCat) p))).
+  pose (Ψ := (tot (fun f => fst (Eqv_of_props (isEquiv_isProp _) (isIsoC_isProp (C := GroupCat) f)
+                                    (toC f) (GroupCat_isIso_isIso f)));
+              tot_isEquiv _ (fun f => snd (Eqv_of_props (isEquiv_isProp _)
+                                             (isIsoC_isProp (C := GroupCat) f)
+                                             (toC f) (GroupCat_isIso_isIso f))))
+             : Iso G K ≃ IsoC (C := GroupCat) G K).
+  refine (isEquiv_homotopic (fst Ψ ∘ fst Φ) _ _ (comp_isEquiv (snd Φ) (snd Ψ))).
+  intro p. apply (path_IsoC (C := GroupCat)). exact (GroupCat_idtoiso_hom p)^.
+Defined.
+
+(** The category of [G]-sets is univalent: isomorphisms are the
+    fiberwise equivalences. *)
+Section GSetUnivalent.
+
+  Context `{Univalence} {G : Group} (X Y : GSet G).
+
+  Definition GSetIso_fw (e : forall z, el X z ≃ el Y z) : IsoC (C := GSetCat G) X Y.
+  Proof.
+    refine ((fun z => fst (e z)); ((fun z => eqinv (snd (e z)); _); (fun z => eqinv (snd (e z)); _))).
+    - apply ptw_inv. intro z. apply ptw_inv. intro y. exact (eqinv_r (snd (e z)) y).
+    - apply ptw_inv. intro z. apply ptw_inv. intro x. exact (eqinv_l (snd (e z)) x).
+  Defined.
+
+  Definition GSetIso_bw (i : IsoC (C := GSetCat G) X Y) (z : utype (BG G)) : el X z ≃ el Y z
+    := (fst i z;
+        fst (isIsoC_isEquiv (fst i z))
+          ((fst (fst (snd i)) z; ap (fun u => u z) (snd (fst (snd i))));
+           (fst (snd (snd i)) z; ap (fun u => u z) (snd (snd (snd i)))))).
+
+  Definition GSetIso_eqv : (forall z, el X z ≃ el Y z) ≃ IsoC (C := GSetCat G) X Y.
+  Proof.
+    refine (mkEqv GSetIso_fw GSetIso_bw _ _).
+    - intro e. apply ptw_inv. intro z. apply path_Eqv. exact refl.
+    - intro i. apply (path_IsoC (C := GSetCat G)). exact refl.
+  Defined.
+
+  Definition GSet_paths_eqv : (X = Y) ≃ (forall z, el X z ≃ el Y z).
+  Proof.
+    refine (Eqv_comp (ptw; funext X Y) _).
+    refine (Eqv_of_Equiv (equiv_functor_forall_id (fun z => Equiv_of_Eqv _))).
+    exact (Eqv_comp (subtype_paths_eqv (fun A => isSet_isProp A) (X z) (Y z)) (idtoeqv; ua _ _)).
+  Defined.
+
+End GSetUnivalent.
+
+Definition GSetCat_isUnivalent `{Univalence} (G : Group) : isUnivalent (GSetCat G).
+Proof.
+  intros X Y.
+  refine (isEquiv_homotopic (fst (GSetIso_eqv X Y) ∘ fst (GSet_paths_eqv X Y)) _ _
+            (comp_isEquiv (snd (GSet_paths_eqv X Y)) (snd (GSetIso_eqv X Y)))).
+  intro p. destruct p. apply (path_IsoC (C := GSetCat G)). exact refl.
+Defined.
+
+Definition GSetCat_isPreCat `{Funext} (G : Group) : isPreCat (GSetCat G)
+  := fun X Y => HomGs_isSet X Y.
+
+Definition GroupCat_isPreCat `{Funext} : isPreCat GroupCat := Hom_isSet.
+
+(** A criterion for univalence: the identity types are equivalent to a
+    type of morphisms with a property implied by being an isomorphism,
+    compatibly with [idtoiso]. *)
+Definition isUnivalent_from `{Funext} (C : WildPreCat)
+  (Q : forall A B : Ob C, homC A B -> Type) (hQ : forall A B f, isProp (Q A B f))
+  (toQ : forall A B (f : homC A B), isIsoC f -> Q A B f)
+  (Φ : forall A B : Ob C, (A = B) ≃ {f : homC A B & Q A B f})
+  (L : forall A B (p : A = B), fst (idtoiso p) = fst (fst (Φ A B) p))
+  : isUnivalent C.
+Proof.
+  intros A B.
+  pose (toC := fun (f : homC A B) (q : Q A B f) =>
+                 let p := eqinv (snd (Φ A B)) (f; q) in
+                 trp (fun u => isIsoC u) (L A B p @ ap fst (eqinv_r (snd (Φ A B)) (f; q)))
+                   (snd (idtoiso p))).
+  pose (Ψ := (tot (fun f => fst (Eqv_of_props (hQ A B f) (isIsoC_isProp f) (toC f) (toQ A B f)));
+              tot_isEquiv _ (fun f => snd (Eqv_of_props (hQ A B f) (isIsoC_isProp f)
+                                             (toC f) (toQ A B f))))
+             : {f : homC A B & Q A B f} ≃ IsoC A B).
+  refine (isEquiv_homotopic (fst Ψ ∘ fst (Φ A B)) _ _ (comp_isEquiv (snd (Φ A B)) (snd Ψ))).
+  intro p. apply path_IsoC. exact (L A B p)^.
+Defined.
+
+(** The wild category of pointed types is univalent. *)
+Definition PtdCat_isUnivalent `{Univalence} : isUnivalent PtdCat.
+Proof.
+  refine (isUnivalent_from PtdCat (fun X Y f => isEquiv (fst f)) (fun X Y f => isEquiv_isProp _)
+            _ (fun X Y => (path_to_pEqv; path_to_pEqv_isEquiv X Y)) _).
+  - intros X Y f [[g s] [h r]].
+    exact (fst (isIsoC_isEquiv (fst f))
+              ((fst g; ap (fun u : Y →* Y => fst u) s); (fst h; ap (fun u : X →* X => fst u) r))).
+  - intros X Y p. destruct p. exact refl.
+Defined.
+
+(** The wild category of families over [X] is univalent. *)
+Definition FamPaths_eqv `{Univalence} {X : Type} (A B : X -> Type)
+  : (A = B) ≃ {f : (forall x, A x -> B x) & forall x, isEquiv (f x)}.
+Proof.
+  refine (Eqv_comp (ptw; funext A B) _).
+  refine (Eqv_comp (Eqv_of_Equiv (equiv_functor_forall_id
+                                    (fun x => Equiv_of_Eqv (idtoeqv; ua (A x) (B x))))) _).
+  exact (Eqv_of_Equiv (equiv_sig_coind (fun x => A x -> B x) (fun x (f : A x -> B x) => isEquiv f))^-1).
+Defined.
+
+Definition FamCat_isUnivalent `{Univalence} (X : Type) : isUnivalent (FamCat X).
+Proof.
+  refine (isUnivalent_from (FamCat X) (fun A B f => forall x, isEquiv (f x))
+            (fun A B f => Pi_isProp (fun x => isEquiv_isProp _)) _ FamPaths_eqv _).
+  - intros A B f [[g s] [h r]] x.
+    exact (fst (isIsoC_isEquiv (f x))
+              ((g x; ap (fun u => u x) s); (h x; ap (fun u => u x) r))).
+  - intros A B p. destruct p. exact refl.
+Defined.
+
+(** In a precategory the hom-types of isomorphisms are sets. *)
+Definition IsoC_isSet `{Funext} {C : WildPreCat} (pc : isPreCat C) (A B : Ob C)
+  : isSet (IsoC A B)
+  := Sigma_isSet (pc A B) (fun f => prop_is_set (isIsoC_isProp f)).
+
+(** Lemma [lem:obj-gpd]: the type of objects of a category is a groupoid. *)
+Definition Ob_isGrpd `{Funext} (C : Cat) : isGrpd (Ob (fst C)).
+Proof.
+  intros A B. refine (isSet_Eqv _ (IsoC_isSet (fst (snd C)) A B)).
+  exact (Eqv_inv (idtoiso; snd (snd C) A B)).
+Defined.
 
 (** Example [ex:poset]: preorders and posets. *)
 Definition isPreorder (C : WildPreCat) : Type := forall A B : Ob C, isProp (homC A B).
@@ -506,142 +643,6 @@ Proof.
 Defined.
 
 Definition PathGrpd_isPreCat (X : Type) (g : isGrpd X) : isPreCat (PathGrpd X) := g.
-
-(** The category of groups is univalent: compare with
-    [path_Group_Iso_eqv] (Section 4.4). *)
-Definition GroupCat_isIso_isIso `{fe : Funext} {G H : Group} (f : Hom G H)
-  (i : isIsoC (C := GroupCat) f) : isIso f.
-Proof.
-  destruct i as [[g s] [h r]].
-  refine (fst (isIsoC_isEquiv (fst (Bf f)))
-            ((fst (Bf g); ap (fun u : Hom H H => fst (Bf u)) s);
-             (fst (Bf h); ap (fun u : Hom G G => fst (Bf u)) r))).
-Defined.
-
-Definition GroupCat_idtoiso_hom `{Univalence} {G K : Group} (p : G = K)
-  : fst (idtoiso (C := GroupCat) p) = fst (fst (path_Group_Iso_eqv G K) p).
-Proof. destruct p. destruct G as [X]. exact refl. Defined.
-
-Definition GroupCat_isUnivalent `{Univalence} : isUnivalent GroupCat.
-Proof.
-  intros G K.
-  pose (Φ := path_Group_Iso_eqv G K).
-  pose (toC := fun (f : Hom G K) (t : isIso f) =>
-                 let p := eqinv (snd Φ) ((f; t) : Iso G K) in
-                 trp (fun u => isIsoC (C := GroupCat) u)
-                   (GroupCat_idtoiso_hom p @ ap fst (eqinv_r (snd Φ) ((f; t) : Iso G K)))
-                   (snd (idtoiso (C := GroupCat) p))).
-  pose (Ψ := (tot (fun f => fst (Eqv_of_props (isEquiv_isProp _) (isIsoC_isProp (C := GroupCat) f)
-                                    (toC f) (GroupCat_isIso_isIso f)));
-              tot_isEquiv _ (fun f => snd (Eqv_of_props (isEquiv_isProp _)
-                                             (isIsoC_isProp (C := GroupCat) f)
-                                             (toC f) (GroupCat_isIso_isIso f))))
-             : Iso G K ≃ IsoC (C := GroupCat) G K).
-  refine (isEquiv_homotopic (fst Ψ ∘ fst Φ) _ _ (comp_isEquiv (snd Φ) (snd Ψ))).
-  intro p. apply (path_IsoC (C := GroupCat)). exact (GroupCat_idtoiso_hom p)^.
-Defined.
-
-(** The category of [G]-sets is univalent: isomorphisms are the
-    fiberwise equivalences. *)
-Section GSetUnivalent.
-
-  Context `{Univalence} {G : Group} (X Y : GSet G).
-
-  Definition GSetIso_fw (e : forall z, el X z ≃ el Y z) : IsoC (C := GSetCat G) X Y.
-  Proof.
-    refine ((fun z => fst (e z)); ((fun z => eqinv (snd (e z)); _); (fun z => eqinv (snd (e z)); _))).
-    - apply ptw_inv. intro z. apply ptw_inv. intro y. exact (eqinv_r (snd (e z)) y).
-    - apply ptw_inv. intro z. apply ptw_inv. intro x. exact (eqinv_l (snd (e z)) x).
-  Defined.
-
-  Definition GSetIso_bw (i : IsoC (C := GSetCat G) X Y) (z : utype (BG G)) : el X z ≃ el Y z
-    := (fst i z;
-        fst (isIsoC_isEquiv (fst i z))
-          ((fst (fst (snd i)) z; ap (fun u => u z) (snd (fst (snd i))));
-           (fst (snd (snd i)) z; ap (fun u => u z) (snd (snd (snd i)))))).
-
-  Definition GSetIso_eqv : (forall z, el X z ≃ el Y z) ≃ IsoC (C := GSetCat G) X Y.
-  Proof.
-    refine (mkEqv GSetIso_fw GSetIso_bw _ _).
-    - intro e. apply ptw_inv. intro z. apply path_Eqv. exact refl.
-    - intro i. apply (path_IsoC (C := GSetCat G)). exact refl.
-  Defined.
-
-  Definition GSet_paths_eqv : (X = Y) ≃ (forall z, el X z ≃ el Y z).
-  Proof.
-    refine (Eqv_comp (ptw; funext X Y) _).
-    refine (Eqv_of_Equiv (equiv_functor_forall_id (fun z => Equiv_of_Eqv _))).
-    exact (Eqv_comp (subtype_paths_eqv (fun A => isSet_isProp A) (X z) (Y z)) (idtoeqv; ua _ _)).
-  Defined.
-
-End GSetUnivalent.
-
-Definition GSetCat_isUnivalent `{Univalence} (G : Group) : isUnivalent (GSetCat G).
-Proof.
-  intros X Y.
-  refine (isEquiv_homotopic (fst (GSetIso_eqv X Y) ∘ fst (GSet_paths_eqv X Y)) _ _
-            (comp_isEquiv (snd (GSet_paths_eqv X Y)) (snd (GSetIso_eqv X Y)))).
-  intro p. destruct p. apply (path_IsoC (C := GSetCat G)). exact refl.
-Defined.
-
-Definition GSetCat_isPreCat `{Funext} (G : Group) : isPreCat (GSetCat G)
-  := fun X Y => HomGs_isSet X Y.
-
-Definition GroupCat_isPreCat `{Funext} : isPreCat GroupCat := Hom_isSet.
-
-(** A criterion for univalence: the identity types are equivalent to a
-    type of morphisms with a property implied by being an isomorphism,
-    compatibly with [idtoiso]. *)
-Definition isUnivalent_from `{Funext} (C : WildPreCat)
-  (Q : forall A B : Ob C, homC A B -> Type) (hQ : forall A B f, isProp (Q A B f))
-  (toQ : forall A B (f : homC A B), isIsoC f -> Q A B f)
-  (Φ : forall A B : Ob C, (A = B) ≃ {f : homC A B & Q A B f})
-  (L : forall A B (p : A = B), fst (idtoiso p) = fst (fst (Φ A B) p))
-  : isUnivalent C.
-Proof.
-  intros A B.
-  pose (toC := fun (f : homC A B) (q : Q A B f) =>
-                 let p := eqinv (snd (Φ A B)) (f; q) in
-                 trp (fun u => isIsoC u) (L A B p @ ap fst (eqinv_r (snd (Φ A B)) (f; q)))
-                   (snd (idtoiso p))).
-  pose (Ψ := (tot (fun f => fst (Eqv_of_props (hQ A B f) (isIsoC_isProp f) (toC f) (toQ A B f)));
-              tot_isEquiv _ (fun f => snd (Eqv_of_props (hQ A B f) (isIsoC_isProp f)
-                                             (toC f) (toQ A B f))))
-             : {f : homC A B & Q A B f} ≃ IsoC A B).
-  refine (isEquiv_homotopic (fst Ψ ∘ fst (Φ A B)) _ _ (comp_isEquiv (snd (Φ A B)) (snd Ψ))).
-  intro p. apply path_IsoC. exact (L A B p)^.
-Defined.
-
-(** The wild category of pointed types is univalent. *)
-Definition PtdCat_isUnivalent `{Univalence} : isUnivalent PtdCat.
-Proof.
-  refine (isUnivalent_from PtdCat (fun X Y f => isEquiv (fst f)) (fun X Y f => isEquiv_isProp _)
-            _ (fun X Y => (path_to_pEqv; path_to_pEqv_isEquiv X Y)) _).
-  - intros X Y f [[g s] [h r]].
-    exact (fst (isIsoC_isEquiv (fst f))
-              ((fst g; ap (fun u : Y →* Y => fst u) s); (fst h; ap (fun u : X →* X => fst u) r))).
-  - intros X Y p. destruct p. exact refl.
-Defined.
-
-(** The wild category of families over [X] is univalent. *)
-Definition FamPaths_eqv `{Univalence} {X : Type} (A B : X -> Type)
-  : (A = B) ≃ {f : (forall x, A x -> B x) & forall x, isEquiv (f x)}.
-Proof.
-  refine (Eqv_comp (ptw; funext A B) _).
-  refine (Eqv_comp (Eqv_of_Equiv (equiv_functor_forall_id
-                                    (fun x => Equiv_of_Eqv (idtoeqv; ua (A x) (B x))))) _).
-  exact (Eqv_of_Equiv (equiv_sig_coind (fun x => A x -> B x) (fun x (f : A x -> B x) => isEquiv f))^-1).
-Defined.
-
-Definition FamCat_isUnivalent `{Univalence} (X : Type) : isUnivalent (FamCat X).
-Proof.
-  refine (isUnivalent_from (FamCat X) (fun A B f => forall x, isEquiv (f x))
-            (fun A B f => Pi_isProp (fun x => isEquiv_isProp _)) _ FamPaths_eqv _).
-  - intros A B f [[g s] [h r]] x.
-    exact (fst (isIsoC_isEquiv (f x))
-              ((g x; ap (fun u => u x) s); (h x; ap (fun u => u x) r))).
-  - intros A B p. destruct p. exact refl.
-Defined.
 
 (** Example [def:slice-cat]: the slice precategory [C/C₀] of a
     precategory. *)

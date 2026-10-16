@@ -210,7 +210,8 @@ Section Permutations.
   Defined.
 
   (** Remark [rem:cycle-vs-cycle]: a cyclic permutation moves only the
-      elements of its list. *)
+      elements of its list.
+    (Placed after [xca:perm-prod-transpositions], since it uses the cyclic permutations [cyc] defined there.) *)
   Definition cyc_fixes (a1 : A) (r : list A) (x : A) (n : notin x (cons a1 r))
     : cyc a1 r x = x
     := next_notin (cons a1 r) a1 x n.
@@ -526,7 +527,8 @@ End FinCode.
 (** Remark [rem:cycle-vs-cycle], first part: for a cycle [(X,t)] with [X]
     an [n]-element set and [x₀ : X], the permutation [t] is the cyclic
     permutation [(x₀ t(x₀) ⋯ t^{n-1}(x₀))], and these elements are
-    pairwise distinct. *)
+    pairwise distinct.
+    (Placed after [xca:perm-prod-transpositions], since it uses the cyclic permutations [cyc] defined there.) *)
 Definition cycle_as_cyc `{Univalence} {X : Type} (dA : isDecSet X) (t : X ≃ X)
   (cy : isCycle t) (n : ℕ) (hn : ptrunc (Fin n = X :> Type)) (x0 : X)
   : distinct (cons x0 (seg t x0 1 (nat_pred n)))

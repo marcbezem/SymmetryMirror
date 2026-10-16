@@ -86,7 +86,8 @@ Section RefinedImage.
   Definition rf1 : {a : A & fiber f a} -> {a : A & strunc (fiber f a)}
     := tot (fun a => settrunc).
 
-  (** The map [|_|' : ‖X‖₀ → ‖X‖] of exercise [xca:0Im-to-Im]. *)
+  (** The map [|_|' : ‖X‖₀ → ‖X‖] of exercise [xca:0Im-to-Im].
+    (Placed here, before [exa:stuff-struct-prop], since the refined image factorization of the text before the example uses it.) *)
   Definition trunc' {X : Type} : strunc X -> ptrunc X
     := strunc_rec (prop_is_set ptrunc_isProp) trunc.
 
@@ -187,7 +188,8 @@ End Examples.
 
 (** Remark after [def:groupoidFin]: [FinSet] is essentially [U]-small, by
     the replacement principle applied to the surjection [ℕ → FinSet],
-    [n ↦ Fin n]; [FinSet] is locally small by univalence. *)
+    [n ↦ Fin n]; [FinSet] is locally small by univalence.
+    (From 2.24; placed here since it uses [sigma_contr_fibers] of this section.) *)
 Section FinSetSmall.
 
   Universe u.

@@ -197,9 +197,9 @@ Definition NNN_eqv : NNN ≃ ℕ
   := mkEqv unneg negN (fun m => match m with negN n => refl end)
            (fun _ => refl).
 
-(** *** Lists
+(** *** Lists *)
 
-    Definition [def:lists]: [X^*] is the library's [list X], with the
+(** Definition [def:lists]: [X^*] is the library's [list X], with the
     empty list [ε :≡ nil] and the constructor [cons]. *)
 
 Notation "X ^*" := (list X) (at level 1, format "X ^*") : uf_scope.

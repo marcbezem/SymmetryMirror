@@ -9,7 +9,7 @@
     - [Symmetry.v] (this file) exports all chapters.
     - One directory per chapter, with a chapter file that exports its
       sections: [IntroUF/IntroUF.v] (Chapter 2, [intro-uf.tex]),
-      [Circle/Circle.v] (Chapter 3, [circle.tex], Sections 3.1 - 3.9),
+      [Circle/Circle.v] (Chapter 3, [circle.tex], Sections 3.1 - 3.10),
       [Group/Group.v] (Chapter 4, [group.tex], Sections 4.2 - 4.7) and
       [Actions/Actions.v] (Chapter 5, [actions.tex], Sections 5.2 - 5.7),
       [Cats/Cats.v] (Chapter 6, [cats.tex], Sections 6.2 - 6.8),

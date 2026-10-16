@@ -335,6 +335,20 @@ Definition wild_functor_laws_stmt : Type
   := forall (C D E W : WildPreCat) (F : Functor C D) (G : Functor D E) (K : Functor E W),
        (compF (idF D) F = F) × (compF F (idF C) = F) × (compF K (compF G F) = compF (compF K G) F).
 
+(** Exercise [xca:wildcat-of-precats] (statement only): the precategories,
+    with functors as arrows, form a univalent wild category; likewise the
+    categories. *)
+Definition PreCatCat `{Funext} : WildPreCat
+  := {| Ob := PreCat;
+        homC := fun C D => Functor (fst C) (fst D);
+        idC := fun C => idF (fst C);
+        compC := fun C D E G F => compF G F;
+        lamC := fun C D F => compF_idF_l (snd D) F;
+        rhoC := fun C D F => compF_idF_r (snd D) F;
+        alphaC := fun C D E W F G K => compF_assoc (snd W) F G K |}.
+
+Definition xca_wildcat_of_precats_stmt `{Funext} : Type := isUnivalent PreCatCat.
+
 (** Definition [def:full-faithful]. *)
 Definition isFaithful {C D : WildPreCat} (F : Functor C D) : Type
   := forall A B : Ob C, isInj (@fmap C D F A B).
@@ -447,20 +461,6 @@ End FunctorCat.
 Definition xca_path_core_adj_stmt `{Funext} : Type
   := forall (A : Type) (C : Cat),
        isEquiv (fun F : Functor (PathGrpd A) (fst C) => fob F).
-
-(** Exercise [xca:wildcat-of-precats] (statement only): the precategories,
-    with functors as arrows, form a univalent wild category; likewise the
-    categories. *)
-Definition PreCatCat `{Funext} : WildPreCat
-  := {| Ob := PreCat;
-        homC := fun C D => Functor (fst C) (fst D);
-        idC := fun C => idF (fst C);
-        compC := fun C D E G F => compF G F;
-        lamC := fun C D F => compF_idF_l (snd D) F;
-        rhoC := fun C D F => compF_idF_r (snd D) F;
-        alphaC := fun C D E W F G K => compF_assoc (snd W) F G K |}.
-
-Definition xca_wildcat_of_precats_stmt `{Funext} : Type := isUnivalent PreCatCat.
 
 (** Example [ex:repr-functors]: the representable wild functors
     [Hom(C₀, -) : C → U] and [Hom(-, C₀) : C^op → U]. *)

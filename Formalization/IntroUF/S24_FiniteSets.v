@@ -193,7 +193,7 @@ Section TwoElementSets.
 
   Context `{Univalence}.
 
-  (** [Bool = Bool] is equivalent to [Bool] (using [xca:C2]). *)
+  (** [Bool = Bool] is equivalent to [Bool] (using exercise [xca:C2] of 2.13). *)
   Definition BoolPaths_Bool : (Bool = Bool :> Type) ≃ Bool.
   Proof.
     pose (swap_no := ptw (ap fst (ptoe_etop swapEqv)) yes : ptoe swap yes = no).

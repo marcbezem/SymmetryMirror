@@ -370,26 +370,6 @@ Section Quotients.
 
   End UniversalProperty.
 
-  (** Definition [def:quotient-as-HIT]: the quotient as a higher inductive
-      type is the library's [Quotient], whose induction principle into
-      families of sets has the book's form (with paths over [qglue]) and
-      computes by definition on [class_of]. *)
-  Definition QuotHIT : Type := Quotient (A := A) (fun x y => fst (R x y)).
-
-  (** Exercise [xca:quotients-equivalence]. *)
-  Definition quot_QuotHIT : quot ≃ QuotHIT.
-  Proof.
-    pose (sQ := @IsHSet_isSet QuotHIT (ishset_quotient _)).
-    pose (to := fbar sQ (class_of _) (fun x y r => qglue r)).
-    pose (from := @Quotient_rec A (fun x y => fst (R x y)) quot
-                    (isSet_IsHSet quot_isSet) cls
-                    (fun x y r => snd (cls_eq_iff x y) r)).
-    refine (mkEqv to from _ _).
-    - refine (im_ind R _ (fun z => quot_isSet _ _) _). intro a. exact refl.
-    - refine (Quotient_ind_hprop _ (fun w => to (from w) = w) _). intro a.
-      exact refl.
-  Defined.
-
 End Quotients.
 
 (** Exercise [xca:A/True-prop-trunc]. *)
@@ -416,6 +396,36 @@ Section QuotientByTrue.
          (ptrunc_rec quot_True_isProp (cls R)).
 
 End QuotientByTrue.
+
+Section QuotientsHIT.
+
+  Context `{Univalence} {A : Type} (R : A -> A -> PropU)
+    (rr : forall x, fst (R x x))
+    (rs : forall x y, fst (R x y) -> fst (R y x))
+    (rt : forall x y z, fst (R x y) -> fst (R y z) -> fst (R x z)).
+
+  (** Definition [def:quotient-as-HIT]: the quotient as a higher inductive
+      type is the library's [Quotient], whose induction principle into
+      families of sets has the book's form (with paths over [qglue]) and
+      computes by definition on [class_of]. *)
+  Definition QuotHIT : Type := Quotient (A := A) (fun x y => fst (R x y)).
+
+  (** Exercise [xca:quotients-equivalence]. *)
+  Definition quot_QuotHIT : quot R ≃ QuotHIT.
+  Proof.
+    pose (sQ := @IsHSet_isSet QuotHIT (ishset_quotient _)).
+    pose (to := fbar R rr sQ (class_of _) (fun x y r => qglue r)).
+    pose (from := @Quotient_rec A (fun x y => fst (R x y)) (quot R)
+                    (isSet_IsHSet (quot_isSet R)) (cls R)
+                    (fun x y r => snd (cls_eq_iff R rr rs rt x y) r)).
+    refine (mkEqv to from _ _).
+    - refine (im_ind R _ (fun z => quot_isSet R _ _) _). intro a. exact refl.
+    - refine (Quotient_ind_hprop _ (fun w => to (from w) = w) _). intro a.
+      exact refl.
+  Defined.
+
+End QuotientsHIT.
+
 
 (** Remark [rem:set-trunc-as-quotient]: the set truncation as the quotient
     by [R(x,y) :≡ ‖x = y‖]. *)

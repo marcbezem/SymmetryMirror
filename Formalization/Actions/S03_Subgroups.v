@@ -76,6 +76,13 @@ Definition subgrp_group `{Funext} {G : Group} (S : SubGrp G) : Group
   := mkgroup (TotG (sg_X S); ((sh G; sg_pt S);
                 (conn_of_trans _ (sg_trans S); TotG_isGrpd (sg_X S)))).
 
+(** Example [ex:Rm0-subgroup]: the symmetries of [ℤ] picked out by
+    [(R_m, 0)] are the [loop^{mk}]. *)
+Definition ex_Rm0_subgroup_stmt `{Univalence} : Type
+  := forall (k : ℕ) (p : base = base),
+       (trp (Rm k) p fin_zero = fin_zero)
+       <-> ptrunc {j : ℤ & p = loopZ (zmul (iplus (S k)) j)}.
+
 (** Lemma [lem:SubGisset]. *)
 Definition istrans_isProp {G : Group} (X : GSet G) : isProp (istrans X) := ptrunc_isProp.
 
@@ -110,6 +117,23 @@ Proof.
   exact (pointed_GSet_paths_isProp _ _ (sg_trans u) _ _).
 Defined.
 
+(** Example [exa:fix1subSGn]: the subgroup [(X, k)] of [Σ_{n+1}] fixing
+    [k] has underlying group isomorphic to [Σ_n]. *)
+Definition exa_fix1subSGn_stmt `{Univalence} : Type
+  := forall (n : ℕ) (k : Fin (S n)) (t : istrans (std_SGset (S n))),
+       Iso (subgrp_group ((std_SGset (S n); (k; t)) : SubGrp (SG (S n)))) (SG n).
+
+(** Exercises [xca:n-is-ptd-n+1] and [xca:A-is-A-1+1]. *)
+Definition xca_n_is_ptd_stmt `{Univalence} : Type
+  := forall n : ℕ, FinSet_n n ≃ {X : FinSet_n (S n) & fst (fst X)}.
+
+Definition xca_A_is_A_1_1_stmt `{Univalence} : Type
+  := forall A : Type, isDecSet A -> A ≃ {B : Type & A ≃ (B ⨿ True)}.
+
+(** Example [exa:C3subC6]: [C_6] has a subgroup isomorphic to [C_3]. *)
+Definition exa_C3subC6_stmt `{Univalence} : Type
+  := {S : SubGrp (CG 5) & Iso (subgrp_group S) (CG 2)}.
+
 (** Definition [def:decidable-subgroup]. *)
 Definition isDecSubGrp {G : Group} (S : SubGrp G) : Type := isDecSet (el (sg_X S) (sh G)).
 
@@ -121,6 +145,36 @@ Definition Mono (G : Group) : Type := {H : Group & {i : Hom H G & ismono i}}.
 Definition Mono_trivial {G : Group} (m : Mono G) : Type := isContr (utype (BG (fst m))).
 
 Definition Mono_proper {G : Group} (m : Mono G) : Type := ¬ isIso (fst (snd m)).
+
+(** Example [ex:SGninSGn+1]: [B ↦ B ⨿ T] gives a monomorphism
+    [Σ_S → Σ_{S ⨿ T}]. *)
+Definition ex_SGninSGn1_stmt `{Univalence} : Type
+  := forall S T : SetU, ismono (sum_hom S T).
+
+(** Exercise [xca:SG2subSG3]: for a pointing path [π], the image of
+    [Ui_3] consists of the permutations fixing the point [π⁻¹(inr triv)];
+    here [Σ_3] is represented by the set [Fin 2 ⨿ 𝟙]. *)
+Definition T1 `{Univalence} : SetU := (True; prop_is_set True_isProp).
+
+Definition X3 `{Univalence} : SetU := sumSetU T1 (FinSetU 2).
+
+Definition i3 `{Univalence} (pp : sh (SG_S X3) = comp_map (FinSetU 2) (sumSetU T1) (sh (SG 2)))
+  : Hom (SG 2) (SG_S X3)
+  := mkhom ((comp_map (FinSetU 2) (sumSetU T1); pp) : BG (SG 2) →* BG (SG_S X3)).
+
+Definition xca_SG2subSG3_stmt `{Univalence} : Type
+  := forall (pp : sh (SG_S X3) = comp_map (FinSetU 2) (sumSetU T1) (sh (SG 2)))
+            (σ : USym (SG_S X3)),
+       let xpp := ptoe (ap (fun w : utype (BG (SG_S X3)) => fst (fst w)) pp)⁻¹ (inr triv) in
+       ptrunc (fiber (USymf (i3 pp)) σ)
+       <-> (ptoe (ap (fun w : utype (BG (SG_S X3)) => fst (fst w)) σ) xpp = xpp).
+
+(** Exercise [xca:C3subSG3]. *)
+Definition xca_C3subSG3_stmt `{Univalence} : Type
+  := {j : Hom (CG 2) (SG 3) & {j' : Hom (CG 2) (SG 3) &
+       {m : ismono j & {m' : ismono j' &
+         (USymf j ≠ USymf j')
+         × (((CG 2; (j; m)) : Mono (SG 3)) = (CG 2; (j'; m')))}}}}.
 
 (** Example [ex:prodinclismono]: the inclusions into [G × H] are
     monomorphisms. *)
@@ -184,7 +238,8 @@ Section SubToMono.
     : ap fst (ap (fun c => (w; c) : TotG (sg_X S)) e ⋅ tot_path_act (sg_X S) p a) = p.
   Proof. destruct e. exact (ap_fst_tot_path_act p a). Defined.
 
-  (** Lemma [lem:E-preserves-symms], for [F(X, pt)]. *)
+  (** Lemma [lem:E-preserves-symms], for [F(X, pt)].
+    (Placed in the section of the map [F] of [lem:SubG=MonoG], whose data it uses.) *)
   Definition E_preserves_symms (g : USym G)
     : (act (sg_X S) g (sg_pt S) = sg_pt S)
       <-> Ex (fun h : USym (subgrp_group S) => g = USymf subgrp_incl h).
@@ -203,6 +258,14 @@ Section SubToMono.
 
 End SubToMono.
 
+(** Example [exa:EforSG3]: [F] sends the standard [Σ_3]-set, pointed at
+    the added element, to [(Σ_2, i_3)] (with [π :≡ refl]). *)
+Definition exa_EforSG3_stmt `{Univalence} : Type
+  := forall (t : istrans (fun A : utype (BG (SG_S X3)) => fst A)) (m : ismono (i3 refl)),
+       subgrp_to_mono (((fun A : utype (BG (SG_S X3)) => fst A); (inr triv; t))
+                       : SubGrp (SG_S X3))
+       = ((SG 2; (i3 refl; m)) : Mono (SG_S X3)).
+
 (** Lemma [lem:SubG=MonoG] with exercise [xca:SubG=MonoG], and corollary
     [lem:setofsubgroups] (statements only). *)
 Definition lem_SubG_MonoG_stmt `{Funext} : Type
@@ -210,89 +273,21 @@ Definition lem_SubG_MonoG_stmt `{Funext} : Type
 
 Definition lem_setofsubgroups_stmt `{Univalence} : Type := forall G : Group, isSet (Mono G).
 
-(** Examples and exercises of this part (statements only). *)
-Section SubgroupExamples.
-
-  Context `{Univalence}.
-
-  (** Example [ex:Rm0-subgroup]: the symmetries of [ℤ] picked out by
-      [(R_m, 0)] are the [loop^{mk}]. *)
-  Definition ex_Rm0_subgroup_stmt : Type
-    := forall (k : ℕ) (p : base = base),
-         (trp (Rm k) p fin_zero = fin_zero)
-         <-> ptrunc {j : ℤ & p = loopZ (zmul (iplus (S k)) j)}.
-
-  (** Example [exa:fix1subSGn]: the subgroup [(X, k)] of [Σ_{n+1}] fixing
-      [k] has underlying group isomorphic to [Σ_n]. *)
-  Definition exa_fix1subSGn_stmt : Type
-    := forall (n : ℕ) (k : Fin (S n)) (t : istrans (std_SGset (S n))),
-         Iso (subgrp_group ((std_SGset (S n); (k; t)) : SubGrp (SG (S n)))) (SG n).
-
-  (** Exercises [xca:n-is-ptd-n+1] and [xca:A-is-A-1+1]. *)
-  Definition xca_n_is_ptd_stmt : Type
-    := forall n : ℕ, FinSet_n n ≃ {X : FinSet_n (S n) & fst (fst X)}.
-
-  Definition xca_A_is_A_1_1_stmt : Type
-    := forall A : Type, isDecSet A -> A ≃ {B : Type & A ≃ (B ⨿ True)}.
-
-  (** Example [exa:C3subC6]: [C_6] has a subgroup isomorphic to [C_3]. *)
-  Definition exa_C3subC6_stmt : Type
-    := {S : SubGrp (CG 5) & Iso (subgrp_group S) (CG 2)}.
-
-  (** Example [ex:SGninSGn+1]: [B ↦ B ⨿ T] gives a monomorphism
-      [Σ_S → Σ_{S ⨿ T}]. *)
-  Definition ex_SGninSGn1_stmt : Type
-    := forall S T : SetU, ismono (sum_hom S T).
-
-  (** Exercise [xca:SG2subSG3]: for a pointing path [π], the image of
-      [Ui_3] consists of the permutations fixing the point [π⁻¹(inr triv)];
-      here [Σ_3] is represented by the set [Fin 2 ⨿ 𝟙]. *)
-  Definition T1 : SetU := (True; prop_is_set True_isProp).
-
-  Definition X3 : SetU := sumSetU T1 (FinSetU 2).
-
-  Definition i3 (pp : sh (SG_S X3) = comp_map (FinSetU 2) (sumSetU T1) (sh (SG 2)))
-    : Hom (SG 2) (SG_S X3)
-    := mkhom ((comp_map (FinSetU 2) (sumSetU T1); pp) : BG (SG 2) →* BG (SG_S X3)).
-
-  Definition xca_SG2subSG3_stmt : Type
-    := forall (pp : sh (SG_S X3) = comp_map (FinSetU 2) (sumSetU T1) (sh (SG 2)))
-              (σ : USym (SG_S X3)),
-         let xpp := ptoe (ap (fun w : utype (BG (SG_S X3)) => fst (fst w)) pp)⁻¹ (inr triv) in
-         ptrunc (fiber (USymf (i3 pp)) σ)
-         <-> (ptoe (ap (fun w : utype (BG (SG_S X3)) => fst (fst w)) σ) xpp = xpp).
-
-  (** Example [exa:EforSG3]: [F] sends the standard [Σ_3]-set, pointed at
-      the added element, to [(Σ_2, i_3)] (with [π :≡ refl]). *)
-  Definition exa_EforSG3_stmt : Type
-    := forall (t : istrans (fun A : utype (BG (SG_S X3)) => fst A)) (m : ismono (i3 refl)),
-         subgrp_to_mono (((fun A : utype (BG (SG_S X3)) => fst A); (inr triv; t))
-                         : SubGrp (SG_S X3))
-         = ((SG 2; (i3 refl; m)) : Mono (SG_S X3)).
-
-  (** Exercise [xca:C3subSG3]. *)
-  Definition xca_C3subSG3_stmt : Type
-    := {j : Hom (CG 2) (SG 3) & {j' : Hom (CG 2) (SG 3) &
-         {m : ismono j & {m' : ismono j' &
-           (USymf j ≠ USymf j')
-           × (((CG 2; (j; m)) : Mono (SG 3)) = (CG 2; (j'; m')))}}}}.
-
-  (** Example [ex:prodinclisGset]: the [G × G']-set corresponding to
-      [i₁ : G → G × G'] is [princ_{G'} ∘ proj₂]. *)
-  Definition ex_prodinclisGset_stmt : Type
-    := forall (G G' : Group)
-              (t : istrans (fun z : utype (BG (prodG G G')) => princ G' (snd z))),
-         subgrp_to_mono (((fun z : utype (BG (prodG G G')) => princ G' (snd z));
-                          ((refl : el (princ G') (sh G')); t)) : SubGrp (prodG G G'))
-         = ((G; (inG1 G G'; inG1_ismono G G')) : Mono (prodG G G')).
-
-End SubgroupExamples.
-
 (** Definition [def:triv-proper-Mono]. *)
 Definition SubGrp_trivial {G : Group} (S : SubGrp G) : Type := isContr (TotG (sg_X S)).
 
 Definition SubGrp_proper {G : Group} (S : SubGrp G) : Type
   := ¬ isContr (el (sg_X S) (sh G)).
+
+(** Example [ex:prodinclisGset]: the [G × G']-set corresponding to
+    [i₁ : G → G × G'] is [princ_{G'} ∘ proj₂]. *)
+Definition ex_prodinclisGset_stmt `{Univalence} : Type
+  := forall (G G' : Group)
+            (t : istrans (fun z : utype (BG (prodG G G')) => princ G' (snd z))),
+       subgrp_to_mono (((fun z : utype (BG (prodG G G')) => princ G' (snd z));
+                        ((refl : el (princ G') (sh G')); t)) : SubGrp (prodG G G'))
+       = ((G; (inG1 G G'; inG1_ismono G G')) : Mono (prodG G G')).
+
 
 (** ** 5.3.3 The Lagrange construction *)
 Section Lagrange.

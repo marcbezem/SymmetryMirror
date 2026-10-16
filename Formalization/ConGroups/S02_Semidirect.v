@@ -55,6 +55,40 @@ Definition semidirect_trivial `{Univalence} (G K : Group)
   : semidirect G (fun _ => K) = prodG G K
   := path_Group ((pid _); id_isEquiv _).
 
+(** Dihedral groups (statements only).  The action of [Σ_2] on [C_n]
+    for an order [n] (by swapping the two directions of a cycle) and the
+    bidirectional bicycles are not constructed; we state their existence,
+    and define [D_n :≡ Σ_2 ⋉ C̃_n] relative to an action. *)
+Section Dihedral.
+
+  Context `{Univalence}.
+
+  Definition S2_on_Cn_stmt : Type
+    := forall n : Order,
+         {A : utype (BG (SG 2)) -> Group &
+           ptrunc {c : Cyc & (ord c = n) × (A (sh (SG 2)) = AutG Cyc_isGrpd c)}}.
+
+  (** Definition [def:gen-dihedral], relative to an action [A]. *)
+  Definition Dihedral (A : utype (BG (SG 2)) -> Group) : Group := semidirect (SG 2) A.
+
+  (** Construction [con:bidirectional-bicycle] with its exercise, and the
+      cardinality [2n] for finite [n]. *)
+  Definition con_bidirectional_bicycle_stmt : Type
+    := forall (A : utype (BG (SG 2)) -> Group),
+         {B : Bicyc & isNormal B
+                      × (BG (Dihedral A) ≃* ((component Bicyc B; (B; trunc refl)) : Ustar))}.
+
+  Definition dihedral_card_stmt : Type
+    := forall (k : ℕ) (A : utype (BG (SG 2)) -> Group), A (sh (SG 2)) = CG k ->
+         {h : isFinGroup (Dihedral A) & CardG (Dihedral A) h = mul 2 (S k)}.
+
+  (** The exercise that [Q_8] and [D_4] are not isomorphic; it holds for
+      any action of [Σ_2] on [C_4]. *)
+  Definition Q8_not_D4_stmt : Type
+    := forall A : utype (BG (SG 2)) -> Group, A (sh (SG 2)) = CG 3 -> ¬ Iso Q8 (Dihedral A).
+
+End Dihedral.
+
 (** Lemma [lem:pathpairsection], definition [def:pathsectionaction],
     lemma [def:pathsectionactionassoc] and lemma [lem:pathpairsectionmult],
     for a section [f : ∏_x Y(x)]. *)
@@ -175,37 +209,3 @@ Section SemidirectHoms.
          forall u, fst e u = ((sh G; u); refl)}.
 
 End SemidirectHoms.
-
-(** Dihedral groups (statements only).  The action of [Σ_2] on [C_n]
-    for an order [n] (by swapping the two directions of a cycle) and the
-    bidirectional bicycles are not constructed; we state their existence,
-    and define [D_n :≡ Σ_2 ⋉ C̃_n] relative to an action. *)
-Section Dihedral.
-
-  Context `{Univalence}.
-
-  Definition S2_on_Cn_stmt : Type
-    := forall n : Order,
-         {A : utype (BG (SG 2)) -> Group &
-           ptrunc {c : Cyc & (ord c = n) × (A (sh (SG 2)) = AutG Cyc_isGrpd c)}}.
-
-  (** Definition [def:gen-dihedral], relative to an action [A]. *)
-  Definition Dihedral (A : utype (BG (SG 2)) -> Group) : Group := semidirect (SG 2) A.
-
-  (** Construction [con:bidirectional-bicycle] with its exercise, and the
-      cardinality [2n] for finite [n]. *)
-  Definition con_bidirectional_bicycle_stmt : Type
-    := forall (A : utype (BG (SG 2)) -> Group),
-         {B : Bicyc & isNormal B
-                      × (BG (Dihedral A) ≃* ((component Bicyc B; (B; trunc refl)) : Ustar))}.
-
-  Definition dihedral_card_stmt : Type
-    := forall (k : ℕ) (A : utype (BG (SG 2)) -> Group), A (sh (SG 2)) = CG k ->
-         {h : isFinGroup (Dihedral A) & CardG (Dihedral A) h = mul 2 (S k)}.
-
-  (** The exercise that [Q_8] and [D_4] are not isomorphic; it holds for
-      any action of [Σ_2] on [C_4]. *)
-  Definition Q8_not_D4_stmt : Type
-    := forall A : utype (BG (SG 2)) -> Group, A (sh (SG 2)) = CG 3 -> ¬ Iso Q8 (Dihedral A).
-
-End Dihedral.

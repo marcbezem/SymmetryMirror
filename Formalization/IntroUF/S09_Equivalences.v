@@ -121,7 +121,8 @@ Definition IsEquiv_of_isEquiv {X Y : Type} {f : X -> Y} (t : isEquiv f)
   : IsEquiv f
   := isequiv_adjointify f (eqinv t) (eqinv_r t) (eqinv_l t).
 
-(** Construction [lem:weq-iso]. *)
+(** Construction [lem:weq-iso].
+    (Placed before [xca:equivalence-invers], which uses it.) *)
 Definition isEquiv_to_iso {X Y : Type} {f : X -> Y} (t : isEquiv f)
   : {g : Y -> X & (forall x, g (f x) = x) * (forall y, f (g y) = y)}
   := (eqinv t; (eqinv_l t, eqinv_r t)).
@@ -210,6 +211,16 @@ Section ContractAway.
 
 End ContractAway.
 
+(** Footnote [ft:Sigma-assoc]: associativity of sum types. *)
+Definition sigma_assoc (X : Type) (Y : X -> Type)
+  (Z : forall x, Y x -> Type)
+  : {x : X & {y : Y x & Z x y}} ≃ {w : {x : X & Y x} & Z (fst w) (snd w)}
+  := mkEqv (fun w : {x : X & {y : Y x & Z x y}} =>
+              ((fst w; fst (snd w)) : {x : X & Y x}; snd (snd w)))
+           (fun w : {w : {x : X & Y x} & Z (fst w) (snd w)} =>
+              (fst (fst w); snd (fst w); snd w))
+           (fun _ => refl) (fun _ => refl).
+
 (** Corollary [cor:contract-away]; here [(a = x) × B(x)] is the sum over
     a constant family, see 2.11. *)
 Definition contract_away {X : Type} (a : X) (B : X -> Type)
@@ -260,7 +271,8 @@ Definition ptw_inv `{Funext} {X : Type} {Y : X -> Type} {f g : forall x, Y x}
   : (forall x, f x = g x) -> f = g
   := eqinv (funext f g).
 
-(** Exercise [xca:substitute-away]. *)
+(** Exercise [xca:substitute-away].
+    (Placed after [def:funext], which it uses.) *)
 Definition substitute_away `{Funext} {X : Type} (a : X) (B : X -> Type)
   : (forall x, a = x -> B x) ≃ B a.
 Proof.
@@ -298,16 +310,6 @@ Definition sigma_comm (X Y : Type) (Z : X -> Y -> Type)
   : {x : X & {y : Y & Z x y}} ≃ {y : Y & {x : X & Z x y}}
   := mkEqv (fun w : {x : X & {y : Y & Z x y}} => (fst (snd w); fst w; snd (snd w)))
            (fun w : {y : Y & {x : X & Z x y}} => (fst (snd w); fst w; snd (snd w)))
-           (fun _ => refl) (fun _ => refl).
-
-(** Footnote [ft:Sigma-assoc]: associativity of sum types. *)
-Definition sigma_assoc (X : Type) (Y : X -> Type)
-  (Z : forall x, Y x -> Type)
-  : {x : X & {y : Y x & Z x y}} ≃ {w : {x : X & Y x} & Z (fst w) (snd w)}
-  := mkEqv (fun w : {x : X & {y : Y x & Z x y}} =>
-              ((fst w; fst (snd w)) : {x : X & Y x}; snd (snd w)))
-           (fun w : {w : {x : X & Y x} & Z (fst w) (snd w)} =>
-              (fst (fst w); snd (fst w); snd w))
            (fun _ => refl) (fun _ => refl).
 
 (** Exercise [xca:fib-of-comp]. *)

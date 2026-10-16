@@ -380,7 +380,8 @@ Section FirstExamples.
   (** Left-out results of this part (statements only). *)
 
   (** Exercise [xca:groups]: two different identifications
-      [ℤ = Aut_Cyc(ℤ, zs)]. *)
+      [ℤ = Aut_Cyc(ℤ, zs)].
+    (Placed after [ex:cyclicgroups], since it uses [Cyc_isGrpd].) *)
   Definition xca_groups_stmt : Type
     := {p : ZZ = AutG Cyc_isGrpd Zcyc & {q : ZZ = AutG Cyc_isGrpd Zcyc & p ≠ q}}.
 
@@ -435,6 +436,41 @@ Definition Klein `{Univalence} : Group := prodG (SG 2) (SG 2).
 
 (** Exercise [xca:klein-not-cyclic] (statement only). *)
 Definition xca_klein_not_cyclic_stmt `{Univalence} : Type := CG 3 ≠ Klein.
+
+(** Example [ex:bigproductofgroups] and exercise [xca:bigproductfunext](1):
+    a finite product of connected groupoids is connected (by the
+    library's finite choice), so we have the product of a finite family
+    of groups, and [ptw] identifies its symmetries. *)
+Section BigProduct.
+
+  Context `{Univalence} {S : Type} (hS : isFinSet S) (G : S -> Group).
+
+  Definition PiG_pt : forall s, utype (BG (G s)) := fun s => sh (G s).
+
+  Definition PiG_isConn : isConn (forall s, utype (BG (G s))).
+  Proof.
+    refine (isConn_from_pt PiG_pt _). intro f.
+    pose (FS := isFinSet_Finite hS).
+    refine (ptrunc_rec ptrunc_isProp (fun h => trunc (ptw_inv h)) _).
+    exact (@finite_choice S FS (fun s => sh (G s) = f s) (fun _ => tt)
+             (fun s => snd (BG_isConn (G s)) (sh (G s)) (f s))).
+  Defined.
+
+  Definition PiG : Group
+    := mkgroup ((forall s, utype (BG (G s)));
+                (PiG_pt; (PiG_isConn; Pi_ntype 1 (fun s => BG_isGrpd (G s))))).
+
+  Definition USym_PiG : USym PiG ≃ (forall s, USym (G s))
+    := Eqv_of_Equiv (equiv_apD10 _ PiG_pt PiG_pt).
+
+End BigProduct.
+
+(** Exercise [xca:bigproductfunext](2) (statement only): for [S = 𝟚]
+    the product is the binary product. *)
+Definition Bool_isFinSet `{Univalence} : isFinSet Bool := trunc (2%nat; etop (Eqv_inv Fin2_Bool)).
+
+Definition xca_bigproductfunext_2_stmt `{Univalence} : Type
+  := forall G : Bool -> Group, PiG Bool_isFinSet G = prodG (G yes) (G no).
 
 (** Definition [def:abgp]: abelian groups. *)
 Definition isAb (G : Group) : Type := forall g h : USym G, g ⋅ h = h ⋅ g.
@@ -514,41 +550,6 @@ End AbelianExamples.
 
 (** [Σ_3] is not abelian (statement only). *)
 Definition SG3_not_isAb_stmt `{Univalence} : Type := ¬ isAb (SG 3).
-
-(** Example [ex:bigproductofgroups] and exercise [xca:bigproductfunext](1):
-    a finite product of connected groupoids is connected (by the
-    library's finite choice), so we have the product of a finite family
-    of groups, and [ptw] identifies its symmetries. *)
-Section BigProduct.
-
-  Context `{Univalence} {S : Type} (hS : isFinSet S) (G : S -> Group).
-
-  Definition PiG_pt : forall s, utype (BG (G s)) := fun s => sh (G s).
-
-  Definition PiG_isConn : isConn (forall s, utype (BG (G s))).
-  Proof.
-    refine (isConn_from_pt PiG_pt _). intro f.
-    pose (FS := isFinSet_Finite hS).
-    refine (ptrunc_rec ptrunc_isProp (fun h => trunc (ptw_inv h)) _).
-    exact (@finite_choice S FS (fun s => sh (G s) = f s) (fun _ => tt)
-             (fun s => snd (BG_isConn (G s)) (sh (G s)) (f s))).
-  Defined.
-
-  Definition PiG : Group
-    := mkgroup ((forall s, utype (BG (G s)));
-                (PiG_pt; (PiG_isConn; Pi_ntype 1 (fun s => BG_isGrpd (G s))))).
-
-  Definition USym_PiG : USym PiG ≃ (forall s, USym (G s))
-    := Eqv_of_Equiv (equiv_apD10 _ PiG_pt PiG_pt).
-
-End BigProduct.
-
-(** Exercise [xca:bigproductfunext](2) (statement only): for [S = 𝟚]
-    the product is the binary product. *)
-Definition Bool_isFinSet `{Univalence} : isFinSet Bool := trunc (2%nat; etop (Eqv_inv Fin2_Bool)).
-
-Definition xca_bigproductfunext_2_stmt `{Univalence} : Type
-  := forall G : Bool -> Group, PiG Bool_isFinSet G = prodG (G yes) (G no).
 
 (** Exercise: [mkgroup(A,a)] and [mkgroup(A,b)] are merely identical. *)
 Definition mkgroup_merely_eq {A : Type} (a : A) (cA : isConn A) (gA : isGrpd A) (b : A)

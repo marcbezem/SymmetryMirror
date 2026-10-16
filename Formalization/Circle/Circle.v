@@ -2,7 +2,7 @@
 
     ** Summary of this formalization
 
-    Sections 3.1 - 3.9 of Chapter 3 of the book "Symmetry", one file per
+    Sections 3.1 - 3.10 of Chapter 3 of the book "Symmetry", one file per
     section, each starting with its own summary: the circle and its
     universal property ([S01_Circle.v]), the integers as a higher
     inductive type ([S02_Integers.v]), coverings ([S03_Coverings.v]), the
@@ -10,7 +10,9 @@
     type of infinite cycles ([S05_Reinterpretation.v]) and connected
     coverings over the circle ([S06_ConnCoverings.v]), permutations
     ([S07_Permutations.v]), the [m]-th root ([S08_MthRoot.v]) and higher
-    images ([S09_HigherImages.v]); 3.6 partly.
+    images ([S09_HigherImages.v]), and the universal property of [Cyc_n]
+    ([S10_UniversalPropertyCycn.v], statements only); 3.6 partly.  The
+    hidden Section 3.11 is not formalized.
     They build on Chapter 2 ([IntroUF.IntroUF]).  Everything compiles with
     nothing admitted.
 
@@ -28,4 +30,5 @@ From SymmetryMirror Require Export
   Circle.S06_ConnCoverings
   Circle.S07_Permutations
   Circle.S08_MthRoot
-  Circle.S09_HigherImages.
+  Circle.S09_HigherImages
+  Circle.S10_UniversalPropertyCycn.
