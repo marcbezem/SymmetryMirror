@@ -33,12 +33,9 @@
       division on [ℕ]; for [n = -(b+1)] with [b = Qm + R] we take
       [q :≡ -(Q+1)] and [r :≡ m - (R+1)], which avoids a case distinction
       on [R = 0]; uniqueness by showing that [dm + r = r'] with
-      [r, r' < m] forces [d = 0].  It is placed after the order, since it
-      uses addition, multiplication and [<], and not right after
-      [def:zet] as in the book.  [int_of_nat_inj] moved here from 3.8.
-      NOTE for the book: "extends [lem:euclid-div] to from ℕ to ℤ" has a
-      stray "to"; and [<] on [ℤ] is only mentioned ("ordering relations"),
-      not defined.
+      [r, r' < m] forces [d = 0].  [int_of_nat_inj] moved here from 3.8.
+      NOTE for the book: [<] on [ℤ] is only mentioned ("ordering
+      relations"), not defined.
     - The alternative form of [ℤ]-induction from [f(0)], [g'] and [h']
       ([ℤ_ind']), with the computation rules by [refl]; the value at [-0]
       is [f(0)] transported along [zeq], so [f(-0) ≡ f(0)] holds only
@@ -302,34 +299,6 @@ Defined.
 Definition iplus_mul (n m : ℕ) : iplus (mul n m) = zmul (iplus n) (iplus m)
   := toInt_inj (x := iplus (mul n m)) ((int_nat_mul n m)^ @ (toInt_zmul (iplus n) (iplus m))^).
 
-(** The alternative form of [ℤ]-induction: given [f(0)], [g'] and [h'],
-    with [f(z+1) ≡ g'(z, f(z))] for [z ≥ 0] and [f(z-1) ≡ h'(z, f(z))] for
-    [z ≤ 0]; the value at [-0] is [f(0)] transported along [zeq]. *)
-Definition ℤ_ind' (T : ℤ -> Type) (f0 : T (iplus 0))
-  (g' : forall n, T (iplus n) -> T (iplus (S n)))
-  (h' : forall n, T (iminus (negN n)) -> T (iminus (negN (S n))))
-  : forall z, T z
-  := ℤ_ind T (fun n => nat_rect (fun n => T (iplus n)) f0 g' n)
-       (fun m => match m with
-                 | negN n => nat_rect (fun n => T (iminus (negN n))) (trp T zeq⁻¹ f0) h' n
-                 end)
-       (transport_pV T zeq f0).
-
-Definition ℤ_ind'_0 T f0 g' h' : ℤ_ind' T f0 g' h' (iplus 0) = f0 := refl.
-
-Definition ℤ_ind'_plus T f0 g' h' (n : ℕ)
-  : ℤ_ind' T f0 g' h' (iplus (S n)) = g' n (ℤ_ind' T f0 g' h' (iplus n)) := refl.
-
-Definition ℤ_ind'_minus T f0 g' h' (n : ℕ)
-  : ℤ_ind' T f0 g' h' (iminus (negN (S n))) = h' n (ℤ_ind' T f0 g' h' (iminus (negN n))) := refl.
-
-(** Exercise [xca:commutative-add-Z]. *)
-Definition zadd_comm (x y : ℤ) : zadd x y = zadd y x
-  := toInt_inj (toInt_zadd x y @ int_add_comm _ _ @ (toInt_zadd y x)^).
-
-Definition zmul_comm (x y : ℤ) : zmul x y = zmul y x
-  := toInt_inj (toInt_zmul x y @ int_mul_comm _ _ @ (toInt_zmul y x)^).
-
 (** The order [z ≤ y :≡ ∑_{n:ℕ} (y = z + ι₊(n))] extends the order on [ℕ]. *)
 Definition zle (z y : ℤ) : Type := {n : ℕ & y = zadd z (iplus n)}.
 
@@ -459,8 +428,7 @@ Proof.
 Defined.
 
 (** Exercise [xca:euclid-div-Z]: for [m > 0] the type of [(q, r)] with
-    [0 ≤ r < m] and [n = qm + r] is contractible.  (Placed here since it
-    uses addition, multiplication and the order.) *)
+    [0 ≤ r < m] and [n = qm + r] is contractible. *)
 Definition euclid_div_Z (n m : ℤ) (pos : zlt (iplus 0) m)
   : isContr {q : ℤ & {r : ℤ & zle (iplus 0) r × (zlt r m × (n = zadd (zmul q m) r))}}.
 Proof.
@@ -494,3 +462,31 @@ Proof.
     apply (ap (fun w => (fromInt q0; (iplus r0; w)))).
     exact (prod_isProp (zle_isProp _ _) (prod_isProp (zle_isProp _ _) (ℤ_isSet _ _)) _ _).
 Defined.
+
+(** The alternative form of [ℤ]-induction: given [f(0)], [g'] and [h'],
+    with [f(z+1) ≡ g'(z, f(z))] for [z ≥ 0] and [f(z-1) ≡ h'(z, f(z))] for
+    [z ≤ 0]; the value at [-0] is [f(0)] transported along [zeq]. *)
+Definition ℤ_ind' (T : ℤ -> Type) (f0 : T (iplus 0))
+  (g' : forall n, T (iplus n) -> T (iplus (S n)))
+  (h' : forall n, T (iminus (negN n)) -> T (iminus (negN (S n))))
+  : forall z, T z
+  := ℤ_ind T (fun n => nat_rect (fun n => T (iplus n)) f0 g' n)
+       (fun m => match m with
+                 | negN n => nat_rect (fun n => T (iminus (negN n))) (trp T zeq⁻¹ f0) h' n
+                 end)
+       (transport_pV T zeq f0).
+
+Definition ℤ_ind'_0 T f0 g' h' : ℤ_ind' T f0 g' h' (iplus 0) = f0 := refl.
+
+Definition ℤ_ind'_plus T f0 g' h' (n : ℕ)
+  : ℤ_ind' T f0 g' h' (iplus (S n)) = g' n (ℤ_ind' T f0 g' h' (iplus n)) := refl.
+
+Definition ℤ_ind'_minus T f0 g' h' (n : ℕ)
+  : ℤ_ind' T f0 g' h' (iminus (negN (S n))) = h' n (ℤ_ind' T f0 g' h' (iminus (negN n))) := refl.
+
+(** Exercise [xca:commutative-add-Z]. *)
+Definition zadd_comm (x y : ℤ) : zadd x y = zadd y x
+  := toInt_inj (toInt_zadd x y @ int_add_comm _ _ @ (toInt_zadd y x)^).
+
+Definition zmul_comm (x y : ℤ) : zmul x y = zmul y x
+  := toInt_inj (toInt_zmul x y @ int_mul_comm _ _ @ (toInt_zmul y x)^).

@@ -391,14 +391,7 @@ and there is an (unnamed) element of $\apd{f}(\zeq) \eqto q$.
 \end{definition}
 
 Like the type $\NN$, the type $\zet$ is a set with decidable equality
-and ordering relations. The following exercise extends \cref{lem:euclid-div}
-to from $\NN$ to $\zet$.
-
-\begin{xca}\label{xca:euclid-div-Z}
-  For all $n,m:\zet$ with $m>0$ there exist unique $q,r:\zet$
-  such that $0\leq r<m$ and $n = qm+r$.
-\end{xca}
-
+and ordering relations.
 
 One well known self-equivalence is \emph{negation}, ${-}:\zet\to\zet$,
 \index{negation!of integer}\glossary(1negation){$-z$}{negation of an integer $z$}
@@ -464,6 +457,12 @@ $zy \defeq (w \mapsto z+w)^y(0)$.
 
 The ordering relations $<$ and $\leq$ on $\zet$ are easily defined
 and shown to extend those on $\NN$.
+The following exercise extends \cref{lem:euclid-div} from $\NN$ to $\zet$.
+
+\begin{xca}\label{xca:euclid-div-Z}
+  For all $n,m:\zet$ with $m>0$ there exist unique $q,r:\zet$
+  such that $0\leq r<m$ and $n = qm+r$.
+\end{xca}
 
 Recall the induction principle for $\zet$ in \cref{def:zet} above.
 Instead of defining $g$ and $h$ explicitly, we will often
