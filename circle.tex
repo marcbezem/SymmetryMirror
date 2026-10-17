@@ -387,11 +387,18 @@ Here $g$ and $h$ can be defined by induction on $n:\NN,m:\NNN$.\footnote{%
 
 The resulting function $f:\prod_{z:\zet}T(z)$ satisfies
 $f(n)\jdeq g(n)$ and $f(-n)\jdeq h(-n)$ for $n:\NN$,
-and there is an (unnamed) element of $\apd{f}(\zeq) = q$.
+and there is an (unnamed) element of $\apd{f}(\zeq) \eqto q$.
 \end{definition}
 
 Like the type $\NN$, the type $\zet$ is a set with decidable equality
-and ordering relations.
+and ordering relations. The following exercise extends \cref{lem:euclid-div}
+to from $\NN$ to $\zet$.
+
+\begin{xca}\label{xca:euclid-div-Z}
+  For all $n,m:\zet$ with $m>0$ there exist unique $q,r:\zet$
+  such that $0\leq r<m$ and $n = qm+r$.
+\end{xca}
+
 
 One well known self-equivalence is \emph{negation}, ${-}:\zet\to\zet$,
 \index{negation!of integer}\glossary(1negation){$-z$}{negation of an integer $z$}
@@ -2431,8 +2438,7 @@ then we claim $H=m\zet$,
 from which it follows that $(X,t)$ has order $m$.
 
 Clearly, $m\zet \subseteq H$, since if $t^m=\id$, then also $t^{nm}=\id$.
-And if $t^q=\id$, then by Euclidean division of integers,
-cf.~\cref{lem:euclid-div},
+And if $t^q=\id$, then by Euclidean division of integers, \cref{xca:euclid-div-Z},
 there exist $k:\ZZ$ and $r:\NN$ with $r<m$ so that $q=km+r$.
 Now, the number $r$ is in $H$, since $t^r=t^{q-km}=\id$,
 and is less than the minimal positive value $m$ in $H$,
@@ -2877,8 +2883,9 @@ also used in \cref{lem:deg-m-on-Cyc}. discussed above.
 Transport of $\sqrt[\uproot{2}m]\zs$ along $\varphi$ is exactly $\zs$,
 \ie $\varphi\!\sqrt[\uproot{2}m]\zs=\zs\varphi$.\footnote{%
 Note that we formulate this in such a way that we don't need to talk about the inverse of $\varphi$.
-Of course, the inverse of $\varphi$ maps $z:\zet$ to the remainder and the integer quotient of $z$
-under Euclidean division by $m$, cf.~\cref{lem:euclid-div}.}
+Of course, the inverse of $\varphi$ maps $z:\zet$ to the remainder and 
+the integer quotient of $z$ under Euclidean division by $m$, 
+\cref{xca:euclid-div-Z}.}
 Likewise, transport of $\id\times\zs^{-1}$ along $\varphi$ is $\zs^{-m}$,
 so that $\varphi$ lifts to an element in
 $\bigl((\bn m\times\zet,\sqrt[\uproot{2}m]{\zs}), \id\times\zs^{-1}\bigr)
