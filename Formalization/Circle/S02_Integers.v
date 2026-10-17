@@ -34,6 +34,8 @@
       [q :≡ -(Q+1)] and [r :≡ m - (R+1)], which avoids a case distinction
       on [R = 0]; uniqueness by showing that [dm + r = r'] with
       [r, r' < m] forces [d = 0].  [int_of_nat_inj] moved here from 3.8.
+      For use in 3.8, the variants [euclid_div_Sk] and [euclid_unique_Sk]
+      for [m = k+1], with the remainder in [ℕ].
       NOTE for the book: [<] on [ℤ] is only mentioned ("ordering
       relations"), not defined.
     - The alternative form of [ℤ]-induction from [f(0)], [g'] and [h']
@@ -461,6 +463,30 @@ Proof.
     destruct pq, pr.
     apply (ap (fun w => (fromInt q0; (iplus r0; w)))).
     exact (prod_isProp (zle_isProp _ _) (prod_isProp (zle_isProp _ _) (ℤ_isSet _ _)) _ _).
+Defined.
+
+(** Variants of [xca:euclid-div-Z] for [m = k+1], with the remainder in
+    [ℕ], for use in 3.8. *)
+Definition euclid_div_Sk (n : ℤ) (k : ℕ)
+  : {q : ℤ & {r : ℕ & (r < S k)%nat × (n = zadd (zmul q (iplus (S k))) (iplus r))}}.
+Proof.
+  destruct (int_euclid_exists (toInt n) (S k) _) as [q0 [r0 [hr e]]].
+  refine (fromInt q0; (r0; (hr; toInt_inj _))).
+  exact (e @ ap (fun t => int_add (int_mul t _) r0) (toInt_fromInt q0)^
+         @ ap (fun t => int_add t _) (toInt_zmul _ (iplus (S k)))^
+         @ (toInt_zadd _ (iplus r0))^).
+Defined.
+
+Definition euclid_unique_Sk {k : ℕ} (q q' : ℤ) (r r' : ℕ)
+  (hr : (r < S k)%nat) (hr' : (r' < S k)%nat)
+  (e : zadd (zmul q (iplus (S k))) (iplus r) = zadd (zmul q' (iplus (S k))) (iplus r'))
+  : (q = q') × (r = r').
+Proof.
+  pose (E := fun q r => toInt_zadd (zmul q (iplus (S k))) (iplus r)
+                        @ ap (fun t => int_add t _) (toInt_zmul _ (iplus (S k)))).
+  destruct (int_euclid_unique (toInt q) (toInt q') (S k) r r' hr hr'
+              ((E q r)^ @ ap toInt e @ E q' r')) as [eq er].
+  exact (toInt_inj eq; er).
 Defined.
 
 (** The alternative form of [ℤ]-induction: given [f(0)], [g'] and [h'],

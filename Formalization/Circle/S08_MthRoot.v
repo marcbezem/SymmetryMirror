@@ -18,9 +18,9 @@
     - Powers of the root: [(ᵐ√t)^{mq}(i,x) = (i, t^q(x))] for [q : ℤ]
       ([root_pow]).
     - Lemma [lem:m-root-id] and its converse: [(ᵐ√t)^n = id] iff [n = mq]
-      with [t^q = id] ([m_root_id], [m_root_id_conv], [Ht_root]); to avoid
-      Euclidean division of negative integers, negative [n] are reduced to
-      positive ones.
+      with [t^q = id] ([m_root_id], [m_root_id_conv], [Ht_root]); as in
+      the book, by Euclidean division [n = qm + r] ([euclid_div_Sk] from
+      3.2, exercise [xca:euclid-div-Z]) and looking at the first component.
     - The [m]-th root of a cycle is a cycle ([root_isCycle], [rho_cyc]).
     - Identifications of cycles from identifications in [Endo]
       ([cyc_path]); cycles with the same [H] are merely identified, and
@@ -33,7 +33,9 @@
       [φ(k, r) :≡ k + mr], the identifications come from [lem:IdCycle]:
       [H_{(ℤ,zs)} = {0}], [H_{(Fin n, zs)} = nℤ] (the standard [n]-cycle is
       the [n]-th root of the trivial cycle), and [H_{ᵐ√t} = mH_t].
-    - [X/m] ([Xm]) and lemma [lem:X-mod-m-chosen] ([X_mod_m_chosen]).
+    - [X/m] ([Xm]) and lemma [lem:X-mod-m-chosen] ([X_mod_m_chosen]), as in
+      the book by Euclidean division: [euclid_div_Sk] for surjectivity, and
+      its uniqueness [euclid_unique_Sk] for [small_diff].
 
     - The identification of [ρ_m] with the degree [m] map,
       [ρ_m c = c dg_m] as maps [S1 → InfCyc] ([root_degree_square]), and
@@ -225,41 +227,23 @@ Section RootPowers.
   (** Lemma [lem:m-root-id]: if [(ᵐ√t)^n = id] (and [X] is nonempty), then
       [n = mq] with [t^q = id]; and conversely.
     (Placed before [lem:deg-m-on-Cyc], which uses it.) *)
-  Definition root_id_nat (a : ℕ) (x0 : X) (h : tpow Rt (iplus a) = idmap)
-    : {q : ℕ & (a = S k * q)%nat × (tpow t (iplus q) = idmap)}.
-  Proof.
-    pose (q := (a / S k)%nat). pose (r := (a mod S k)%nat).
-    pose (lr := nat_mod_lt_r a (S k) _ : (r < S k)%nat).
-    assert (ea : (a = S k * q + r)%nat) by exact (nat_div_mod_spec a (S k)).
-    assert (E : forall x, tpow Rt (iplus a) (fn0 k; x) = (((r; lr) : FN k); tpow t (iplus q) x)).
-    { intro x. refine (ap (fun n => nat_iter n (root k (fst t)) (fn0 k; x)) ea @ _).
-      refine (nat_iter_add _ _ _ _ @ _).
-      refine (ap (fun w => nat_iter (S k * q)%nat (root k (fst t)) w)
-                (root_up k (fst t) r 0%nat (leq_succ (leq_zero_l k)) lr x) @ _).
-      exact (root_pow_nat r lr q x). }
-    assert (r0 : r = 0%nat).
-    { exact (ap (fun w : FN k × X => fst (fst w)) ((E x0)^ @ ptw h _)). }
-    refine (q; (ea @ ap (fun s => (S k * q + s)%nat) r0 @ nat_add_zero_r _; _)).
-    apply ptw_inv. intro x.
-    exact (ap (fun w : FN k × X => snd w) ((E x)^ @ ptw h _)).
-  Defined.
-
   Definition m_root_id (n : ℤ) (x0 : X) (h : tpow Rt n = idmap)
     : Ex (fun q : ℤ => (n = zmul (iplus (S k)) q) × (tpow t q = idmap)).
   Proof.
-    revert n h.
-    refine (ℤ_ind_prop (fun n => tpow Rt n = idmap -> _) (fun n => fun_isProp ptrunc_isProp) _ _).
-    - intros a h. destruct (root_id_nat a x0 h) as [q [ea hq]].
-      exact (trunc (iplus q; (ap iplus ea @ iplus_mul (S k) q; hq))).
-    - intros [a] h.
-      assert (h' : tpow Rt (iplus a) = idmap).
-      { apply ptw_inv. intro w.
-        exact (ap (tpow Rt (iplus a)) (ptw h w)^ @ tpow_neg sFX Rt (iminus (negN a)) w). }
-      destruct (root_id_nat a x0 h') as [q [ea hq]].
-      refine (trunc (zneg (iplus q); (_ ; _))).
-      + exact (ap zneg (ap iplus ea @ iplus_mul (S k) q) @ (zmul_neg _ _)^).
-      + apply ptw_inv. intro y.
-        exact (ap (tpow t (zneg (iplus q))) (ptw hq y)^ @ tpow_neg sX t _ y).
+    destruct (euclid_div_Sk n k) as [q [r [lr en]]].
+    (* [(ᵐ√t)^{qm+r}(0, x) = (r, t^q(x))] *)
+    assert (E : forall x, tpow Rt n (fn0 k; x) = (((r; lr) : FN k); tpow t q x)).
+    { intro x. refine (ap (fun w => tpow Rt w (fn0 k; x)) en @ tpow_add sFX Rt _ _ _ @ _).
+      refine (ap (tpow Rt (iplus r))
+                (ap (fun w => tpow Rt w (fn0 k; x)) (zmul_comm q (iplus (S k)))
+                 @ root_pow q (fn0 k; x)) @ _).
+      exact (root_up k (fst t) r 0%nat (leq_succ (leq_zero_l k)) lr (tpow t q x)). }
+    assert (r0 : r = 0%nat).
+    { exact (ap (fun w : FN k × X => fst (fst w)) ((E x0)^ @ ptw h _)). }
+    refine (trunc (q; (en @ ap (fun s => zadd (zmul q (iplus (S k))) (iplus s)) r0
+                       @ zmul_comm _ _; _))).
+    apply ptw_inv. intro x.
+    exact (ap (fun w : FN k × X => snd w) ((E x)^ @ ptw h _)).
   Defined.
 
   Definition m_root_id_conv (q : ℤ) (hq : tpow t q = idmap)
@@ -719,62 +703,19 @@ Proof.
   exact (ap011 int_add (toInt_zmul a b)^ (toInt_zmul a c)^ @ (toInt_zadd _ _)^).
 Defined.
 
-Definition neg_normal (k a : ℕ)
-  : zadd (iplus (k * a)%nat) (zmul (iplus (S k)) (zneg (iplus a))) = iminus (negN a).
-Proof.
-  apply (toInt_inj (y := iminus (negN a))).
-  rewrite toInt_zadd, toInt_zmul, toInt_zneg.
-  change (int_add (int_of_nat (k * a)%nat)
-            (int_mul (int_of_nat (S k)) (int_neg (int_of_nat a))) = int_neg (int_of_nat a)).
-  rewrite int_mul_neg_r, (int_nat_mul (S k) a).
-  change (int_add (int_of_nat (k * a)%nat) (int_neg (int_of_nat (a + k * a)%nat))
-          = int_neg (int_of_nat a)).
-  rewrite <- (int_nat_add a (k * a)%nat), int_neg_add.
-  rewrite int_add_assoc, (int_add_comm (int_of_nat (k * a)%nat) (int_neg (int_of_nat a))).
-  rewrite <- int_add_assoc, int_add_neg_r, int_add_0_r. exact refl.
-Defined.
-
-Definition int_sub_eq (x y z : Int) (e : int_add x (int_neg y) = z) : x = int_add z y.
-Proof. destruct e. rewrite <- int_add_assoc, int_add_neg_l, int_add_0_r. exact refl. Defined.
-
 (** If [i, j < m] and [i - j = mu], then [i = j]. *)
-Section SmallDiff.
-
-  Context `{Funext} (k : ℕ).
-
-  Definition small_diff_pos (i j v : ℕ) (li : (i < S k)%nat)
-    (e : zadd (iplus i) (zneg (iplus j)) = zmul (iplus (S k)) (iplus (S v))) : Empty.
-  Proof.
-    pose (e' := ap toInt e).
-    rewrite toInt_zadd, toInt_zmul, toInt_zneg in e'.
-    pose (e2 := int_sub_eq _ _ _ e'). cbn in e2.
-    rewrite (int_nat_mul (S k) (S v)), (int_nat_add (S k * S v)%nat j) in e2.
-    pose (e3 := int_of_nat_inj e2 : i = (S k * S v + j)%nat).
-    assert (le : (S k <= i)%nat).
-    { rewrite e3, nat_mul_succ_r.
-      exact (leq_trans (leq_add_l (S k) (S k * v)%nat) (leq_add_r _ j)). }
-    exact (lt_irrefl _ (leq_trans li le)).
-  Defined.
-
-  Definition small_diff (i j : ℕ) (li : (i < S k)%nat) (lj : (j < S k)%nat) (u : ℤ)
-    (e : zadd (iplus i) (zneg (iplus j)) = zmul (iplus (S k)) u) : i = j.
-  Proof.
-    revert u e.
-    refine (ℤ_ind_prop (fun u => zadd (iplus i) (zneg (iplus j)) = zmul (iplus (S k)) u -> i = j)
-              (fun u => fun_isProp (ℕ_isSet _ _)) _ _).
-    - intros [|v] e.
-      + pose (e' := ap toInt e). rewrite toInt_zadd, toInt_zneg in e'.
-        exact (int_of_nat_inj (int_sub_eq _ _ _ e')).
-      + destruct (small_diff_pos i j v li e).
-    - intros [[|v]] e.
-      + pose (e' := ap toInt e). rewrite toInt_zadd, toInt_zneg in e'.
-        exact (int_of_nat_inj (int_sub_eq _ _ _ e')).
-      + refine (match small_diff_pos j i v lj _ with end).
-        refine ((zsub_neg (iplus i) (iplus j))^ @ ap zneg e @ _).
-        refine ((zmul_neg _ _)^ @ _). exact refl.
-  Defined.
-
-End SmallDiff.
+Definition small_diff (k i j : ℕ) (li : (i < S k)%nat) (lj : (j < S k)%nat) (u : ℤ)
+  (e : zadd (iplus i) (zneg (iplus j)) = zmul (iplus (S k)) u) : i = j.
+Proof.
+  refine (snd (euclid_unique_Sk (iplus 0) u i j li lj _)).
+  apply toInt_inj.
+  refine (toInt_zadd _ _ @ ap (fun t => int_add t _) (toInt_zmul _ _) @ _
+          @ (toInt_zadd _ _)^).
+  refine (_ @ ap (fun t => int_add t _)
+                (ap toInt e @ toInt_zmul _ _ @ int_mul_comm _ _ @ (toInt_zmul u _)^)).
+  rewrite toInt_zadd, toInt_zneg, <- int_add_assoc, int_add_neg_l, int_add_0_r.
+  exact refl.
+Defined.
 
 (** The set [X/m :≡ X/∼_m], with [x ∼_m x'] iff [x' = t^{mr}(x)] for some
     [r : ℤ], and lemma [lem:X-mod-m-chosen]. *)
@@ -824,24 +765,12 @@ Section XmodM.
   Proof.
     refine (im_ind simm _ (fun _ => ptrunc_isProp) _). intro x.
     refine (ptrunc_rec ptrunc_isProp _ (snd cy x0 x)). intros [n en].
-    (* a nonnegative exponent [a] with [t^a(x₀) ∼_m t^n(x₀)] *)
-    assert (A : Ex (fun a : ℕ => fst (simm (tpow t (iplus a) x0) (tpow t n x0)))).
-    { revert n en. refine (ℤ_ind_prop (fun n => _ -> _) (fun n => fun_isProp ptrunc_isProp) _ _).
-      - intros a _. exact (trunc (a; simm_refl _)).
-      - intros [a] _. refine (trunc ((k * a)%nat; trunc (zneg (iplus a); _))).
-        refine (ap (fun w => tpow t w x0) (neg_normal k a)^ @ _).
-        exact (tpow_add sX t _ _ x0). }
-    refine (ptrunc_rec ptrunc_isProp _ A). intros [a ha].
-    pose (q := (a / S k)%nat). pose (r := (a mod S k)%nat).
-    pose (lr := nat_mod_lt_r a (S k) _ : (r < S k)%nat).
+    destruct (euclid_div_Sk n k) as [q [r [lr e]]].
     refine (trunc (((r; lr) : FN k); _)).
     apply (snd (clsm_iff _ _)).
-    refine (simm_trans x (tpow t (iplus a) x0) _ _ _).
-    - exact (simm_sym _ _ (simm_trans _ _ _ ha (trunc (iplus 0; en)))).
-    - refine (simm_sym _ _ (trunc (iplus q; _))).
-      refine (ap (fun b => nat_iter b (fst t) x0) (nat_div_mod_spec a (S k)) @ _).
-      refine (nat_iter_add _ _ _ _ @ _).
-      exact (ap (fun w => tpow t w _) (iplus_mul (S k) q)).
+    refine (simm_sym _ _ (trunc (q; en @ _))).
+    refine (ap (fun w => tpow t w x0) (e @ zadd_comm _ _) @ _).
+    exact (tpow_add sX t _ _ x0 @ ap (fun w => tpow t w _) (zmul_comm q (iplus (S k)))).
   Defined.
 
   Definition fXm_inj (hP : Pdiv) (x0 : X) : isInj (fXm x0).
