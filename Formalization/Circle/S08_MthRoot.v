@@ -31,8 +31,8 @@
       [ρ_m : Cyc_n →* Cyc_{mn}] ([rho_Cyc0], [rho_Cyc0_pt], [rho_Cycm],
       [rho_Cycm_pt]).  Instead of the book's explicit equivalence
       [φ(k, r) :≡ k + mr], the identifications come from [lem:IdCycle]:
-      [H_{(ℤ,zs)} = {0}], [H_{(Fin n, zs)} = nℤ] (the standard [n]-cycle is
-      the [n]-th root of the trivial cycle), and [H_{ᵐ√t} = mH_t].
+      [H_{(ℤ,zs)} = {0}], [H_{(Fin n, zs)} = nℤ] ([Hc_Z], [Hc_Fin], from
+      3.6), and [H_{ᵐ√t} = mH_t].
     - [X/m] ([Xm]) and lemma [lem:X-mod-m-chosen] ([X_mod_m_chosen]), as in
       the book by Euclidean division: [euclid_div_Sk] for surjectivity, and
       its uniqueness [euclid_unique_Sk] for [small_diff].
@@ -359,15 +359,6 @@ Section DegMOnCyc.
       × (Ex (fun q => (n = zmul (iplus (S k)) q) × fst (Hc c q)) -> fst (Hc (rho_cyc c) n))
     := Ht_root k (snd (fst c)) (fst (snd c)) (snd (snd c)) n.
 
-  Definition zadd_0_l (n : ℤ) : zadd (iplus 0) n = n
-    := toInt_inj (y := n) (toInt_zadd (iplus 0) n).
-
-  (** [H] of the infinite cycle [(ℤ, zs)] is [{0}]. *)
-  Definition Hc_Z (n : ℤ) : (fst (Hc Zcyc n) -> n = iplus 0) × (n = iplus 0 -> fst (Hc Zcyc n))
-    := (fun h => (zadd_0_l n)^ @ ptw h (iplus 0);
-        fun e : n = iplus 0 => trp (fun w => fst (Hc Zcyc w)) e^
-                                  (refl : fst (Hc Zcyc (iplus 0)))).
-
   Definition Hiff_rho_Z : Hiffc (rho_cyc Zcyc) Zcyc.
   Proof.
     intro n. refine (fun h => _; fun h => _).
@@ -389,73 +380,8 @@ Section DegMOnCyc.
     := path_sigma_prop (fun _ => ptrunc_isProp) (u := rho_Cyc0 (Zcyc; trunc refl))
          (v := (Zcyc; trunc refl)) rho_Z_path.
 
-  (** The trivial cycle [(𝟙, id)], whose [H] is all of [ℤ]. *)
-  Definition tpow_id {X : Type} (sX : isSet X) (n : ℤ) (x : X) : tpow (idEqv X) n x = x.
-  Proof.
-    revert n. refine (ℤ_ind_prop _ (fun n => sX _ _) _ _).
-    - intro j. induction j as [|j IH]; [exact refl | exact IH].
-    - intros [j]. induction j as [|j IH]; [exact refl|].
-      exact (eqinv_l (snd (idEqv X)) _ @ IH).
-  Defined.
-
-  Definition True_isSet : isSet True := prop_is_set True_isProp.
-
-  Definition unit_isCycle : isCycle (idEqv True)
-    := (trunc tt; fun x x' => trunc (iplus 0; True_isProp _ _)).
-
-  Definition unitcyc : Cyc := ((True; True_isSet); (idEqv True; unit_isCycle)).
-
-  (** The standard [m]-cycle on [∑_i (i < m)] is the [m]-th root of the
-      trivial cycle, so its [H] is [mℤ]. *)
-  Definition fn_root_eqv : FinNat (S k) ≃ (FN k × True)
-    := mkEqv (fun i => ((i; tt) : FN k × True)) fst (fun i => refl)
-             (fun w => match w with (i; tt) => refl end).
-
-  Definition fn_root_comm (i : FinNat (S k))
-    : fst fn_root_eqv (fs k i) = root k idmap (fst fn_root_eqv i).
-  Proof.
-    destruct i as [i l]. unfold fs, root. cbn.
-    destruct (dec (i < k)%nat); exact refl.
-  Defined.
-
-  Definition Hc_FinNat (n : ℤ)
-    : (fst (Ht (FinNat_isSet k) (fsEqv k) n) -> Ex (fun q => n = zmul (iplus (S k)) q))
-      × (Ex (fun q => n = zmul (iplus (S k)) q) -> fst (Ht (FinNat_isSet k) (fsEqv k) n)).
-  Proof.
-    pose (e := fn_root_eqv).
-    pose (to := Ht_transfer (FinNat_isSet k) (sFX k True_isSet) (fsEqv k) (Rt k (idEqv True)) e
-                  fn_root_comm n).
-    pose (back := Ht_transfer (sFX k True_isSet) (FinNat_isSet k) (Rt k (idEqv True)) (fsEqv k)
-                    (Eqv_inv e) (inv_comm (fsEqv k) (Rt k (idEqv True)) e fn_root_comm) n).
-    refine (fun h => _; fun h => back _).
-    - refine (ptrunc_rec ptrunc_isProp _ (fst (Hc_rho unitcyc n) (to h))).
-      intros [q [eq _]]. exact (trunc (q; eq)).
-    - apply (snd (Hc_rho unitcyc n)).
-      refine (ptrunc_rec ptrunc_isProp _ h). intros [q eq].
-      exact (trunc (q; (eq; ptw_inv (tpow_id True_isSet q)))).
-  Defined.
-
 End DegMOnCyc.
 
-Section HcFinSec.
-
-  Context `{Univalence} (j : ℕ).
-
-  (** [H] of the standard [n]-cycle [(Fin n, zs)] is [nℤ]. *)
-  Definition Hc_Fin (n : ℤ)
-    : (fst (Hc (Fincyc j) n) -> Ex (fun q => n = zmul (iplus (S j)) q))
-      × (Ex (fun q => n = zmul (iplus (S j)) q) -> fst (Hc (Fincyc j) n)).
-  Proof.
-    pose (e := Eqv_of_Equiv (equiv_fin_finnat (S j))).
-    assert (he : forall x, fst e (fst (finsuccEqv j) x) = fst (fsEqv j) (fst e x))
-      by (intro x; exact (eqinv_r (snd e) _)).
-    pose (to := Ht_transfer (Fin_isSet (S j)) (FinNat_isSet j) (finsuccEqv j) (fsEqv j) e he n).
-    pose (back := Ht_transfer (FinNat_isSet j) (Fin_isSet (S j)) (fsEqv j) (finsuccEqv j)
-                    (Eqv_inv e) (inv_comm (finsuccEqv j) (fsEqv j) e he) n).
-    exact (fun h => fst (Hc_FinNat j n) (to h); fun h => back (snd (Hc_FinNat j n) h)).
-  Defined.
-
-End HcFinSec.
 
 Section DegMOnCycN.
 

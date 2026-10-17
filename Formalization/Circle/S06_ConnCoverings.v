@@ -35,8 +35,29 @@
       [(ℤ/∼_H, zs)] with [H_t = H]).
     - [def:Order] ([Order], [ord], [HO], [divides]); [(ℤ, zs)] and the
       standard [m]-cycles are cycles, giving the principal orders.
+    - After [def:Order], principal orders as subsets of [ℤ]: [H] of
+      [(ℤ, zs)] is [{0}] ([Hc_Z]) and [H] of the standard [m]-cycle is [mℤ]
+      ([Hc_FinNat], [Hc_Fin]), from the criterion [Ht_mult]: if
+      [t^m(x₀) = x₀] and no [0 < r < m] has [t^r(x₀) = x₀], then
+      [H_t = mℤ], by Euclidean division ([xca:euclid-div-Z]).  (Moved here
+      from 3.8, where they were derived via [m]-th roots.)
     - The Limited Principle of Omniscience ([LPO]), [LEM → LPO]
       ([LEM_LPO]) and exercise [xca:not-not-lpoP].
+    - [lem:componentsofcoversofS1] ([lem_componentsofcoversofS1]): under
+      LPO, [ConnDecCovS1 ≃ component(R) ⨿ ∑_m component(R_m)].  As in the
+      book: a connected covering [C] gives a cycle [(X, t)]
+      ([conn_cycE], via [thm:cycset-connS1cover] and [gU]); with [x₀ : X]
+      (we prove a proposition) LPO is applied to [P(n) :≡ (t^{n+1}(x₀) =
+      x₀)], decidable since [X] is.  If [P] is constantly [0], then
+      [H_t = {0}], otherwise [H_t = mℤ] for the least [m]; by
+      [lem:IdCycle] the cycle is then merely identified with [(ℤ, zs)] or
+      [(Fin m, zs)], and identifications of the underlying [Endo]s give
+      identifications of coverings ([endo_cov_path], through [gSet]).  For
+      the equivalence we also show what the book leaves implicit: the
+      components are disjoint ([Bc_isProp]: [m ∈ H] distinguishes [R]
+      from [R_m] ([RSet_ne_Rm]), and [Fin m = Fin m'] gives [m = m']), and
+      [R] and [R_m] are connected and decidable ([ConnDec_RSet],
+      [ConnDec_Rm]).
     - Remark [rem:flipthecircle]: [(S1, r) = (S1, id)] as coverings, via
       the general [(A, f e) = (A', f)] for an equivalence [e].
     - Functoriality: the function underlying a composite identification
@@ -50,9 +71,6 @@
       instance of [ConnCycles], and the compatibility with [zs] follows
       from [endo_fun_concat]; the instantiation at [Fin m] ran into
       universe constraints and was not finished.
-    - [lem:componentsofcoversofS1] ([lem_componentsofcoversofS1_stmt],
-      with [ConnDecCovS1]), which needs Euclidean division on [ℤ] and the
-      computation of [H] for the standard cycles.
  *)
 
 From HoTT Require Import
@@ -732,6 +750,100 @@ End FinIsCycle.
 Definition principal_order `{Univalence} (n : ℕ) : Order
   := match n with O => ord Zcyc | S k => ord (Fincyc k) end.
 
+(** After [def:Order]: a principal order [d] is simply [dℤ], as a subset
+    of [ℤ]; we compute [H] for [(ℤ, zs)] and for the standard [m]-cycles. *)
+Definition zadd_0_l (n : ℤ) : zadd (iplus 0) n = n
+  := toInt_inj (y := n) (toInt_zadd (iplus 0) n).
+
+(** [H] of the infinite cycle [(ℤ, zs)] is [{0}]. *)
+Definition Hc_Z `{Univalence} (n : ℤ)
+  : (fst (Hc Zcyc n) -> n = iplus 0) × (n = iplus 0 -> fst (Hc Zcyc n))
+  := (fun h => (zadd_0_l n)^ @ ptw h (iplus 0);
+      fun e : n = iplus 0 => trp (fun w => fst (Hc Zcyc w)) e^
+                                (refl : fst (Hc Zcyc (iplus 0)))).
+
+(** If [t^m(x₀) = x₀] for [m = k+1], and [t^r(x₀) = x₀] with [r < m]
+    only for [r = 0], then [H_t = mℤ]; by Euclidean division. *)
+Section HtMult.
+
+  Context `{Univalence} {X : Type} (sX : isSet X) (t : X ≃ X) (cy : isCycle t)
+    (x0 : X) (k : ℕ) (hm : tpow t (iplus (S k)) x0 = x0)
+    (hr : forall r : ℕ, (r < S k)%nat -> tpow t (iplus r) x0 = x0 -> r = 0%nat).
+
+  Definition Ht_mul (q : ℤ) : fst (Ht sX t (zmul (iplus (S k)) q)).
+  Proof.
+    pose (hM := snd (Ht_point sX t cy x0 (iplus (S k))) hm).
+    revert q. refine (ℤ_ind_prop _ (fun q => snd (Ht sX t _)) _ _).
+    - intro j. induction j as [|j IH].
+      + exact (fst (fst (Ht_subgroup sX t))).
+      + exact (snd (fst (Ht_subgroup sX t)) _ _ hM IH).
+    - intros [j].
+      assert (hj : fst (Ht sX t (zmul (iplus (S k)) (iplus j)))).
+      { induction j as [|j IH].
+        + exact (fst (fst (Ht_subgroup sX t))).
+        + exact (snd (fst (Ht_subgroup sX t)) _ _ hM IH). }
+      refine (trp (fun w => fst (Ht sX t w)) _ (snd (Ht_subgroup sX t) _ hj)).
+      apply toInt_inj.
+      refine (toInt_zneg _ @ ap int_neg (toInt_zmul _ _) @ (int_mul_neg_r (toInt (iplus (S k))) (toInt (iplus j)))^
+              @ (toInt_zmul (iplus (S k)) (iminus (negN j)))^).
+  Defined.
+
+  Definition Ht_mult (n : ℤ)
+    : (fst (Ht sX t n) -> Ex (fun q => n = zmul (iplus (S k)) q))
+      × (Ex (fun q => n = zmul (iplus (S k)) q) -> fst (Ht sX t n)).
+  Proof.
+    refine (fun h => _; ptrunc_rec (snd (Ht sX t n))
+                          (fun w => trp (fun v => fst (Ht sX t v)) (snd w)^ (Ht_mul (fst w)))).
+    destruct (euclid_div_Sk n k) as [q [r [lr en]]].
+    assert (er : tpow t (iplus r) x0 = x0).
+    { refine (ap (tpow t (iplus r)) (ptw (Ht_mul q) x0)^ @ _).
+      refine ((tpow_add sX t _ _ x0)^ @ _).
+      refine (ap (fun w => tpow t w x0) (ap (fun w => zadd w (iplus r)) (zmul_comm _ _) @ en^) @ _).
+      exact (fst (Ht_point sX t cy x0 n) h). }
+    pose (r0 := hr r lr er).
+    exact (trunc (q; en @ ap (fun s => zadd (zmul q (iplus (S k))) (iplus s)) r0
+                     @ zmul_comm _ _)).
+  Defined.
+
+End HtMult.
+
+(** [H] of the standard [m]-cycle, [m = k+1], is [mℤ]. *)
+Section HcFin.
+
+  Context `{Univalence} (k : ℕ).
+
+  Definition fs_last : fs k (k; leq_refl (S k)) = fn0 k.
+  Proof.
+    unfold fs; cbn. destruct (dec (k < k)%nat) as [l|nl].
+    - destruct (lt_irrefl k l).
+    - apply (path_sigma_prop (fn_isProp_lt k)). exact refl.
+  Defined.
+
+  Definition Hc_FinNat (n : ℤ)
+    : (fst (Ht (FinNat_isSet k) (fsEqv k) n) -> Ex (fun q => n = zmul (iplus (S k)) q))
+      × (Ex (fun q => n = zmul (iplus (S k)) q) -> fst (Ht (FinNat_isSet k) (fsEqv k) n)).
+  Proof.
+    refine (Ht_mult (FinNat_isSet k) (fsEqv k) (FinNat_isCycle k) (fn0 k) k _ _ n).
+    - change (fs k (tpow (fsEqv k) (iplus k) (fn0 k)) = fn0 k).
+      exact (ap (fs k) (fs_iter k k (leq_refl (S k))) @ fs_last).
+    - intros r lr e. exact (ap fst ((fs_iter k r lr)^ @ e)).
+  Defined.
+
+  Definition Hc_Fin (n : ℤ)
+    : (fst (Hc (Fincyc k) n) -> Ex (fun q => n = zmul (iplus (S k)) q))
+      × (Ex (fun q => n = zmul (iplus (S k)) q) -> fst (Hc (Fincyc k) n)).
+  Proof.
+    pose (e := Eqv_of_Equiv (equiv_fin_finnat (S k))).
+    assert (he : forall x, fst e (fst (finsuccEqv k) x) = fst (fsEqv k) (fst e x))
+      by (intro x; exact (eqinv_r (snd e) _)).
+    pose (to := Ht_transfer (Fin_isSet (S k)) (FinNat_isSet k) (finsuccEqv k) (fsEqv k) e he n).
+    pose (back := Ht_transfer (FinNat_isSet k) (Fin_isSet (S k)) (fsEqv k) (finsuccEqv k)
+                    (Eqv_inv e) (inv_comm (finsuccEqv k) (fsEqv k) e he) n).
+    exact (fun h => fst (Hc_FinNat n) (to h); fun h => back (snd (Hc_FinNat n) h)).
+  Defined.
+
+End HcFin.
+
 (** Corollary [cor:set-trunc-cyc], second half, and [def:standard-cycle]:
     for [H ⊆ ℤ] containing [0] and closed under addition and negation, the
     cycle [(ℤ/∼_H, zs)], with [z ∼_H z'] iff [z - z' ∈ H], has [H_t = H].
@@ -940,15 +1052,206 @@ Proof.
 Defined.
 
 
-(** Lemma [lem:componentsofcoversofS1] (statement only): under LPO, the
-    connected decidable coverings of the circle are the component of the
-    universal covering and those of the [m]-fold coverings. *)
 Definition ConnDecCovS1 : Type
   := {E : S1 -> SetU & isConn {z : S1 & fst (E z)} × (forall z, isDecSet (fst (E z)))}.
 
-Definition lem_componentsofcoversofS1_stmt `{Univalence} : Type
-  := LPO -> ConnDecCovS1 ≃ (component (S1 -> SetU) RSet
-                             ⨿ {k : ℕ & component (S1 -> SetU) (fun z => (Rm k z; Rm_isSet k z))}).
+(** Lemma [lem:componentsofcoversofS1]: under LPO, the connected
+    decidable coverings of the circle are the component of the universal
+    covering and those of the [m]-fold coverings. *)
+Section ComponentsOfCoversOfS1.
+
+  Context `{Univalence}.
+
+  (** The cycle [(E(base), trp^E_loop)] of a covering [E : S1 → Set]
+      ([gSet] of [thm:coveringsofS1perms]), and its underlying [Endo]. *)
+  Definition cycE (E : S1 -> SetU) : {X : SetU & fst X ≃ fst X} := fst gSet E.
+
+  Definition endoE (E : S1 -> SetU) : Endo := (fst (fst (cycE E)); fst (snd (cycE E))).
+
+  (** An identification of the underlying [Endo]s gives one of coverings. *)
+  Definition endo_lift {X : Type} {t : X -> X} (w : Endo) (q : ((X; t) : Endo) = w)
+    (sX : isSet X) (te : isEquiv t) (sY : isSet (fst w)) (ue : isEquiv (snd w))
+    : (((X; sX); (t; te)) : {X : SetU & fst X ≃ fst X}) = ((fst w; sY); (snd w; ue)).
+  Proof.
+    destruct q.
+    exact (ap (fun v : isSet X × isEquiv t => ((X; fst v); (t; snd v)) : {X : SetU & fst X ≃ fst X})
+              (prod_isProp (isSet_isProp _) (isEquiv_isProp _) (sX; te) (sY; ue))).
+  Defined.
+
+  Definition endo_cov_path {E E' : S1 -> SetU} (p : endoE E = endoE E') : E = E'
+    := Eqv_inj gSet (x := E) (x' := E') (endo_lift (endoE E') p (snd (fst (cycE E))) (snd (snd (cycE E)))
+                       (snd (fst (cycE E'))) (snd (snd (cycE E')))).
+
+  (** For the coverings [E_t(base) :≡ X], [E_t(loop) :≡ etop(t)] of
+      [con:cycset-connS1cover], the cycle is [(X, t)]. *)
+  Definition EV {X : Type} (t : X ≃ X) (s : forall z, isSet (E t z)) : S1 -> SetU
+    := fun z => (E t z; s z).
+
+  Definition endoE_EV {X : Type} (t : X ≃ X) (s : forall z, isSet (E t z))
+    : endoE (EV t s) = (X; fst t).
+  Proof.
+    apply (ap (fun f => (X; f) : Endo)).
+    exact (ap (fun r => fst (idtoeqv r)) ((ap_compose (EV t s) fst loop)^
+                                          @ S1_rec_loop Type X (etop t))
+           @ ap fst (ptoe_etop t)).
+  Defined.
+
+  (** A connected covering gives a cycle ([thm:cycset-connS1cover]). *)
+  Definition conn_cycE (C : S1 -> SetU) (c : isConn {z : S1 & fst (C z)})
+    : isCycle (snd (cycE C)).
+  Proof.
+    pose (t := snd (cycE C)).
+    assert (F : (fun z => fst (C z)) = E t).
+    { apply (Eqv_inj gU).
+      refine (ap (fun e => (fst (C base); e) : {X : Type & X ≃ X}) _).
+      exact (ap idtoeqv (ap_compose C fst loop) @ (ptoe_etop t)^
+             @ ap idtoeqv (S1_rec_loop Type _ (etop t))^). }
+    exact (conn_isCycle (snd (fst (cycE C))) t
+             (trp (fun S : S1 -> Type => isConn {z : S1 & S z}) F c)).
+  Defined.
+
+  Definition RmSet (k : ℕ) : S1 -> SetU := fun z => (Rm k z; Rm_isSet k z).
+
+  Definition ConnDec (E : S1 -> SetU) : Type
+    := isConn {z : S1 & fst (E z)} × (forall z, isDecSet (fst (E z))).
+
+  Definition ConnDec_isProp (E : S1 -> SetU) : isProp (ConnDec E)
+    := prod_isProp (prod_isProp ptrunc_isProp
+                      (Pi_isProp (fun _ => Pi_isProp (fun _ => ptrunc_isProp))))
+         (Pi_isProp (fun z => isDecSet_isProp _)).
+
+  Definition ConnDec_RSet : ConnDec RSet
+    := (isCycle_conn ℤ_isSet zsEqv Z_isCycle;
+        S1_ind_prop (fun z => isDecSet (R z)) (fun z => isDecSet_isProp _) ℤ_isDecSet).
+
+  Definition ConnDec_Rm (k : ℕ) : ConnDec (RmSet k)
+    := (isCycle_conn (Fin_isSet (S k)) (finsuccEqv k) (Fin_isCycle k);
+        S1_ind_prop (fun z => isDecSet (Rm k z)) (fun z => isDecSet_isProp _)
+          (Fin_isDecSet (S k))).
+
+  (** Cycles with the same [H] give merely identified coverings
+      ([lem:IdCycle]). *)
+  Definition cov_merely (C : S1 -> SetU) (cC : isCycle (snd (cycE C)))
+    {Y : Type} (sY : isSet Y) (u : Y ≃ Y) (cY : isCycle u)
+    (hH : Hiff (snd (fst (cycE C))) sY (snd (cycE C)) u)
+    (D : S1 -> SetU) (eD : endoE D = (Y; fst u))
+    : ptrunc (D = C)
+    := ptrunc_rec ptrunc_isProp (fun p => trunc (endo_cov_path (eD @ p^)))
+         (IdCycle_31 _ u cC cY (IdCycle_23 _ sY _ u cC cY hH)).
+
+  Definition endoE_RSet : endoE RSet = (ℤ; fst zsEqv) := endoE_EV zsEqv R_isSet.
+
+  Definition endoE_Rm (k : ℕ) : endoE (RmSet k) = (Fin (S k); fst (finsuccEqv k))
+    := endoE_EV (finsuccEqv k) (Rm_isSet k).
+
+  (** The universal covering is not an [m]-fold covering: [m ∈ H] for the
+      latter, but not for the former. *)
+  Definition RSet_ne_Rm (k : ℕ) (p : RSet = RmSet k) : False.
+  Proof.
+    pose (hH := IdCycle_12 ℤ_isSet (Fin_isSet (S k)) zsEqv (finsuccEqv k)
+                  (trunc (endoE_RSet^ @ ap endoE p @ endoE_Rm k))).
+    pose (h := snd (hH (iplus (S k))) (snd (Hc_Fin k (iplus (S k))) (trunc (iplus 1; refl)))).
+    exact (zero_ne_succ k (iplus_inj (fst (Hc_Z (iplus (S k))) h))^).
+  Defined.
+
+  Definition Bc (C : S1 -> SetU) : Type
+    := ptrunc (RSet = C) ⨿ {k : ℕ & ptrunc (RmSet k = C)}.
+
+  Definition Bc_isProp (C : S1 -> SetU) : isProp (Bc C).
+  Proof.
+    intros [a|[k a]] [b|[k' b]].
+    - exact (ap inl (ptrunc_isProp _ _)).
+    - refine (match _ : False with end).
+      refine (ptrunc_rec False_isProp _ a). intro p.
+      refine (ptrunc_rec False_isProp _ b). intro q.
+      exact (RSet_ne_Rm k' (p @ q^)).
+    - refine (match _ : False with end).
+      refine (ptrunc_rec False_isProp _ a). intro p.
+      refine (ptrunc_rec False_isProp _ b). intro q.
+      exact (RSet_ne_Rm k (q @ p^)).
+    - assert (e : k = k').
+      { refine (ptrunc_rec (ℕ_isSet _ _) _ a). intro p.
+        refine (ptrunc_rec (ℕ_isSet _ _) _ b). intro q.
+        exact (ap nat_pred (Fin_paths_eq (ap (fun D : S1 -> SetU => fst (D base)) (p @ q^)))). }
+      destruct e. exact (ap (fun w => inr (k; w)) (ptrunc_isProp _ _)).
+  Defined.
+
+  Definition ConnDec_Bc (C : S1 -> SetU) (b : Bc C) : ConnDec C
+    := match b with
+       | inl a => ptrunc_rec (ConnDec_isProp C) (fun p => trp ConnDec p ConnDec_RSet) a
+       | inr (k; a) => ptrunc_rec (ConnDec_isProp C) (fun p => trp ConnDec p (ConnDec_Rm k)) a
+       end.
+
+  (** Booleans from decisions. *)
+  Definition bdec {A : Type} (d : isDecidable A) : Bool
+    := match d with inl _ => yes | inr _ => no end.
+
+  Definition bdec_yes {A : Type} (d : isDecidable A) : bdec d = yes -> A
+    := match d with
+       | inl a => fun _ => a
+       | inr _ => fun e => match yes_ne_no e^ with end
+       end.
+
+  Definition yes_bdec {A : Type} (d : isDecidable A) (a : A) : bdec d = yes
+    := match d with inl _ => refl | inr n => match n a with end end.
+
+  (** The main step: by LPO, a connected decidable covering is merely the
+      universal covering, or merely an [m]-fold covering. *)
+  Definition Bc_ConnDec (lpo : LPO) (C : S1 -> SetU) (cd : ConnDec C) : Bc C.
+  Proof.
+    pose (sX := snd (fst (cycE C))). pose (t := snd (cycE C)).
+    pose (cy := conn_cycE C (fst cd)).
+    pose (dX := snd cd base : isDecSet (fst (fst (cycE C)))).
+    refine (ptrunc_rec (Bc_isProp C) _ (fst cy)). intro x0.
+    pose (Pb := fun n : ℕ => bdec (snd (dX (tpow t (iplus (S n)) x0) x0))).
+    destruct (lpo Pb) as [[n0 [p0 pmin]] | none].
+    - (* the least [m = n₀+1] with [t^m(x₀) = x₀]: [H_t = mℤ] *)
+      right. exists n0.
+      assert (hr : forall r : ℕ, (r < S n0)%nat -> tpow t (iplus r) x0 = x0 -> r = 0%nat).
+      { intros [|r] lr e; [exact refl|].
+        destruct (lt_irrefl r (leq_trans (leq_pred' lr)
+                                (le_leq (pmin r (yes_bdec _ e))))). }
+      pose (hM := Ht_mult sX t cy x0 n0 (bdec_yes _ p0) hr).
+      refine (cov_merely C cy (Fin_isSet (S n0)) (finsuccEqv n0) (Fin_isCycle n0) _
+                (RmSet n0) (endoE_Rm n0)).
+      intro n. exact (fun h => snd (Hc_Fin n0 n) (fst (hM n) h);
+                      fun h => snd (hM n) (fst (Hc_Fin n0 n) h)).
+    - (* no such [m]: [H_t = {0}] *)
+      left.
+      assert (H0 : forall n, fst (Ht sX t n) -> n = iplus 0).
+      { assert (pos : forall a, fst (Ht sX t (iplus (S a))) -> False).
+        { intros a h. apply yes_ne_no.
+          exact ((yes_bdec _ (fst (Ht_point sX t cy x0 _) h))^ @ none a). }
+        refine (ℤ_ind_prop _ (fun n => fun_isProp (ℤ_isSet _ _)) _ _).
+        - intros [|a] h; [exact refl | destruct (pos a h)].
+        - intros [[|a]] h; [exact zeq | destruct (pos a (snd (Ht_subgroup sX t) _ h))]. }
+      refine (cov_merely C cy ℤ_isSet zsEqv Z_isCycle _ RSet endoE_RSet).
+      intro n. refine (fun h => snd (Hc_Z n) (H0 n h); fun h => _).
+      exact (trp (fun w => fst (Ht sX t w)) (fst (Hc_Z n) h)^ (fst (fst (Ht_subgroup sX t)))).
+  Defined.
+
+  Definition CompT : Type
+    := component (S1 -> SetU) RSet ⨿ {k : ℕ & component (S1 -> SetU) (RmSet k)}.
+
+  Definition splitB (C : S1 -> SetU) (b : Bc C) : CompT
+    := match b with inl a => inl (C; a) | inr (k; a) => inr (k; (C; a)) end.
+
+  Definition lem_componentsofcoversofS1 (lpo : LPO) : ConnDecCovS1 ≃ CompT.
+  Proof.
+    refine (mkEqv (fun w => splitB (fst w) (Bc_ConnDec lpo (fst w) (snd w)))
+              (fun v => match v with
+                        | inl (C; a) => (C; ConnDec_Bc C (inl a))
+                        | inr (k; (C; a)) => (C; ConnDec_Bc C (inr (k; a)))
+                        end) _ _).
+    - intros [C cd]. change (fst (C; cd)) with C. change (snd (C; cd)) with cd.
+      destruct (Bc_ConnDec lpo C cd) as [a|[k a]];
+        (apply (path_sigma_prop ConnDec_isProp); exact refl).
+    - intros [[C a]|[k [C a]]].
+      + exact (ap (splitB C) (Bc_isProp C _ (inl a))).
+      + exact (ap (splitB C) (Bc_isProp C _ (inr (k; a)))).
+  Defined.
+
+End ComponentsOfCoversOfS1.
 
 (** Remark [rem:flipthecircle]: the orientation reversing map [r :≡ -id_S1]
     and [id_S1] give the same covering, since [r] is an equivalence. *)
