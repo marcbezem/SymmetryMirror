@@ -24,7 +24,21 @@
       These, and the inverse of [w ↦ z + w], are proved by comparing the
       operations with those of the library's [Int] ([toInt_zadd],
       [toInt_zmul]) and reusing its lemmas.
-    - The order [z ≤ y :≡ ∑_n (y = z + ι₊(n))], which extends [≤] on [ℕ].
+    - The order [z ≤ y :≡ ∑_n (y = z + ι₊(n))], which extends [≤] on [ℕ]
+      and is a proposition ([zle_isProp]), and [z < y :≡ s(z) ≤ y] ([zlt]).
+    - Exercise [xca:euclid-div-Z] ([euclid_div_Z]), stated as
+      contractibility of the type of [(q, r)] with [0 ≤ r < m] and
+      [n = qm + r], as for [lem:euclid-div].  It is proved on the library's
+      [Int] ([int_euclid_exists], [int_euclid_unique]): for [n ≥ 0] by
+      division on [ℕ]; for [n = -(b+1)] with [b = Qm + R] we take
+      [q :≡ -(Q+1)] and [r :≡ m - (R+1)], which avoids a case distinction
+      on [R = 0]; uniqueness by showing that [dm + r = r'] with
+      [r, r' < m] forces [d = 0].  It is placed after the order, since it
+      uses addition, multiplication and [<], and not right after
+      [def:zet] as in the book.  [int_of_nat_inj] moved here from 3.8.
+      NOTE for the book: "extends [lem:euclid-div] to from ℕ to ℤ" has a
+      stray "to"; and [<] on [ℤ] is only mentioned ("ordering relations"),
+      not defined.
     - The alternative form of [ℤ]-induction from [f(0)], [g'] and [h']
       ([ℤ_ind']), with the computation rules by [refl]; the value at [-0]
       is [f(0)] transported along [zeq], so [f(-0) ≡ f(0)] holds only
@@ -35,7 +49,7 @@
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
   Types.Forall Types.Paths Truncations.Core Colimits.Coeq Colimits.Pushout
-  Spaces.Nat.Core Spaces.Int Spaces.Circle.
+  Spaces.Nat.Core Spaces.Nat.Division Spaces.Int Spaces.Circle.
 From SymmetryMirror Require Export Circle.S01_Circle.
 
 Local Open Scope uf_scope.
@@ -335,4 +349,148 @@ Proof.
   refine (_; _).
   - intros [k e]. exact (k; ap iplus (e^ @ add_comm k m) @ iplus_add m k).
   - intros [k e]. exact (k; add_comm k m @ iplus_inj (iplus_add m k @ e^)).
+Defined.
+
+(** The strict order [z < y :≡ s(z) ≤ y]. *)
+Definition zlt (z y : ℤ) : Type := zle (zs z) y.
+
+Definition int_of_nat_inj {a b : ℕ} (e : int_of_nat a = int_of_nat b) : a = b
+  := iplus_inj (toInt_inj (x := iplus a) (y := iplus b) e).
+
+Definition int_add_cancel_l {x y z : Int} (e : int_add x y = int_add x z) : y = z
+  := (int_add_assoc _ _ _ @ ap (fun t => int_add t y) (int_add_neg_l x))^
+     @ ap (int_add (int_neg x)) e
+     @ int_add_assoc _ _ _ @ ap (fun t => int_add t z) (int_add_neg_l x).
+
+(** [≤] on [ℤ] is a proposition. *)
+Definition zle_isProp (z y : ℤ) : isProp (zle z y).
+Proof.
+  intros [a e] [b e'].
+  assert (p : a = b).
+  { apply int_of_nat_inj, (@int_add_cancel_l (toInt z)).
+    exact ((toInt_zadd _ _)^ @ ap toInt (e^ @ e') @ toInt_zadd _ _). }
+  destruct p. exact (ap (fun w => (a; w)) (ℤ_isSet _ _ _ _)).
+Defined.
+
+(** [z ≤ y] in terms of the library's [Int]. *)
+Definition zle_Int {z y : ℤ} (h : zle z y)
+  : {n : ℕ & toInt y = int_add (toInt z) (int_of_nat n)}
+  := (h.1; ap toInt h.2 @ toInt_zadd _ _).
+
+Definition Int_zle {z y : ℤ} (n : ℕ) (e : toInt y = int_add (toInt z) (int_of_nat n))
+  : zle z y
+  := (n; toInt_inj (e @ (toInt_zadd z (iplus n))^)).
+
+(** [m ≤ (k+1)m + r]. *)
+Definition leq_mul_succ_add (m k r : ℕ) : (m <= S k * m + r)%nat.
+Proof.
+  change (m <= (m + k * m) + r)%nat.
+  rewrite <- nat_add_assoc. exact _.
+Defined.
+
+(** Towards exercise [xca:euclid-div-Z]: Euclidean division on the
+    library's [Int], by a positive [m : ℕ].  The key to uniqueness: if [dm + r = r'] with [r, r' < m], then [d = 0]. *)
+Definition int_euclid_unique0 (d : Int) (m r r' : ℕ)
+  (hr : (r < m)%nat) (hr' : (r' < m)%nat)
+  (e : int_add (int_mul d (int_of_nat m)) (int_of_nat r) = int_of_nat r')
+  : d = zero.
+Proof.
+  destruct d as [k| |k].
+  - (* d = -(k+1): then r = (k+1)m + r' ≥ m *)
+    change (negS k) with (int_neg (int_of_nat (S k))) in e.
+    rewrite int_mul_neg_l, int_nat_mul in e.
+    assert (e' : int_of_nat r = int_of_nat (S k * m + r')%nat).
+    { refine (_ @ int_nat_add _ _). rewrite <- e, int_add_assoc, int_add_neg_r.
+      exact refl. }
+    destruct (lt_irrefl m
+                (lt_leq_lt_trans (leq_mul_succ_add m k r')
+                   (transport (fun t => (t < m)%nat) (int_of_nat_inj e') hr))).
+  - exact refl.
+  - (* d = k+1: then (k+1)m + r = r' ≥ m *)
+    change (posS k) with (int_of_nat (S k)) in e.
+    rewrite int_nat_mul, int_nat_add in e.
+    destruct (lt_irrefl m
+                (lt_leq_lt_trans (leq_mul_succ_add m k r)
+                   (transport (fun t => (t < m)%nat) (int_of_nat_inj e)^ hr'))).
+Defined.
+
+Definition int_euclid_unique (q q' : Int) (m r r' : ℕ)
+  (hr : (r < m)%nat) (hr' : (r' < m)%nat)
+  (e : int_add (int_mul q m) r = int_add (int_mul q' m) r')
+  : (q = q') × (r = r').
+Proof.
+  assert (e0 : int_add (int_mul (int_add q (int_neg q')) m) r = r').
+  { rewrite int_dist_r, int_mul_neg_l, (int_add_comm (int_mul q m)),
+      <- int_add_assoc, e, int_add_assoc, int_add_neg_l.
+    exact refl. }
+  pose (d0 := int_euclid_unique0 _ m r r' hr hr' e0).
+  refine (_; int_of_nat_inj ((ap (fun d => int_add (int_mul d m) r) d0)^ @ e0)).
+  exact ((int_add_0_r q)^ @ ap (int_add q) (int_add_neg_l q')^ @ int_add_assoc _ _ _
+         @ ap (fun t => int_add t q') d0).
+Defined.
+
+Definition int_euclid_exists (x : Int) (m : ℕ) (pos : (0 < m)%nat)
+  : {q : Int & {r : ℕ & (r < m)%nat × (x = int_add (int_mul q m) r)}}.
+Proof.
+  pose (spec := fun a : ℕ =>
+          nat_div_mod_spec a m @ ap (fun t => (t + a mod m)%nat) (nat_mul_comm m _)).
+  destruct x as [b| |a].
+  - (* -(b+1) = -(Q+1)m + (m - (R+1)), where b = Qm + R *)
+    pose (Q := (b / m)%nat). pose (R := (b mod m)%nat).
+    pose (hR := nat_mod_lt_r b m pos : (S R <= m)%nat).
+    pose (r := (m - S R)%nat).
+    assert (E : (S Q * m = S b + r)%nat).
+    { refine (_ @ ap (fun t => (S t + r)%nat) (spec b)^).
+      change (m + Q * m = S (Q * m + R) + r)%nat.
+      refine (nat_add_comm _ _ @ _).
+      exact (ap (nat_add (Q * m)) (nat_add_sub_r_cancel hR)^ @ nat_add_assoc _ _ _
+             @ ap (fun t => (t + r)%nat) (nat_add_succ_r _ _)). }
+    refine (negS Q; (r; (_; _))).
+    + refine (transport (fun t => (S r <= t)%nat) (nat_add_sub_l_cancel hR) _).
+      rewrite nat_add_succ_r. exact (leq_succ (leq_add_r r R)).
+    + change (negS Q) with (int_neg (int_of_nat (S Q))).
+      rewrite int_mul_neg_l, int_nat_mul, E, <- int_nat_add, int_neg_add,
+        <- int_add_assoc, int_add_neg_l, int_add_0_r.
+      exact refl.
+  - exact (zero; (0%nat; (pos; refl))).
+  - refine (int_of_nat (S a / m); ((S a) mod m; (nat_mod_lt_r _ m pos; _)))%nat.
+    change (posS a) with (int_of_nat (S a)).
+    rewrite int_nat_mul, int_nat_add. exact (ap int_of_nat (spec (S a))).
+Defined.
+
+(** Exercise [xca:euclid-div-Z]: for [m > 0] the type of [(q, r)] with
+    [0 ≤ r < m] and [n = qm + r] is contractible.  (Placed here since it
+    uses addition, multiplication and the order.) *)
+Definition euclid_div_Z (n m : ℤ) (pos : zlt (iplus 0) m)
+  : isContr {q : ℤ & {r : ℤ & zle (iplus 0) r × (zlt r m × (n = zadd (zmul q m) r))}}.
+Proof.
+  destruct (zle_Int pos) as [k ek].
+  pose (em := ek @ int_nat_add 1 k : toInt m = int_of_nat (S k)).
+  pose (pos' := _ : (0 < S k)%nat).
+  pose (toInt_qmr := fun q r => toInt_zadd (zmul q m) r
+                       @ ap (fun t => int_add t (toInt r))
+                           (toInt_zmul q m @ ap (int_mul (toInt q)) em)).
+  destruct (int_euclid_exists (toInt n) (S k) pos') as [q0 [r0 [hr e]]].
+  pose (h1 := Int_zle (z := zs (iplus r0)) (y := m) (S k - S r0)%nat
+                (em @ ap int_of_nat (nat_add_sub_r_cancel hr)^ @ (int_nat_add _ _)^)).
+  pose (e0 := toInt_inj (e @ ap (fun t => int_add (int_mul t _) r0) (toInt_fromInt q0)^
+                         @ (toInt_qmr (fromInt q0) (iplus r0))^)
+              : n = zadd (zmul (fromInt q0) m) (iplus r0)).
+  refine ((fromInt q0; (iplus r0; (Int_zle (z := iplus 0) (y := iplus r0) r0 refl;
+                                   (h1; e0)))); _).
+  intros [q [r [h0 [h1' e']]]].
+    destruct (zle_Int h0) as [r1 er]. change (toInt r = int_of_nat r1) in er.
+    destruct (zle_Int h1') as [j ej].
+    assert (hr1 : (r1 < S k)%nat).
+    { pose (ej' := em^ @ ej @ ap (fun t => int_add t j) (toInt_zs r @ ap int_succ er
+                                                    @ int_nat_succ r1)
+                   @ int_nat_add _ _).
+      exact (transport (fun t => (S r1 <= t)%nat) (int_of_nat_inj ej')^ (leq_add_r _ _)). }
+    destruct (int_euclid_unique q0 (toInt q) (S k) r0 r1 hr hr1
+                (e^ @ ap toInt e' @ toInt_qmr _ _ @ ap (int_add _) er)) as [eq er'].
+    assert (pq : fromInt q0 = q) by exact (ap fromInt eq @ fromInt_toInt q).
+    assert (pr : iplus r0 = r) by exact (toInt_inj (x := iplus r0) (ap int_of_nat er' @ er^)).
+    destruct pq, pr.
+    apply (ap (fun w => (fromInt q0; (iplus r0; w)))).
+    exact (prod_isProp (zle_isProp _ _) (prod_isProp (zle_isProp _ _) (ℤ_isSet _ _)) _ _).
 Defined.

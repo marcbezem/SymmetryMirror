@@ -734,9 +734,6 @@ Proof.
   rewrite <- int_add_assoc, int_add_neg_r, int_add_0_r. exact refl.
 Defined.
 
-Definition int_of_nat_inj {a b : ℕ} (e : int_of_nat a = int_of_nat b) : a = b
-  := iplus_inj (toInt_inj (x := iplus a) (y := iplus b) e).
-
 Definition int_sub_eq (x y z : Int) (e : int_add x (int_neg y) = z) : x = int_add z y.
 Proof. destruct e. rewrite <- int_add_assoc, int_add_neg_l, int_add_0_r. exact refl. Defined.
 
