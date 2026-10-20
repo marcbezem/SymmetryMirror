@@ -730,11 +730,14 @@ End XmodM.
     [∑_{c:Cyc} ((X,t) = ρ_m(c))] of [ρ_m] is equivalent to [P × X/m], where
     [P] says that [m] divides the order of [t].  The map sends [(c, e)] to
     the proof of [P] (by [lem:m-root-id]) and the class [[e⁻¹(0,y)]] for
-    any [y] in [c].  Instead of the book's inverse (which restricts [t^m] to
-    a class [V]), we show that the fibers of this map are contractible: the
-    fiber over [(P, [x])] is equivalent to the type of pointed cycles in the
-    component of the standard cycle with [H = {q | t^{mq} = id}], which is
-    contractible by [lem:sum-cycle-point-contr]. *)
+    any [y] in [c].  Instead of the book's inverse, we show that the fibers
+    of this map are contractible: the fiber over [(P, [x])] is equivalent
+    to the type of pointed cycles in the component of the cycles with
+    [H = {q | t^{mq} = id}], which is contractible by
+    [lem:sum-cycle-point-contr].  A cycle in that component is the orbit of
+    a point [x₀] under [t^m], with [t^m] restricted to it (the book's
+    [(V, t^m)], below); the standard cycle [ℤ/∼_H] of [cor:set-trunc-cyc]
+    would not do, since it lives in a higher universe than [(X,t)]. *)
 Section FiberCdg.
 
   Context `{Univalence} (k : ℕ) (d : Cyc).
@@ -793,7 +796,8 @@ Section FiberCdg.
 
   Definition G_F (w : Fib) : Pdiv k sX t × Xm k t := (Pdiv_F w; g_F w).
 
-  (** The standard cycle [c₀] with [H_{c₀} = {q | t^{mq} = id}]. *)
+  (** The subgroup [{q | t^{mq} = id}] of [ℤ], the [H] of the cycles [c]
+      with [(X,t)] identified with [ρ_m(c)]. *)
   Local Notation Hs q := (Ht sX t (zmul (iplus (S k)) q)).
 
   Definition Hs_0 : fst (Hs (iplus 0)) := fst (fst (Ht_subgroup sX t)).
