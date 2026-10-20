@@ -30,6 +30,10 @@ From SymmetryMirror Require Export IntroUF.IntroUF.
 
 Local Open Scope uf_scope.
 
+(** Chapter introduction, items [it:one-out] and [it:prop-in]: maps
+    [𝟙 → A] correspond to elements of [A] ([xca:Xequiv1toX] in 2.9), and
+    maps [A → Prop] to subtypes of [A] ([lem:Sub(T)=Inj(T)] in 2.20). *)
+
 (** ** 3.1 The circle and its universal property *)
 
 (** Definition [def:circle]: the circle is the library's [Circle], with

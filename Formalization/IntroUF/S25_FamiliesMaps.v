@@ -107,6 +107,7 @@ Section FamiliesStructure.
   Universe u.
   Context `{Univalence} (A : Type@{u}).
 
+  (** Part [cnstr:families+structure]. *)
   Definition families_structure (S : Type@{u} -> Type@{u})
     : (A -> {B : Type@{u} & S B})
       ≃ {B : Type@{u} & {f : B -> A & forall a, S (fiber f a)}}.
@@ -119,16 +120,19 @@ Section FamiliesStructure.
                       (fun B f => forall a, S (fiber f a)))).
   Defined.
 
+  (** Part [lem:Prop-families]. *)
   Definition families_props
     : (A -> {B : Type@{u} & isProp B})
       ≃ {B : Type@{u} & {f : B -> A & forall a, isProp (fiber f a)}}
     := families_structure (fun B => isProp B).
 
+  (** Part [lem:Set-families]. *)
   Definition families_sets
     : (A -> {B : Type@{u} & isSet B})
       ≃ {B : Type@{u} & {f : B -> A & forall a, isSet (fiber f a)}}
     := families_structure (fun B => isSet B).
 
+  (** Part [cnstr:families+points]. *)
   Definition families_points
     : (A -> {B : Type@{u} & B})
       ≃ {B : Type@{u} & {f : B -> A & forall a, fiber f a}}

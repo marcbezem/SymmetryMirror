@@ -84,6 +84,11 @@ Local Open Scope uf_scope.
 
 (** ** 3.6 Connected coverings over the circle *)
 
+(** Diagram [eq:subgroup-covering-1]: for a pointed connected covering
+    [f : A → S1], [ap_f] followed by the winding number embeds
+    [a₀ = a₀] into [ℤ]; see [loopsAE_isEquiv] and [image_loops_Ht]
+    below. *)
+
 (** Iteration [t^n] of a permutation [t] of a set, for [n : ℤ]. *)
 Section Iteration.
 
@@ -315,6 +320,9 @@ Section FinCycle.
 
 End FinCycle.
 
+(** Remark [rem:finitecoveringsofS1]: a picture of the [m]-th power
+    bundle [R_m] (informal). *)
+
 (** Construction [con:psi-alpha-m] and corollary [cor:dgm-conncov]
     (statements only), for [m = k+1]. *)
 Definition con_psi_alpha_m_stmt `{Univalence} : Type
@@ -424,8 +432,9 @@ Section Orders.
   Definition loopsAE_isEquiv (x : X) : isEquiv (loopsAE x)
     := comp_isEquiv (split'_isEquiv ((base; x) : AE t) (base; x)) (loopsAE_reindex_isEquiv x).
 
-  (** The image of [(a = a) → (base = base) ≃ ℤ] (with [a :≡ (base, x)]) is
-      [H_t], for a cycle [(X,t)]. *)
+  (** The image of the composite [eq:order-composite],
+      [(a = a) → (base = base) ≃ ℤ] (with [a :≡ (base, x)]), is [H_t], for
+      a cycle [(X,t)]. *)
   Definition image_loops_Ht (cy : isCycle t) (x : X) (n : ℤ)
     : (ptrunc {p : ((base; x) : AE t) = (base; x) & fst wdg (ap fst p) = n}
        -> fst (Ht n))
@@ -554,7 +563,7 @@ Section IdCycle.
 
   Definition EndoEqv : Type := {e : X ≃ Y & fst e ∘ fst t = fst u ∘ fst e}.
 
-  (** 1 ⇒ 2. *)
+  (** 1 ⇒ 2, i.e. [nr:TruncXtYu] ⇒ [nr:HtSubZYu] ([Hiff]). *)
   Definition IdCycle_12 (p : ptrunc (((X; fst t) : Endo) = (Y; fst u))) : Hiff.
   Proof.
     refine (ptrunc_rec (Pi_isProp (fun n => prod_isProp (fun_isProp (snd (Ht sY u n)))
@@ -565,7 +574,7 @@ Section IdCycle.
                       (inv_comm t u (fst w) (ptw (snd w))) n).
   Defined.
 
-  (** 2 ⇒ 3. *)
+  (** 2 ⇒ 3, i.e. [nr:HtSubZYu] ⇒ [nr:eXtYuPtd]. *)
   Definition IdCycle_23 (hH : Hiff) (x0 : X) (y0 : Y)
     : isContr {w : EndoEqv & fst (fst w) x0 = y0}.
   Proof.
@@ -592,7 +601,7 @@ Section IdCycle.
     exact (eF_unique sX sY t u cX h1 x0 y0 (fst e) (ptw h) p0 x)^.
   Defined.
 
-  (** 3 ⇒ 1. *)
+  (** 3 ⇒ 1, i.e. [nr:eXtYuPtd] ⇒ [nr:TruncXtYu]. *)
   Definition IdCycle_31 (h3 : forall x0 y0, isContr {w : EndoEqv & fst (fst w) x0 = y0})
     : ptrunc (((X; fst t) : Endo) = (Y; fst u))
     := ptrunc_rec ptrunc_isProp
@@ -630,6 +639,10 @@ Definition cor_id_m_cycle_stmt `{Univalence} : Type
        {e : (((Fin (S k); zsk) : Endo) = (Fin (S k); zsk)) ≃ Fin (S k) &
          (fst e refl = fin_zero)
          × (forall p, fst e (endo_path (finsuccEqv k) refl ⋅ p) = zsk (fst e p))}.
+
+(** Remark [rem:thenonuniquenessofgeneratorsofmodulararithmetic1]: the
+    equivalence [zs] in [cor:id-m-cycle] is not uniquely determined by the
+    stated property (informal). *)
 
 (** Corollary [cor:set-trunc-cyc], first half: each [H_t] contains [0] and
     is closed under addition and negation. *)

@@ -499,7 +499,8 @@ Section Sign.
     := path_sigma_prop (fun _ => ptrunc_isProp) (u := A) (v := A)
          (path_sigma_prop (fun X => isSet_isProp X) (u := fst A) (v := fst A) (etop e)).
 
-  (** Lemma [lem:sign-properties]. *)
+  (** Lemma [lem:sign-properties]: parts [it:sign-transposition],
+      [it:sign-cycle] and [it:identity-even], in this order. *)
   Definition lem_sign_properties_stmt : Type
     := (forall n (A : utype (BG (SG n))) (a b : fst (fst A)) (ne : a ≠ b),
           sign (perm_of A (transpEqv (finset_isDecSet (comp_isFinSet A)) a b)) = no)

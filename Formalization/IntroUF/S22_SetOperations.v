@@ -294,7 +294,10 @@ Definition wconst_elim {A B : Type} {f : A -> B} (sB : isSet B)
 Definition wconst_elim_trunc {A B : Type} {f : A -> B} (sB : isSet B)
   (c : wconst f) (x : A) : wconst_elim sB c (trunc x) = f x := refl.
 
-(** *** Set quotients *)
+(** *** Set quotients
+
+    Footnote [ft:equiv-rel]: an equivalence relation is reflexive,
+    symmetric and transitive ([rr], [rs], [rt] below). *)
 
 Section Quotients.
 

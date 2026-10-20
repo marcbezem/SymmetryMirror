@@ -247,6 +247,14 @@ Definition cor_orbit_equiv_quot_stmt `{Univalence} : Type
        {e : quot (orbit_rel X) ≃ Orbits X &
          forall x, fst e (S22_SetOperations.cls (orbit_rel X) x) = orb X x}.
 
+(** Remark [rem:equivalents-of-[x]=[y]]: for [x, y : X(sh_G)] the
+    propositions [[x] = [y]], [[x]₀ = [y]₀], [‖(sh_G,x) = (sh_G,y)‖] and
+    [∃_g (g · x = y)] are equivalent (see [orbit0_eff] and [cor:orbit-equiv]
+    above; used without mention). *)
+
+(** Footnote [ft:orbit-surj]: the surjections [X(sh_G) → X_hG → X/G]
+    justify the notation [X/G] (informal). *)
+
 (** ** Stabilizers, fixed and free elements *)
 Section Stabilizers.
 
@@ -412,6 +420,7 @@ Section Stabilizers.
       elements [x] with [x = g · x] for all [g]. *)
   Definition ev_sh (f : XuhG X) : el X (sh G) := f (sh G).
 
+  (** Part [it:ev-is-inj]. *)
   Definition ev_sh_inj (f f' : XuhG X) (e : f (sh G) = f' (sh G)) : f = f'.
   Proof.
     apply ptw_inv. intro z.
@@ -419,6 +428,8 @@ Section Stabilizers.
     destruct p. exact e.
   Defined.
 
+  (** Part [it:ev-is-eq-on-inv]: the image of [ev] consists of the fixed
+      elements. *)
   Definition invariant_fixed (f : XuhG X) (g : USym G) : f (sh G) = act X g (f (sh G))
     := (apD f g)^.
 
@@ -535,7 +546,9 @@ Section OrbitStabilizer.
     : act tildeG s g = ap (BGx_fst X x) s ⋅ g.
   Proof. destruct s. exact refl. Defined.
 
-  (** Construction [con:orbit-stabilizer]: [(G̃_x)_{hG_x} ≃ G · x]. *)
+  (** Construction [con:orbit-stabilizer]: [(G̃_x)_{hG_x} ≃ G · x].
+      Footnote [ft:action-type-tildeGx-set]: [(G̃_x)_{hG_x}] is a set
+      already by [xca:Gx-action-on-G] (informal). *)
   Definition os_fwd (v : TotG tildeG) : Gdot X x.
   Proof.
     destruct v as [[[z y] t] p]. cbn in p.

@@ -165,7 +165,7 @@ Definition AbstrFun_ff `{Funext} : isFullyFaithful AbstrFun
 (** Exercise [xca:Bconcr-OK] and theorem [thm:concr-equiv-cats]
     (statements only).  [concr] on morphisms uses [φ_!] (Section 7.4,
     stated only), so we state the theorem for [abstr], whose inverse
-    [concr] is. *)
+    [concr] is.  The first component is part [it:Bconcr_pt]. *)
 Definition xca_Bconcr_OK_stmt `{Univalence} : Type
   := (forall (G H : AbsGroup) (φ : absHom G H) (F : absGSet G -> absGSet H),
         (forall X, gset (F X) ≃ quot (phi_rel φ X)) -> F (absprtor G) = absprtor H)

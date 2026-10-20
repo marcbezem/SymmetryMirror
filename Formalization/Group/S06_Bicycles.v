@@ -183,6 +183,9 @@ Proof.
              (Pi_isProp (fun x => Pi_isProp (fun x' => ptrunc_isProp)))).
 Defined.
 
+(** Remark [rem:F2-first-look]: bicycles are the connected coverings of
+    [S1 ∨ S1], see 8.7 (informal). *)
+
 (** Definition [def:Dinfty-Q]: the standard infinite dihedral bicycle on
     [ℤ ⨿ ℤ], with [a(inl n) :≡ inl(n+1)], [a(inr n) :≡ inr(n-1)] and
     [b] swapping the summands. *)

@@ -68,6 +68,9 @@ Definition pcomp {X Y Z : Ustar} (g : Y →* Z) (f : X →* Y) : X →* Z
 (** Definition [def:pointedidentity]. *)
 Definition pid (X : Ustar) : X →* X := (id (utype X); refl).
 
+(** Remark [rem:coerceawaypt]: we write [x : X] for [x : X_÷] (informal
+    convention; here we write [utype X] explicitly). *)
+
 (** Exercise [xca:plusforgetadjoint]. *)
 Definition plus_adjoint `{Funext} (A : Type) (B : Ustar)
   : (A -> utype B) ≃ (plus A →* B).

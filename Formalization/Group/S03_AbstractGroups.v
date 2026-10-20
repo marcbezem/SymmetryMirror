@@ -35,16 +35,27 @@ Local Open Scope uf_scope.
 
 (** ** 4.3 Abstract groups *)
 
+(** The laws [it:right-unit], [it:left-unit], [it:associativity] and
+    [it:inverse] of the symmetries [a = a] in a groupoid are exercise
+    [xca:path-groupoid-laws] in 2.5. *)
+
 (** Definition [def:abstractgroup]. *)
 Record AbsGroup : Type := {
+  (** [struc:under-set] *)
   ag_S : Type;
   ag_isSet : isSet ag_S;
+  (** [struc:unit] *)
   ag_e : ag_S;
+  (** [struc:mult-op] *)
   ag_mul : ag_S -> ag_S -> ag_S;
+  (** [struc:inv-op] *)
   ag_inv : ag_S -> ag_S;
+  (** [axiom:unit-laws] *)
   ag_runit : forall g, ag_mul g ag_e = g;
   ag_lunit : forall g, ag_mul ag_e g = g;
+  (** [axiom:ass-law] *)
   ag_assoc : forall g1 g2 g3, ag_mul g1 (ag_mul g2 g3) = ag_mul (ag_mul g1 g2) g3;
+  (** [axiom:inv-law] *)
   ag_rinv : forall g, ag_mul g (ag_inv g) = ag_e
 }.
 

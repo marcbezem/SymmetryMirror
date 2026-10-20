@@ -65,6 +65,12 @@ Local Open Scope uf_scope.
 
 (** ** 4.2 The type of groups *)
 
+(** Example [ex:base=base]: the symmetries [base = base] in the circle
+    form the integers ([cor:S1groupoid] in 3.4); the group [ZZ] below. *)
+
+(** Remark [rem:heap-preview]: identity types [a = a'] with [a ≠ a'] are
+    heaps, see 7.7 (informal). *)
+
 (** Definition [def:pt-conn-groupoid]: pointed connected groupoids
     [U_*^{=1} :≡ ∑_{A:U} (A × isConn(A) × isGrpd(A))]. *)
 Definition UUscone : Type := {A : Type & A × (isConn A × isGrpd A)}.
@@ -195,6 +201,10 @@ Proof.
   exact (eqinv (path_to_pEqv_isEquiv (BG G) (BG G')) e).
 Defined.
 
+(** Remark [rem:BG-convention]: to define [f : ∏_{G:Group} T(G)] it
+    suffices to define [f(mkgroup X)], [Group] being a wrapped copy of
+    [U_*^{=1}] with constructor [mkgroup] (informal convention). *)
+
 (** Definition [def:automorphism-group]: [Aut_A(a) :≡ mkgroup(A_(a), (a,!))]
     for a groupoid [A].  We call it [AutG] since [Aut X :≡ (X ≃ X)] is
     already used in Section 3.7. *)
@@ -270,7 +280,7 @@ Section FirstExamples.
 
   Definition ZZ_AutG : ZZ = AutG S1_isGrpd base := group_is_AutG ZZ.
 
-  (** Example [ex:groups](1): the trivial group [𝟙 :≡ Aut_Prop(True)]. *)
+  (** Example [ex:groups](1), item [ex:trivgroup]: the trivial group [𝟙 :≡ Aut_Prop(True)]. *)
   Definition PropU_isGrpd : isGrpd PropU := set_ntype 1 PropU_isSet.
 
   Definition TrueProp : PropU := (True; True_isProp).
@@ -298,7 +308,8 @@ Section FirstExamples.
     : mkgroup (contr_UUscone c) = TG
     := path_Group_contr (G := mkgroup (contr_UUscone c)) c TG_contr.
 
-  (** Example [ex:groups](2, 3): the permutation groups [Σ_S :≡ Aut_Set(S)]
+  (** Example [ex:groups](2, 3), items [ex:permgroup] and
+      [ex:genpermgroup]: the permutation groups [Σ_S :≡ Aut_Set(S)]
       and [Σ_n :≡ Aut_Set(Fin n)]. *)
   Definition SG_S (S : SetU) : Group := AutG SetU_isGrpd S.
 
@@ -437,7 +448,8 @@ Definition Klein `{Univalence} : Group := prodG (SG 2) (SG 2).
 (** Exercise [xca:klein-not-cyclic] (statement only). *)
 Definition xca_klein_not_cyclic_stmt `{Univalence} : Type := CG 3 ≠ Klein.
 
-(** Example [ex:bigproductofgroups] and exercise [xca:bigproductfunext](1):
+(** Example [ex:bigproductofgroups] and exercise [xca:bigproductfunext](1)
+    ([it:bigproductfunext-i]):
     a finite product of connected groupoids is connected (by the
     library's finite choice), so we have the product of a finite family
     of groups, and [ptw] identifies its symmetries. *)
@@ -550,6 +562,10 @@ End AbelianExamples.
 
 (** [Σ_3] is not abelian (statement only). *)
 Definition SG3_not_isAb_stmt `{Univalence} : Type := ¬ isAb (SG 3).
+
+(** Remark [rem:whatAREabeliangroups]: the classifying types of abelian
+    groups are identity types of [2]-types; see Chapter [abelian.tex]
+    (informal here). *)
 
 (** Exercise: [mkgroup(A,a)] and [mkgroup(A,b)] are merely identical. *)
 Definition mkgroup_merely_eq {A : Type} (a : A) (cA : isConn A) (gA : isGrpd A) (b : A)

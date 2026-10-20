@@ -224,7 +224,8 @@ Definition zs_not_cyc_stmt : Type
   := forall (dZ : isDecSet ℤ) (a1 : ℤ) (r : list ℤ), ¬ (forall x, zs x = cyc dZ a1 r x).
 
 (** Exercise [xca:factorial]: a finite set of cardinality [n] has [n!]
-    permutations, via the library's [fcard_aut]. *)
+    permutations, via the library's [fcard_aut] instead of the bijection
+    [eq:type-factorial] of the hint. *)
 Definition Aut (X : Type) : Type := X ≃ X.
 
 Definition Aut_isFinSet `{Univalence} {X : Type} (h : isFinSet X) : isFinSet (Aut X)

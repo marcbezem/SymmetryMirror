@@ -37,7 +37,9 @@ From SymmetryMirror Require Export Actions.S06_Cayley.
 
 Local Open Scope uf_scope.
 
-(** ** 5.7 The lemma that is not Burnside's *)
+(** ** 5.7 The lemma that is not Burnside's
+
+    The section is also labelled [lem:burnsides-lemma]. *)
 
 (** Example [exa:prep-burnside] (statement only): [C_4] acting on binary
     sequences of length [4], [X(A, f) :≡ (A → Fin 2)], has [6] orbits. *)
@@ -215,7 +217,8 @@ Section Burnside.
     exact (trp (fun O' => ptrunc (USym G ≃ {x : S0 & StabZ O' x})) e⁻¹ (orbit_count_eqv x0)).
   Defined.
 
-  (** Lemma [lem:burnside]: [Card(∑_g X^g) = Card(X/G) · Card(G)]; the
+  (** Lemma [lem:burnside], equation [eq:burnside]:
+      [Card(∑_g X^g) = Card(X/G) · Card(G)]; the
       sets [X^g], [∑_g X^g] and [X/G] are finite ([Xfix_Finite],
       [sumXfix_Finite], [Orbits_Finite]). *)
   Definition burnside

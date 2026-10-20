@@ -34,11 +34,16 @@ Local Open Scope uf_scope.
 
 (** ** 2.5 Identity types
 
-    Rules (E1) - (E3).  (E1) is the identity type [a = b] (HoTT's
-    [paths], which lives in the same universe as [X]); (E2) is
-    [refl a : a = a]; (E3) is based path induction, with its computation
-    rule holding by definition.  Possible further parameters of [P] can
-    be absorbed into [P]. *)
+    Rules (E1) - (E3) [rules-for-equality]. *)
+
+(** Rule (E1) [E1]: the identity type [a = b] (HoTT's [paths], which
+    lives in the same universe as [X]). *)
+
+(** Rule (E2) [E2]: [refl a : a = a]. *)
+
+(** Rule (E3) [E3]: based path induction, with its computation rule
+    holding by definition.  Possible further parameters of [P] can be
+    absorbed into [P]. *)
 
 Definition path_ind {X : Type} (a : X) (P : forall b : X, a = b -> Type)
   (p : P a refl) : forall (b : X) (e : a = b), P b e

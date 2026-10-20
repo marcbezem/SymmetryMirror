@@ -53,12 +53,17 @@ Local Open Scope uf_scope.
 
 (** Definition [def:monoid]. *)
 Record Monoid : Type := {
+  (** [struc:monoid-set] *)
   mo_S : Type;
   mo_isSet : isSet mo_S;
+  (** [struc:monoid-unit] *)
   mo_e : mo_S;
+  (** [struc:monoid-mult] *)
   mo_mul : mo_S -> mo_S -> mo_S;
+  (** [monoid:unit-laws] *)
   mo_runit : forall g, mo_mul g mo_e = g;
   mo_lunit : forall g, mo_mul mo_e g = g;
+  (** [monoid:ass-law] *)
   mo_assoc : forall g1 g2 g3, mo_mul g1 (mo_mul g2 g3) = mo_mul (mo_mul g1 g2) g3
 }.
 
@@ -84,8 +89,8 @@ Definition ag_monoid (G : AbsGroup) : Monoid
   := {| mo_S := ag_S G; mo_isSet := ag_isSet G; mo_e := ag_e G; mo_mul := ag_mul G;
         mo_runit := ag_runit G; mo_lunit := ag_lunit G; mo_assoc := ag_assoc G |}.
 
-(** The propositions [UnitLaws], [AssocLaw], [MonoidLaws], [InverseLaw]
-    and [GroupLaws]. *)
+(** Notation [not:GroupLaws]: the propositions [UnitLaws], [AssocLaw],
+    [MonoidLaws], [InverseLaw] and [GroupLaws]. *)
 Section Laws.
 
   Context (S : Type) (e : S) (μ : S -> S -> S) (ι : S -> S).
@@ -114,6 +119,11 @@ Definition issig_AbsGroup : _ <~> AbsGroup := ltac:(issig).
 
 Definition issig_Monoid : _ <~> Monoid := ltac:(issig).
 
+(** Remark [rem:inverses-as-property]: instead of the inverse operation
+    [monoid:inv-op] ([ι] above, or [ag_inv]) with the law of inverses
+    [monoid:inv-law] ([InverseLaw]), one may posit [axiom:mere-inverse]
+    (the hypothesis [minv] below); [lem:group-inv-operation] shows that
+    this gives a unique inverse operation. *)
 Section Inverses.
 
   Context `{Funext} (S : Type) (sS : isSet S) (e : S) (μ : S -> S -> S)
@@ -237,6 +247,9 @@ Definition AbsIso (G H : AbsGroup) : Type
 
 Definition AbsIso_id (G : AbsGroup) : AbsIso G G := (idEqv _; fun s t => refl).
 
+(** Footnote [ft:no-abs-inftygp]: we do not know how to define a type of
+    "abstract [∞]-groups" in a similar way (informal). *)
+
 (** Two abstract groups with the same underlying set and the same
     multiplication are equal: the unit and the inverse are determined by
     the multiplication, and the rest are propositions. *)
@@ -348,6 +361,10 @@ Definition conj_iso (G : AbsGroup) (g : ag_S G) : AbsIso G G
 
 Definition conj_path `{Univalence} (G : AbsGroup) (g : ag_S G) : G = G
   := path_AbsGroup (conj_iso G g).
+
+(** Remark [rem:ee=e_coherence]: since the underlying type is a set, the
+    two identifications [e · e = e] given by the unit laws agree, and no
+    coherence is needed (informal). *)
 
 (** Exercise [xca:typemonoidisgroupoid]: the types of monoids and of
     abstract groups are groupoids, as [Σ]-types over [Set] of sets. *)

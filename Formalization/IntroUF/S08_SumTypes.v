@@ -36,6 +36,7 @@ Definition sum_in_U@{u} (X : Type@{u}) (Y : X -> Type@{u}) : Type@{u}
 (** First and second projection: [fst(a,b) :≡ a] and [snd(a,b) :≡ b],
     the library's [fst] and [snd]. *)
 Definition fst {X : Type} {Y : X -> Type} (z : {x : X & Y x}) : X := pr1 z.
+(** Second projection [it:second-projection]. *)
 Definition snd {X : Type} {Y : X -> Type} (z : {x : X & Y x}) : Y (fst z)
   := pr2 z.
 

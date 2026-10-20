@@ -279,6 +279,9 @@ Definition SubGrp_trivial {G : Group} (S : SubGrp G) : Type := isContr (TotG (sg
 Definition SubGrp_proper {G : Group} (S : SubGrp G) : Type
   := ¬ isContr (el (sg_X S) (sh G)).
 
+(** Remark [rem:notationsubgroup]: classical notation for subgroups
+    (informal). *)
+
 (** Example [ex:prodinclisGset]: the [G × G']-set corresponding to
     [i₁ : G → G × G'] is [princ_{G'} ∘ proj₂]. *)
 Definition ex_prodinclisGset_stmt `{Univalence} : Type
@@ -312,7 +315,8 @@ Section Lagrange.
     : ((sh G; x) : TotG X) = (sh G; pt0)
     := ap (fun c => (sh G; c) : TotG X) (snd f) ⋅ tot_path_act X (fst f) x.
 
-  (** Construction [con:lagrange]. *)
+  (** Construction [con:lagrange]; footnote [ft:lagrange-dep-sum] leads to
+      [lagrange_dep] below. *)
   Definition lagrange (f : forall x : el X (sh G), {g : USym G & act X g x = pt0})
     : USym G ≃ (el X (sh G) × USym (subgrp_group S)).
   Proof.

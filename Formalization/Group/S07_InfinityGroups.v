@@ -36,6 +36,9 @@ Definition mkinfgroup (X : UUpconn) : InfGroup := inc X.
 
 Definition Binf (G : InfGroup) : UUpconn := out G.
 
+(** Remark [rem:pointedtypes]: [∞]-group is a synonym for pointed
+    connected type, wrapped with a constructor ([mkinfgroup]). *)
+
 (** Definition [def:classifyingspace]. *)
 Definition BGinf (G : InfGroup) : Ustar := (fst (Binf G); fst (snd (Binf G))).
 

@@ -40,6 +40,9 @@ Local Open Scope uf_scope.
 
 (** ** 2.27 Higher structure: stuff, structure, and properties *)
 
+(** Diagram [eq:forget-fibers]: [f] is [fst] after the equivalence
+    [sum_of_fibers] of [lem:sum-of-fibers]; [f] forgets its fibers. *)
+
 Section ForgetfulMaps.
 
   Context {B A : Type} (f : B -> A).

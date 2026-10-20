@@ -72,7 +72,8 @@ Proof.
   - intros [s [x y]]. exact refl.
 Defined.
 
-(** Exercise [xca:intersectionpullbackofsets](2) (statement only):
+(** Exercise [xca:intersectionpullbackofsets](2), part
+    [xca:cardinalityintersectionunion] (statement only):
     for subsets of a finite set (with finite carriers),
     [|A| + |B| = |A ∪ B| + |A ∩ B|]. *)
 Definition xca_card_union_inter_stmt `{Univalence} : Type

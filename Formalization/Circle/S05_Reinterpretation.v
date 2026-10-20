@@ -118,6 +118,9 @@ Section Reinterpretation.
     : orbit w x (zs n) = snd (fst w) (orbit w x n)
     := iterZ_zs (IC_isSet w) (IC_eqv w) n x.
 
+  (** Remark [rem:bang]: [!] names elements of a proposition clear from
+      the context (a notational convention). *)
+
   (** Lemma [lem:IdCisZet], in the form: the type of pointed infinite
       cycles is contractible.  Hence, for [(X,t)] in [InfCyc],
       [ev_0 : ((ℤ,zs) = (X,t)) → X] is an equivalence (below). *)

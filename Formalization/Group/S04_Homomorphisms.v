@@ -69,6 +69,10 @@ Local Open Scope uf_scope.
 
 (** ** 4.4 Homomorphisms *)
 
+(** Remark [rem:homom-eqs]: [ap k] of a pointed map [k : BG →* BH]
+    preserves unit, inverses and composition; made precise in
+    [lem:grouphomomaxioms] below. *)
+
 (** Definition [def:grouphomomorphism]: [Hom(G,H) :≡ Copy(BG →* BH)],
     with constructor [mkhom] and destructor [Bf]. *)
 Definition Hom (G H : Group) : Type := Copy (BG G →* BG H).
@@ -122,13 +126,18 @@ Section HomAxioms.
 
 End HomAxioms.
 
+(** Equation [gp-homo-unit]. *)
 Definition USymf_unit {G H : Group} (f : Hom G H) : USymf f refl = refl
   := loops_fun_unit (sh G) (fst (Bf f)) (sh H) (snd (Bf f)).
 
+(** Equation [gp-homo-comp] (the book's label on the equation for
+    inverses). *)
 Definition USymf_inv {G H : Group} (f : Hom G H) (g : USym G)
   : USymf f g⁻¹ = (USymf f g)⁻¹
   := loops_fun_inv (sh G) (fst (Bf f)) (sh H) (snd (Bf f)) g.
 
+(** Equation [gp-homo-inv] (the book's label on the equation for
+    composition). *)
 Definition USymf_comp {G H : Group} (f : Hom G H) (g g' : USym G)
   : USymf f (g' ⋅ g) = USymf f g' ⋅ USymf f g
   := loops_fun_comp (sh G) (fst (Bf f)) (sh H) (snd (Bf f)) g g'.
@@ -163,6 +172,9 @@ Defined.
 (** Definition [def:group-homomorphism-composition]. *)
 Definition compG {G G' G'' : Group} (f' : Hom G' G'') (f : Hom G G') : Hom G G''
   := mkhom (pcomp (Bf f') (Bf f)).
+
+(** Remark [rem:Bf-convention]: to define [φ : ∏_{f:Hom(G,H)} T(f)] it
+    suffices to consider [f ≡ mkhom(Bf)] (informal convention). *)
 
 (** Lemma [lem:hom-is-set], in the general form of footnote
     [ft:ptd-decr-h-lev]: [X →* Y] is a set when [X] is connected and [Y]
@@ -284,7 +296,7 @@ Definition fin_sum_eqv_stmt : Type := forall m n : ℕ, Fin m ⨿ Fin n ≃ Fin 
 
 Definition fin_prod_eqv_stmt : Type := forall m n : ℕ, Fin m × Fin n ≃ Fin (mul m n).
 
-(** Example [ex:groups-morphisms](4): [mod_m : ℤ → C_m], with
+(** Example [ex:groups-morphisms](4), item [it:mod_m]: [mod_m : ℤ → C_m], with
     [Bmod_m(base) :≡ (Fin m, zs)] and [Bmod_m(loop) := (zs, !)], pointed
     by [refl]; and the homomorphism [C_m → Σ_m] forgetting the cycle
     structure.  That [R_m : ℤ → Σ_m] factors as their composite is stated
@@ -431,6 +443,10 @@ Section BGtoType.
                                           (Eqv_inv (Copy_eqv _))))).
 
 End BGtoType.
+
+(** Remark [rem:first-abs-hom]: contrary to homomorphisms of abstract
+    groups, ours preserve the group structure automatically
+    ([lem:grouphomomaxioms]); see 7.3 (informal). *)
 
 (** Example [exa:conj-concrete]: moving the shape along [p : sh_G = y].
     [(id, p⁻¹) : BG ≃* (BG_÷, y)] gives an isomorphism, and its [Ω] is

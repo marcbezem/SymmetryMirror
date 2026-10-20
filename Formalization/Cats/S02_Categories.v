@@ -64,12 +64,18 @@ Local Open Scope uf_scope.
 (** Definition [def:wild-cat]: a wild precategory, with composition
     written in the order of function composition. *)
 Record WildPreCat : Type := {
+  (** [struc:cat-ob] *)
   Ob : Type;
+  (** [struc:cat-mor] *)
   homC : Ob -> Ob -> Type;
+  (** [struc:cat-id] *)
   idC : forall A, homC A A;
+  (** [struc:cat-comp] *)
   compC : forall A B C, homC B C -> homC A B -> homC A C;
+  (** [struc:cat-unit-laws] *)
   lamC : forall A B (f : homC A B), compC A B B (idC B) f = f;
   rhoC : forall A B (f : homC A B), compC A A B f (idC A) = f;
+  (** [struct:cat-assoc] *)
   alphaC : forall A B C D (f : homC A B) (g : homC B C) (h : homC C D),
       compC A C D h (compC A B C g f) = compC A B D (compC B C D h g) f
 }.

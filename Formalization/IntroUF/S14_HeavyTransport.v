@@ -77,13 +77,15 @@ Section TrpInPaths.
   Definition trp_paths_const (i : a = b) : trp (fun _ => a = b) e i = i.
   Proof. destruct e. exact refl. Defined.
 
+  (** Part [trp-in-a=x]. *)
   Definition trp_paths_l (i : a = x) : trp (fun x => a = x) e i = e ⋅ i.
   Proof. destruct e. exact refl. Defined.
 
+  (** Part [trp-in-x=a]. *)
   Definition trp_paths_r (i : x = b) : trp (fun x => x = b) e i = i ⋅ e⁻¹.
   Proof. destruct e. exact (trans_1p i)^. Defined.
 
-  (** Conjugation; see also [trp_symmetry_conj] in 2.5. *)
+  (** Part [trp-in-x=x], conjugation; see also [trp_symmetry_conj] in 2.5. *)
   Definition trp_paths_conj (i : x = x)
     : trp (fun x => x = x) e i = (e ⋅ i) ⋅ e⁻¹.
   Proof. destruct e. exact (trans_1p i)^. Defined.

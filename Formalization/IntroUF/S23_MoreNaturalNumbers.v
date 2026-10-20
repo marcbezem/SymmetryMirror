@@ -240,6 +240,7 @@ Section LeastNumber.
     exact (leq_antisym (le_leq (h n' p')) (le_leq (h' n p))).
   Defined.
 
+  (** The function [min(P)] of equation [eqn:min]. *)
   Definition min `{Funext} : ptrunc {n : ℕ & fst (P n)} -> {n : ℕ & Pmin n}
     := ptrunc_rec Pmin_isProp (fun w => (mu (S (fst w)); mu_Pmin (fst w) (snd w))).
 

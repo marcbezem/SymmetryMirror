@@ -137,7 +137,7 @@ Proof.
 Defined.
 
 (** Construction [con:fib-vs-path]:
-    [(z = z') ≃ ap_f⁻¹(snd(z') · snd(z)⁻¹)], following the chain of
+    [(z = z') ≃ ap_f⁻¹(snd(z') · snd(z)⁻¹)] (equation [eq:fib_vs-path]), following the chain of
     equivalences in the book. *)
 Definition trp_fiber_path {A B : Type} (f : A -> B) {b : B} {a a' : A}
   (q : a = a') (p : b = f a)

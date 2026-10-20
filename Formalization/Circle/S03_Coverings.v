@@ -154,7 +154,7 @@ Section CoveringUtils.
     := fun c => is_ntype_Eqv 0 (Eqv_inv (fiber_comp_eqv f g c))
                   (Sigma_isSet (cg c) (fun w => cf (fst w))).
 
-  (** 4. If [g] and [gf] are coverings, then so is [f].  Instead of the
+  (** 4 [it:left-cancel-cover]. If [g] and [gf] are coverings, then so is [f].  Instead of the
       book's hint we use that [f⁻¹(b)] is the fiber over [(b, refl)] of
       the projection [(gf)⁻¹(g(b)) ≃ ∑_{w : g⁻¹(g(b))} f⁻¹(fst w) → g⁻¹(g(b))],
       a map between sets. *)
@@ -188,7 +188,7 @@ Section CoveringUtils.
              (snd cA a x)).
   Defined.
 
-  (** 6. A covering of an [n]-type ([n ≥ 0]) has an [n]-type as domain. *)
+  (** 6 [it:cover-n-type]. A covering of an [n]-type ([n ≥ 0]) has an [n]-type as domain. *)
   Fixpoint set_ntype (n : ℕ) {X : Type} (s : isSet X) : is_ntype n X
     := match n with
        | O => s
@@ -431,3 +431,6 @@ Section ExpCovering.
     := fun z => is_ntype_Eqv 0 (fst_fiber_eqv R z) (R_isSet z).
 
 End ExpCovering.
+
+(** Remark [rem:expforreal]: [exp] pictured as a helix over the circle,
+    like the exponential map [ℝ → S¹] (informal). *)

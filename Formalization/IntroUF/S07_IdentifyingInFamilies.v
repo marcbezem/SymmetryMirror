@@ -50,6 +50,9 @@ Definition PathOver {X : Type} (Y : X -> Type) {a a' : X} (p : a = a')
 Definition PathOver_refl {X : Type} (Y : X -> Type) {a : X} (y y' : Y a)
   : PathOver Y refl y y' = (y = y') := refl.
 
+(** Footnote [ft:path-over-pic]: a picture of a path over [p]
+    (informal). *)
+
 (** Remark: for a constant family the types of paths over [p] and of
     paths can be identified, by induction on [p].  (This is an
     identification of types, no univalence is needed.) *)

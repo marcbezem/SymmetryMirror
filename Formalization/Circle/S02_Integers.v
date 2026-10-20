@@ -53,7 +53,10 @@ From SymmetryMirror Require Export Circle.S01_Circle.
 
 Local Open Scope uf_scope.
 
-(** ** 3.2 The integers *)
+(** ** 3.2 The integers
+
+    Footnote [ft:many-integers]: alternative definitions of the integers;
+    [ℤ_Int] below relates ours to the library's [Int]. *)
 
 (** Definition [def:zet]: the higher inductive type [ℤ] with constructors
     [ι₊ : ℕ → ℤ], [ι₋ : ℕ⁻ → ℤ] and [zeq : ι₋(-0) = ι₊(0)] is the

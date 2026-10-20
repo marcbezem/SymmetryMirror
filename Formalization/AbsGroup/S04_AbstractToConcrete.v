@@ -103,6 +103,10 @@ Proof.
            (isProp_inhabited_isContr (isSet_isProp _) (snd X))).
 Defined.
 
+(** Footnote [ft:choicePshG]: [P_G] is defined with [sh_G = z] rather
+    than [z = sh_G], so its abstract homomorphism is postcomposition
+    [g ↦ (g · _)]; compare [Bq_G] in [ex:BqG] below (informal). *)
+
 (** Definition [def:abstrGtorsors]: [G]-sets, the principal torsor and
     the type of torsors of an abstract group. *)
 Section AbsGSets.
@@ -242,7 +246,8 @@ Definition concr `{Univalence} (G : AbsGroup) : Group
 
 
 (** Example [ex:BqG], definition [def:qG-concr-abstr] and lemma
-    [lem:Groupsareidentitytypes]. *)
+    [lem:Groupsareidentitytypes].  Footnote [ft:shG=z]: [P_G(z)] with
+    precomposition by inverses is also an [abstr(G)]-set (informal). *)
 Section ConcrAbstr.
 
   Context `{Univalence} (G : Group).

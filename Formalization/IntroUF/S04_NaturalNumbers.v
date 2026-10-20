@@ -31,14 +31,18 @@ Local Open Scope uf_scope.
 
 (** ** 2.4 The type of natural numbers
 
-    Rules (P1) - (P3): [ℕ : U_0], [0 : ℕ], [succ : ℕ -> ℕ]. *)
+    Peano's rules (P1) - (P4). *)
 
+(** Rule (P1) [P1]: [ℕ : U_0]. *)
 Definition ℕ : Type0 := nat.
 Bind Scope nat_scope with ℕ.
 
+(** Rule (P2) [P2]: [0 : ℕ] is Rocq's [0%nat]. *)
+
+(** Rule (P3) [P3]: [succ : ℕ -> ℕ]. *)
 Definition succ : ℕ -> ℕ := S.
 
-(** Rule (P4): induction on ℕ, with its two computation rules holding by
+(** Rule (P4) [P4]: induction on ℕ, with its two computation rules holding by
     definition. *)
 Definition ind_ℕ (X : ℕ -> Type) (a : X 0%nat)
   (g : forall m, X m -> X (succ m)) : forall m, X m

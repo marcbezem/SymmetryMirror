@@ -99,6 +99,10 @@ Definition subtype_eq {T : Type} (P : T -> PropU) (w w' : carrier P)
   : isEquiv (@ap (carrier P) T fst w w')
   := snd (subtype_paths_eqv (fun t => snd (P t)) w w').
 
+(** Remark [rem:subtype-convention]: by [lem:subtype-eq-=] we need not
+    distinguish carefully between elements of [T_P] and of [T]
+    (informal convention). *)
+
 (** Example [def:Prop-Set]: [Prop_U] and [Set_U] (here [PropU] and [SetU],
     from 2.16 and 2.17) are subtypes of [U]. *)
 Definition PropU_paths_eqv `{Funext} (P Q : PropU) : (P = Q) ≃ (fst P = fst Q)
@@ -113,7 +117,9 @@ Proof.
   exact (Sigma_isProp (fun_isProp (snd Q)) (fun f => isEquiv_isProp f)).
 Defined.
 
-(** Hence [Sub(T)] is a set. *)
+(** Hence [Sub(T)] is a set.  Footnote [ft:caution-subtype]: identifying
+    subtypes as elements of [Sub(T)] differs from identifying their
+    underlying types (informal). *)
 Definition Sub_isSet `{Univalence} (T : Type) : isSet (Sub T).
 Proof.
   apply IsHSet_isSet. pose proof (isSet_IsHSet PropU_isSet).
@@ -121,7 +127,7 @@ Proof.
 Defined.
 
 (** Exercise [xca:subtype-univ-prop]: the universal property of
-    subtypes. *)
+    subtypes; footnote [ft:subtype-univ-prop] is the diagram. *)
 Definition subtype_univ_prop `{Funext} {T X : Type} (f : X -> T)
   (P : T -> PropU)
   : ((forall x, fst (P (f x))) -> isContr {g : X -> carrier P & f = fst ∘ g})
@@ -149,7 +155,9 @@ Section SubInj.
   Definition Inj_to_Sub (w : Inj) : T -> {X : Type@{u} & isProp X}
     := fun t => (fiber (fst (snd w)) t; snd (snd w) t).
 
-  (** Lemma [lem:Sub(T)=Inj(T)] and Exercise [xca:Sub(T)=Inj(T)]. *)
+  (** Lemma [lem:Sub(T)=Inj(T)] and Exercise [xca:Sub(T)=Inj(T)].
+      Footnote [ft:incl-vs-inj]: the full notation of a subtype as an
+      element of [Inj(T)] is [Sub_to_Inj]. *)
 
   Definition Inj_Sub_Inj_carrier (w : Inj)
     : carrier (Inj_to_Sub w) ≃ fst w.
@@ -226,7 +234,8 @@ Proof.
 Defined.
 
 (** Exercise [xca:subsets-inclusion]: inclusion of subtypes is a partial
-    order with a least and a greatest element. *)
+    order (footnote [ft:partial-order]: reflexive, transitive,
+    antisymmetric) with a least and a greatest element. *)
 Definition subset_incl {T : Type} (P0 P1 : Sub T) : Type
   := forall t, fst (P0 t) -> fst (P1 t).
 

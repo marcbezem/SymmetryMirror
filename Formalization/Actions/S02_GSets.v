@@ -73,8 +73,12 @@ Definition act {G : Group} (X : GSet G) {z w : utype (BG G)} (p : z = w)
 (** Example [def:trivGset]. *)
 Definition trivG (G : Group) (S : SetU) : GSet G := fun _ => S.
 
+(** Remark [rem:G-set-vs-set-bundle]: [G]-sets are the coverings over
+    [BG] ([lem:Prop-Set-pointed-families] in 2.25); the two names reflect
+    a different focus (informal). *)
+
 (** Example [def:principaltorsor]: [P_y(z) :≡ (y = z)] and the principal
-    torsor [P_{sh_G}]. *)
+    torsor [P_{sh_G}]; [pathsp] is the map [eq:pathsp]. *)
 Definition pathsp {G : Group} (y : utype (BG G)) : GSet G
   := fun z => ((y = z); BG_isGrpd G y z).
 
@@ -91,6 +95,8 @@ Proof. destruct p. exact refl. Defined.
     conjugation. *)
 Definition Ad (G : Group) : GSet G := fun z => ((z = z); BG_isGrpd G z z).
 
+(** Footnote [ft:adjoint-transport]: transport in [Ad_G] is
+    conjugation. *)
 Definition act_Ad {G : Group} {z w : utype (BG G)} (p : z = w) (q : z = z)
   : act (Ad G) p q = p ⋅ (q ⋅ p⁻¹).
 Proof. destruct p. exact (trans_1p q)^. Defined.
@@ -158,6 +164,8 @@ Proof. destruct g. exact refl. Defined.
     underlying [G]-set [X_P]. *)
 Definition SubG {G : Group} (X : GSet G) : Type := forall z, el X z -> PropU.
 
+(** [Sub_G(X)] is a set; footnote [ft:SubTotX]: uncurried it is
+    [Sub(Tot(X))]. *)
 Definition SubG_isSet `{Univalence} {G : Group} (X : GSet G) : isSet (SubG X)
   := Pi_isSet (fun z => Pi_isSet (fun _ => PropU_isSet)).
 
@@ -334,6 +342,9 @@ Definition isFinGSet {G : Group} (X : GSet G) : Type := isFinSet (el X (sh G)).
 (** Definition [def:transitiveGset]. *)
 Definition istrans {G : Group} (X : GSet G) : Type
   := Ex (fun x : el X (sh G) => forall y : el X (sh G), Ex (fun g : USym G => x = act X g y)).
+
+(** The equivalent condition [eq:Gset-trans-gen] over all [z : BG] is not
+    formalized separately. *)
 
 Definition TotG {G : Group} (X : GSet G) : Type := {z : utype (BG G) & el X z}.
 

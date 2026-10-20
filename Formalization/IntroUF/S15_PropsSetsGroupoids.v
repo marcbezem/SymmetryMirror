@@ -95,19 +95,23 @@ Proof. intros b b' p q. destruct q. exact (bool_loops_trivial b p). Defined.
 (** Lemma [lem:prop-utils]. *)
 Section PropUtils.
 
+  (** Part [prop-utils-false-true]. *)
   Definition False_isProp : isProp False := fun a => match a with end.
 
   Definition True_isProp : isProp True
     := fun a b => match a, b with triv, triv => refl end.
 
+  (** Part [prop-utils-pi]. *)
   Definition Pi_isProp `{Funext} {A : Type} {R : A -> Type}
     (h : forall a, isProp (R a)) : isProp (forall a, R a)
     := fun p q => ptw_inv (fun a => h a (p a) (q a)).
 
+  (** Part [prop-utils-codom]. *)
   Definition fun_isProp `{Funext} {A P : Type} (h : isProp P)
     : isProp (A -> P)
     := Pi_isProp (fun _ => h).
 
+  (** Part [prop-utils-sum]. *)
   Definition Sigma_isProp {A : Type} {R : A -> Type} (hA : isProp A)
     (hR : forall a, isProp (R a)) : isProp {a : A & R a}.
   Proof.
@@ -116,6 +120,7 @@ Section PropUtils.
     exact (pathpair u (trp (fun T : Type => T) (po u r1 r2)^ (hR _ _ _))).
   Defined.
 
+  (** Part [prop-utils-times]. *)
   Definition prod_isProp {P Q : Type} (hP : isProp P) (hQ : isProp Q)
     : isProp (P × Q)
     := Sigma_isProp hP (fun _ => hQ).
@@ -123,6 +128,7 @@ Section PropUtils.
   Definition neg_isProp `{Funext} (A : Type) : isProp (¬ A)
     := fun_isProp False_isProp.
 
+  (** Part [prop-utils-lem]. *)
   Definition lem_isProp `{Funext} {P : Type} (hP : isProp P)
     : isProp (P ⨿ ¬ P).
   Proof.
@@ -170,6 +176,7 @@ Section LevelNUtils.
 
   Context `{Funext} (n : ℕ).
 
+  (** Part [level-n-utils-pi]. *)
   Definition Pi_ntype {A : Type} {Z : A -> Type}
     (h : forall a, is_ntype n (Z a)) : is_ntype n (forall a, Z a).
   Proof.
@@ -177,9 +184,11 @@ Section LevelNUtils.
     apply IsTrunc_ntype. exact _.
   Defined.
 
+  (** Part [level-n-utils-codom]. *)
   Definition fun_ntype {A X : Type} (h : is_ntype n X) : is_ntype n (A -> X)
     := Pi_ntype (fun _ => h).
 
+  (** Part [level-n-utils-sum]. *)
   Definition Sigma_ntype {A : Type} {Z : A -> Type} (hA : is_ntype n A)
     (h : forall a, is_ntype n (Z a)) : is_ntype n {a : A & Z a}.
   Proof.
@@ -188,6 +197,7 @@ Section LevelNUtils.
     apply IsTrunc_ntype. exact _.
   Defined.
 
+  (** Part [level-n-utils-times]. *)
   Definition prod_ntype {X Y : Type} (hX : is_ntype n X) (hY : is_ntype n Y)
     : is_ntype n (X × Y)
     := Sigma_ntype hX (fun _ => hY).

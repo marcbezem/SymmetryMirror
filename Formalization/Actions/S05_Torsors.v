@@ -155,7 +155,9 @@ Section RestrictInduce.
   Local Notation Bf0 := (fst (Bf f)).
 
   (** Definition [def:restrictandinduce]: restriction [f^*Y :≡ Y ∘ Bf] and
-      the induced [H]-set [f_!X(w) :≡ ‖∑_z (Bf(z) = w) × X(z)‖₀]. *)
+      the induced [H]-set [f_!X(w) :≡ ‖∑_z (Bf(z) = w) × X(z)‖₀].
+      Footnote [ft:f_!X(w)-orbitset]: [f_!X(w)] is also a set of orbits
+      (informal). *)
   Definition restrict (Y : GSet K) : GSet G := fun z => Y (Bf0 z).
 
   Definition induce_type (X : GSet G) (w : utype (BG K)) : Type

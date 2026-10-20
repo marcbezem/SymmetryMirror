@@ -58,7 +58,7 @@ Section TypesElementsFamiliesFunctions.
   Definition comp_assoc_jdeq : (h ∘ g) ∘ f = h ∘ (g ∘ f) := refl.
 
   (** Unit laws hold by definition, using the eta rule
-      [f ≡ (a ↦ f(a))]. *)
+      [f ≡ (a ↦ f(a))] (anchor [page:idofetaf]). *)
   Definition comp_id_r_jdeq : f ∘ id X = f := refl.
   Definition comp_id_l_jdeq : id Y ∘ f = f := refl.
 

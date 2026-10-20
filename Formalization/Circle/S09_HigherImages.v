@@ -52,6 +52,9 @@ Local Open Scope uf_scope.
 
 (** ** 3.9 Higher images *)
 
+(** Diagram [eqn:image-univ-prop]: uniqueness of the image factorization;
+    the case [n = -1] of [thm:n-im-univ-prop] below. *)
+
 (** Exercise [xca:cancel-injection]: postcomposition with an injection
     induces equivalences on identifications. *)
 Definition cancel_injection `{Funext} {A B X : Type} (i : A -> B) (j : isInj i)
@@ -111,7 +114,8 @@ Definition isnConnMap (n : trunc_index) {A B : Type} (f : A -> B) : Type
 Definition isnTruncMap (n : trunc_index) {A B : Type} (f : A -> B) : Type
   := forall b, IsTrunc n (fiber f b).
 
-(** The factorization of [f] through its [n]-image. *)
+(** The factorization [eqn:n-image-factorization] of [f] through its
+    [n]-image. *)
 Section NImage.
 
   Context (n : trunc_index) {A B : Type} (f : A -> B).
