@@ -6,8 +6,8 @@
     ** Summary of this formalization
 
     - The pair-path map [pair⁼(p,q) :≡ apap pair p q] ([pathpair]) and its
-      inverse [Ψ] ([pathsplit]); [lem:isEquiv-pair=] and
-      [cor:isEquiv-pair=].
+      inverse [Ψ] ([pathsplit]); [lem:isEq-pair=] and
+      [cor:isEq-pair=].
     - [snd(pair⁼(p,q)) = q]: taken literally, the two sides have
       different types.  It is stated together with the [fst] part as
       [Ψ(pair⁼(p,q)) = (p,q)]. *)
@@ -36,7 +36,7 @@ Section IdentifyingPairs.
     (p : x = x') (q : PathOver Y p y y') : (x; y) = (x'; y')
     := apap pair p q.
 
-  (** Construction [cor:isEquiv-pair=]. *)
+  (** Construction [cor:isEq-pair=]. *)
   Definition pathpair_refl {x : X} {y y' : Y x} (q : y = y')
     : pathpair refl q = ap (pair x) q
     := apap_refl pair q.
@@ -55,7 +55,7 @@ Section IdentifyingPairs.
     : pathpair (fst (pathsplit r)) (snd (pathsplit r)) = r.
   Proof. destruct r. exact refl. Defined.
 
-  (** Lemma [lem:isEquiv-pair=]. *)
+  (** Lemma [lem:isEq-pair=]. *)
   Definition pathpair_isEquiv {x x' : X} {y : Y x} {y' : Y x'}
     : isEquiv (fun pq : {p : x = x' & PathOver Y p y y'} =>
               pathpair (fst pq) (snd pq))

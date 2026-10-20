@@ -35,6 +35,7 @@ Anchoring in the LaTeX source:
   exercise, example, remark, ...) is preceded by a comment naming the item
   and its label, e.g. (** Lemma [lem:ff-eso] ... *), and may consist of
   several Rocq items (auxiliary definitions and lemmas, variants).
+  Labels are cited verbatim, exactly as in \label{...}, for searchability.
 - Items without a label are anchored by a comment that names them by the
   nearest label (e.g. "the exercise after [def:mu_E]") or by their content.
 - Items follow the order of the LaTeX source.

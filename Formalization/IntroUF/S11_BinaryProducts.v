@@ -8,7 +8,7 @@
     - Own binary product [X × Y :≡ Σ_{x:X} Y], shown equivalent to the
       library's [prod]; the notation is left-associative, so triples are
       parenthesized.
-    - [lem:isEquiv-pair-bin=]: [q : y = y'] isn't definitionally a path
+    - [lem:isEq-pair-bin=]: [q : y = y'] isn't definitionally a path
       over [p], so the map converts [q] with [po_const].
     - Exercises [xca:binary-prod-equiv] and [xca:binary-prod-comm].
     - Bridge: identifications of pairs in [X × Y] correspond to the
@@ -46,7 +46,7 @@ Definition po_const_isEquiv {X Z : Type} {a a' : X} (p : a = a') (z z' : Z)
   : isEquiv (@po_const X Z a a' p z z')
   := match p with refl => id_isEquiv _ end.
 
-(** Lemma [lem:isEquiv-pair-bin=]. *)
+(** Lemma [lem:isEq-pair-bin=]. *)
 Definition pathpair_bin {X Y : Type} {x x' : X} {y y' : Y}
   : (x = x') × (y = y') -> ((x; y) = (x'; y') :> X × Y)
   := fun pq => pathpair (fst pq) (po_const (fst pq) (snd pq)).

@@ -75,7 +75,7 @@ Proof.
   intros x y p q. exact (L x y p @ (L x y q)^).
 Defined.
 
-(** Lemma [lem:isSet-bool], following Simon Huber's proof. *)
+(** Lemma [lem:isset-bool], following Simon Huber's proof. *)
 Definition C_bool (b b' : Bool) : b = b' -> Type
   := match b, b' with
      | yes, yes => fun p => p = refl
