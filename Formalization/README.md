@@ -43,8 +43,9 @@ Anchoring in the LaTeX source:
 Labels:
 - Cite a label verbatim between square brackets, exactly as in
   \label{...} (without extra braces), so that one search finds both the
-  .tex and the .v file. Never correct or normalize a label, not even
-  an odd one such as [lem:[]0-maps-to-X/G] or [exer:first examples].
+  .tex and the .v file. Never correct or normalize a label in a .v file,
+  not even an odd one such as [lem:[]0-maps-to-X/G] or
+  [exer:first examples].
 - Every label gets an anchor in the .v files, for navigation, also
   labels of enumerate items, equations, footnotes and informal remarks.
   Exceptions are structural labels (of chapters, sections, figures,
@@ -57,8 +58,15 @@ Labels:
 - If nothing is formalized (footnote, informal remark, displayed
   diagram), the anchor is a short comment at the right place saying what
   the item is, marked "(informal)"; the summary need not list these.
-- If a label in the book is wrong (e.g. swapped labels), cite it verbatim
-  anyway and add a note at the anchor and a NOTE in the summary.
+- If a label in the book is wrong (e.g. swapped labels), propose the fix
+  of the .tex file and show the diff first. After approval, fix the .tex
+  file, check the \cref's to the label, update the anchors in the .v
+  files, and commit both together. Until then, cite the label verbatim
+  with a note at the anchor and a NOTE in the summary.
+- The same holds for small errors in the book text (typos, stray
+  punctuation): show the fix first, then fix the .tex file. The .tex
+  files mirror the SymmetryBook repository; the author carries such fixes
+  over to SymmetryBook.
 - Before committing, check both directions: every cited [label] exists
   in the .tex sources, and every label of the formalized sections that
   is not exempt (see above) is cited in some .v file.
