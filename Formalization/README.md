@@ -31,19 +31,37 @@ File structure:
 
 Anchoring in the LaTeX source:
 - The labels of the LaTeX source (\label{...}) are the anchor points of the
-  formalization. The formalization of a labelled item (definition, lemma,
-  exercise, example, remark, ...) is preceded by a comment naming the item
-  and its label, e.g. (** Lemma [lem:ff-eso] ... *), and may consist of
-  several Rocq items (auxiliary definitions and lemmas, variants).
-  Labels are cited verbatim, exactly as in \label{...}, for searchability.
-- Every label gets an anchor in the .v files, for navigation: also labels
-  of items, equations, footnotes and informal remarks (the anchor then
-  just says what the item is). Exceptions are structural labels (of
-  chapters, sections, figures) and labels in commented-out text or in
-  hidden (\wip) parts.
+  formalization; see "Labels" below.
+- The formalization of a labelled item (definition, lemma, exercise,
+  example, remark, ...) is preceded by a comment naming the item and its
+  label, e.g. (** Lemma [lem:ff-eso] ... *), and may consist of several
+  Rocq items (auxiliary definitions and lemmas, variants).
 - Items without a label are anchored by a comment that names them by the
   nearest label (e.g. "the exercise after [def:mu_E]") or by their content.
 - Items follow the order of the LaTeX source.
+
+Labels:
+- Cite a label verbatim between square brackets, exactly as in
+  \label{...} (without extra braces), so that one search finds both the
+  .tex and the .v file. Never correct or normalize a label, not even
+  an odd one such as [lem:[]0-maps-to-X/G] or [exer:first examples].
+- Every label gets an anchor in the .v files, for navigation, also
+  labels of enumerate items, equations, footnotes and informal remarks.
+  Exceptions are structural labels (of chapters, sections, figures,
+  including section labels without a prefix) and labels in commented-out
+  text or in hidden (\wip) parts.
+- Put the anchor where the item is formalized: an item label of a lemma
+  goes on the Rocq lemma for that part ((** Part [prop-utils-pi]. *)),
+  a label of a component of a structure goes on the record field, and
+  an equation label goes on the definition or lemma that realizes it.
+- If nothing is formalized (footnote, informal remark, displayed
+  diagram), the anchor is a short comment at the right place saying what
+  the item is, marked "(informal)"; the summary need not list these.
+- If a label in the book is wrong (e.g. swapped labels), cite it verbatim
+  anyway and add a note at the anchor and a NOTE in the summary.
+- Before committing, check both directions: every cited [label] exists
+  in the .tex sources, and every label of the formalized sections that
+  is not exempt (see above) is cited in some .v file.
 
 Contents of a section file:
 - A header comment with the summary of the run: what is formalized (book
