@@ -4,3 +4,4 @@
 *.glob
 .*.aux
 .lia.cache
+.claude/settings.local.json
