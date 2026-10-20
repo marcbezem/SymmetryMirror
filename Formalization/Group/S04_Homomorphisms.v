@@ -11,7 +11,10 @@
       k_pt]) and the pointed [loops_map k]; remark [rem:loops-map]
       ([loops_fun_refl]); definition [def:USym-hom] ([USymf]).
     - Lemma [lem:grouphomomaxioms] ([USymf_unit], [USymf_inv],
-      [USymf_comp]), by induction on the pointing path.
+      [USymf_comp]), by induction on the pointing path.  NOTE for the
+      book text: the labels [gp-homo-comp] and [gp-homo-inv] are swapped
+      (the first is on the equation for inverses, the second on the one
+      for composition).
     - Definitions [def:groupisomorphism] ([isIso], [Iso]),
       [def:identity-group-homomorphism] ([idG], [idG_isIso]) and
       [def:group-homomorphism-composition] ([compG]).
