@@ -11,10 +11,7 @@
       k_pt]) and the pointed [loops_map k]; remark [rem:loops-map]
       ([loops_fun_refl]); definition [def:USym-hom] ([USymf]).
     - Lemma [lem:grouphomomaxioms] ([USymf_unit], [USymf_inv],
-      [USymf_comp]), by induction on the pointing path.  NOTE for the
-      book text: the labels [gp-homo-comp] and [gp-homo-inv] are swapped
-      (the first is on the equation for inverses, the second on the one
-      for composition).
+      [USymf_comp]), by induction on the pointing path.
     - Definitions [def:groupisomorphism] ([isIso], [Iso]),
       [def:identity-group-homomorphism] ([idG], [idG_isIso]) and
       [def:group-homomorphism-composition] ([compG]).
@@ -133,14 +130,12 @@ End HomAxioms.
 Definition USymf_unit {G H : Group} (f : Hom G H) : USymf f refl = refl
   := loops_fun_unit (sh G) (fst (Bf f)) (sh H) (snd (Bf f)).
 
-(** Equation [gp-homo-comp] (the book's label on the equation for
-    inverses). *)
+(** Equation [gp-homo-inv]. *)
 Definition USymf_inv {G H : Group} (f : Hom G H) (g : USym G)
   : USymf f g⁻¹ = (USymf f g)⁻¹
   := loops_fun_inv (sh G) (fst (Bf f)) (sh H) (snd (Bf f)) g.
 
-(** Equation [gp-homo-inv] (the book's label on the equation for
-    composition). *)
+(** Equation [gp-homo-comp]. *)
 Definition USymf_comp {G H : Group} (f : Hom G H) (g g' : USym G)
   : USymf f (g' ⋅ g) = USymf f g' ⋅ USymf f g
   := loops_fun_comp (sh G) (fst (Bf f)) (sh H) (snd (Bf f)) g g'.
