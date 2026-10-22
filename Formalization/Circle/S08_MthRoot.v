@@ -11,7 +11,10 @@
       [𝟙m] represented as [∑_{i:ℕ} (i < m)] ([FinNat]).
     - Lemma [lem:root-pres-equiv], with an explicit inverse
       ([root_isEquiv]).
-    - [(ᵐ√t)^m (i, x) = (i, t(x))] ([root_m]).
+    - [(ᵐ√t)^m (i, x) = (i, t(x))] ([root_m]), which the book also writes
+      as [(ᵐ√t)^m = (id, t)].
+    - Exercise [xca:root-NOT-pres-inv] ([root_not_pres_inv]): a
+      counterexample for [m = 2], [X = ℤ], [t = zs].
     - Definition [def:root]: the formal [m]-th root [ρ_m] on [∑_X (X → X)]
       ([rho]).
 
@@ -21,7 +24,8 @@
       with [t^q = id] ([m_root_id], [m_root_id_conv], [Ht_root]); as in
       the book, by Euclidean division [n = qm + r] ([euclid_div_Sk] from
       3.2, exercise [xca:euclid-div-Z]) and looking at the first component.
-    - The [m]-th root of a cycle is a cycle ([root_isCycle], [rho_cyc]).
+    - Lemma [lem:root-pres-cycle]: the [m]-th root of a cycle is a cycle
+      ([root_isCycle], [rho_cyc]).
     - Identifications of cycles from identifications in [Endo]
       ([cyc_path]); cycles with the same [H] are merely identified, and
       pointed ones uniquely ([cyc_merely_eq], [cyc_pointed_path]).
@@ -172,6 +176,17 @@ End Root.
     (Placed after [lem:root-pres-equiv]: the section on [ᵐ√t] fixes [X], while [ρ_m] needs [ᵐ√t] for all [X].) *)
 Definition rho (k : ℕ) (w : Endo) : Endo := (FN k × fst w; root k (snd w)).
 
+(** Exercise [xca:root-NOT-pres-inv]: [ᵐ√(t⁻¹)] and [ᵐ√t] need not
+    commute.  For [m = 2], [X = ℤ] and [t = zs], at [(1, 0)] the two
+    composites give [(1, 1)] and [(1, -1)]. *)
+Definition root_not_pres_inv
+  : ¬ (root 1 zp (root 1 zs (((1%nat; leq_refl 2) : FN 1); iplus 0))
+       = root 1 zs (root 1 zp (((1%nat; leq_refl 2) : FN 1); iplus 0))).
+Proof.
+  intro h. pose (h' := ap (fun w : FN 1 × ℤ => toInt (snd w)) h). cbn in h'.
+  exact (trp (fun i : Int => match i with posS _ => True | _ => False end) h' triv).
+Defined.
+
 (** Powers of the [m]-th root, for a permutation [t] of a set [X]. *)
 Section RootPowers.
 
@@ -250,7 +265,7 @@ Section RootPowers.
     : tpow Rt (zmul (iplus (S k)) q) = idmap
     := ptw_inv (fun w => root_pow q w @ ap (fun y => (fst w; y)) (ptw hq (snd w))).
 
-  (** The [m]-th root of a cycle is a cycle. *)
+  (** Lemma [lem:root-pres-cycle]: the [m]-th root of a cycle is a cycle. *)
   Definition up_conn (a a' : ℕ) (la : (a < S k)%nat) (la' : (a' < S k)%nat) (y : X)
     (le : (a <= a')%nat)
     : fst (conn_by Rt ((((a; la) : FN k); y)) ((((a'; la') : FN k); y))).

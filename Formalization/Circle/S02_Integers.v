@@ -26,9 +26,10 @@
       [toInt_zmul]) and reusing its lemmas.
     - The order [z ≤ y :≡ ∑_n (y = z + ι₊(n))], which extends [≤] on [ℕ]
       and is a proposition ([zle_isProp]), and [z < y :≡ s(z) ≤ y] ([zlt]).
-    - Exercise [xca:euclid-div-Z] ([euclid_div_Z]), stated as
-      contractibility of the type of [(q, r)] with [0 ≤ r < m] and
-      [n = qm + r], as for [lem:euclid-div].  It is proved on the library's
+    - Towards exercise [xca:euclid-div-Z]: Euclidean division on [ℤ]
+      ([euclid_div_Z]), stated as contractibility of the type of [(q, r)]
+      with [0 ≤ r < m] and [n = qm + r], as for [lem:euclid-div].  It is
+      proved on the library's
       [Int] ([int_euclid_exists], [int_euclid_unique]): for [n ≥ 0] by
       division on [ℕ]; for [n = -(b+1)] with [b = Qm + R] we take
       [q :≡ -(Q+1)] and [r :≡ m - (R+1)], which avoids a case distinction
@@ -36,6 +37,10 @@
       [r, r' < m] forces [d = 0].  [int_of_nat_inj] moved here from 3.8.
       For use in 3.8, the variants [euclid_div_Sk] and [euclid_unique_Sk]
       for [m = k+1], with the remainder in [ℕ].
+    - Exercise [xca:euclid-div-Z], for [m = k+1]: [φ(k, n) :≡ k + mn] is
+      an equivalence [𝟙m × ℤ ≃ ℤ] ([euclid_phi], [euclid_div_Z_eqv]),
+      with inverse given by [euclid_div_Sk]; placed after
+      [xca:commutative-add-Z], as in the book.
       NOTE for the book: [<] on [ℤ] is only mentioned ("ordering
       relations"), not defined.
     - The alternative form of [ℤ]-induction from [f(0)], [g'] and [h']
@@ -48,7 +53,7 @@
 From HoTT Require Import
   Basics Types.Sigma Types.Prod Types.Equiv Types.Bool Types.Universe
   Types.Forall Types.Paths Truncations.Core Colimits.Coeq Colimits.Pushout
-  Spaces.Nat.Core Spaces.Nat.Division Spaces.Int Spaces.Circle.
+  Spaces.Nat.Core Spaces.Nat.Division Spaces.Int Spaces.Circle Spaces.Finite.FinNat.
 From SymmetryMirror Require Export Circle.S01_Circle.
 
 Local Open Scope uf_scope.
@@ -432,7 +437,7 @@ Proof.
     rewrite int_nat_mul, int_nat_add. exact (ap int_of_nat (spec (S a))).
 Defined.
 
-(** Exercise [xca:euclid-div-Z]: for [m > 0] the type of [(q, r)] with
+(** Towards exercise [xca:euclid-div-Z]: for [m > 0] the type of [(q, r)] with
     [0 ≤ r < m] and [n = qm + r] is contractible. *)
 Definition euclid_div_Z (n m : ℤ) (pos : zlt (iplus 0) m)
   : isContr {q : ℤ & {r : ℤ & zle (iplus 0) r × (zlt r m × (n = zadd (zmul q m) r))}}.
@@ -468,7 +473,7 @@ Proof.
     exact (prod_isProp (zle_isProp _ _) (prod_isProp (zle_isProp _ _) (ℤ_isSet _ _)) _ _).
 Defined.
 
-(** Variants of [xca:euclid-div-Z] for [m = k+1], with the remainder in
+(** Variants of [euclid_div_Z] for [m = k+1], with the remainder in
     [ℕ], for use in 3.8. *)
 Definition euclid_div_Sk (n : ℤ) (k : ℕ)
   : {q : ℤ & {r : ℕ & (r < S k)%nat × (n = zadd (zmul q (iplus (S k))) (iplus r))}}.
@@ -519,3 +524,29 @@ Definition zadd_comm (x y : ℤ) : zadd x y = zadd y x
 
 Definition zmul_comm (x y : ℤ) : zmul x y = zmul y x
   := toInt_inj (toInt_zmul x y @ int_mul_comm _ _ @ (toInt_zmul y x)^).
+
+(** Exercise [xca:euclid-div-Z], for [m = k+1]: [φ(k, n) :≡ k + mn] is an
+    equivalence [𝟙m × ℤ ≃ ℤ], with [𝟙m] represented as [∑_{i:ℕ} (i < m)];
+    the inverse is Euclidean division ([euclid_div_Sk], [euclid_unique_Sk]). *)
+Definition euclid_phi (k : ℕ) (u : FinNat (S k) × ℤ) : ℤ
+  := zadd (iplus (fst (fst u))) (zmul (iplus (S k)) (snd u)).
+
+Definition euclid_phi_qmr (k : ℕ) (u : FinNat (S k) × ℤ)
+  : euclid_phi k u = zadd (zmul (snd u) (iplus (S k))) (iplus (fst (fst u)))
+  := zadd_comm _ _ @ ap (fun t => zadd t _) (zmul_comm _ _).
+
+Definition euclid_psi (k : ℕ) (n : ℤ) : FinNat (S k) × ℤ
+  := let w := euclid_div_Sk n k in ((fst (snd w); fst (snd (snd w))); fst w).
+
+Definition euclid_div_Z_eqv (k : ℕ) : FinNat (S k) × ℤ ≃ ℤ.
+Proof.
+  refine (mkEqv (euclid_phi k) (euclid_psi k) _ _); unfold euclid_psi; cbv zeta.
+  - intro u. destruct (euclid_div_Sk (euclid_phi k u) k) as [q [r [hr e]]].
+    destruct u as [[r0 l0] q0]. cbn.
+    destruct (euclid_unique_Sk q q0 r r0 hr l0 (e^ @ euclid_phi_qmr k ((r0; l0); q0)))
+      as [eq er].
+    destruct eq, er.
+    exact (ap (fun l => ((r; l); q)) (IsHProp_isProp _ _)).
+  - intro n. destruct (euclid_div_Sk n k) as [q [r [hr e]]].
+    exact (euclid_phi_qmr k ((r; hr); q) @ e^).
+Defined.

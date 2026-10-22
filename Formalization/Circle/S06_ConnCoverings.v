@@ -326,7 +326,7 @@ End FinCycle.
 (** Construction [con:psi-alpha-m] and corollary [cor:dgm-conncov]
     (statements only), for [m = k+1]. *)
 Definition con_psi_alpha_m_stmt `{Univalence} : Type
-  := forall k : ℕ, {ψ : Tot (Rm k) ≃ S1 & dg (S k) ∘ fst ψ = fst (powm k)}.
+  := forall k : ℕ, {ψ : Tot (Rm k) ≃ S1 & fst (powm k) = dg (S k) ∘ fst ψ}.
 
 Definition cor_dgm_conncov_stmt `{Univalence} : Type
   := forall k : ℕ, isConnCovering (dg (S k))
@@ -641,8 +641,8 @@ Definition cor_id_m_cycle_stmt `{Univalence} : Type
          × (forall p, fst e (endo_path (finsuccEqv k) refl ⋅ p) = zsk (fst e p))}.
 
 (** Remark [rem:thenonuniquenessofgeneratorsofmodulararithmetic1]: the
-    equivalence [zs] in [cor:id-m-cycle] is not uniquely determined by the
-    stated property (informal). *)
+    equivalence [zs] in [cor:id-m-cycle] is in general not uniquely
+    determined by the stated property (informal). *)
 
 (** Corollary [cor:set-trunc-cyc], first half: each [H_t] contains [0] and
     is closed under addition and negation. *)

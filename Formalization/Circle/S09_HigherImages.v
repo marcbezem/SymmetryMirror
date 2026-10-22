@@ -6,10 +6,8 @@
     ** Summary of this formalization
 
     - Exercise [xca:cancel-injection] ([cancel_injection]).
-    - Exercise [xca:cancel-surjection], for a set [Y]
-      ([cancel_surjection]).  NOTE for the book text: without the
-      assumption that [Y] is a set the statement fails.  Counterexample,
-      suggested by the author ([cancel_surjection_fails]): the constant
+    - Exercise [xca:cancel-surjection] ([cancel_surjection]), and that it
+      fails for arbitrary [Y] ([cancel_surjection_fails]): the constant
       map [p : 𝟙 → S1] at [base] is a surjection, and [id_S1 ≠ -id_S1]
       (3.4), but [id_S1 ∘ p] and [-id_S1 ∘ p] are both constant at [base],
       so [ap_{_∘p} : (id = -id) → (id∘p = -id∘p)] goes from an empty type
@@ -74,10 +72,8 @@ Proof.
   destruct p. exact (eqinv_l (funext _ _) refl).
 Defined.
 
-(** Exercise [xca:cancel-surjection], for a set [Y]: precomposition with
-    a surjection induces equivalences on identifications.
-    NOTE for the book text: without the assumption that [Y] is a set the
-    statement fails; see [cancel_surjection_fails] below. *)
+(** Exercise [xca:cancel-surjection]: for a set [Y], precomposition with
+    a surjection induces equivalences on identifications. *)
 Definition cancel_surjection `{Funext} {A B Y : Type} (p : A -> B) (s : isSurj p)
   (sY : isSet Y) (f g : B -> Y) : isEquiv (@ap (B -> Y) (A -> Y) (fun h => h ∘ p) f g).
 Proof.
@@ -87,9 +83,10 @@ Proof.
   exact (ptrunc_rec (sY _ _) (fun w => ap f (snd w) @ ptw r (fst w) @ (ap g (snd w))^) (s b)).
 Defined.
 
-(** The counterexample, suggested by the author: the constant map
-    [p : 𝟙 → S1] at [base] is a surjection, [id_S1 ≠ -id_S1] (3.4), but
-    [id_S1 ∘ p] and [-id_S1 ∘ p] are both constant at [base]. *)
+(** Exercise [xca:cancel-surjection], second part: this is not true for
+    all types [Y].  The counterexample, suggested by the author: the
+    constant map [p : 𝟙 → S1] at [base] is a surjection, [id_S1 ≠ -id_S1]
+    (3.4), but [id_S1 ∘ p] and [-id_S1 ∘ p] are both constant at [base]. *)
 Definition const_base_isSurj `{Univalence} : isSurj (fun _ : True => base)
   := fun z => ptrunc_rec ptrunc_isProp (fun e : base = z => trunc (tt; e⁻¹))
                 (S1_base_paths z).
