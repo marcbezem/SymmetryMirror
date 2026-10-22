@@ -391,7 +391,7 @@ and there is an (unnamed) element of $\apd{f}(\zeq) \eqto q$.
 \end{definition}
 
 Like the type $\NN$, the type $\zet$ is a set with decidable equality
-and ordering relations.
+and ordering relations. 
 
 One well known self-equivalence is \emph{negation}, ${-}:\zet\to\zet$,
 \index{negation!of integer}\glossary(1negation){$-z$}{negation of an integer $z$}
@@ -457,12 +457,6 @@ $zy \defeq (w \mapsto z+w)^y(0)$.
 
 The ordering relations $<$ and $\leq$ on $\zet$ are easily defined
 and shown to extend those on $\NN$.
-The following exercise extends \cref{lem:euclid-div} from $\NN$ to $\zet$.
-
-\begin{xca}\label{xca:euclid-div-Z}
-  For all $n,m:\zet$ with $m>0$ there exist unique $q,r:\zet$
-  such that $0\leq r<m$ and $n = qm+r$.
-\end{xca}
 
 Recall the induction principle for $\zet$ in \cref{def:zet} above.
 Instead of defining $g$ and $h$ explicitly, we will often
@@ -477,6 +471,15 @@ and $f(z-1)\jdeq h'(z,f(z))$ for all $z\leq 0$.
 \begin{xca}\label{xca:commutative-add-Z}
   Show that $x+y = y+x$ and $xy=yx$ for all $x,y:\zet$.
 \end{xca}
+
+The following exercise extends Euclidian division, \cref{lem:euclid-div},
+from $\NN$ to $\zet$, with a new formulation for later use.
+
+\begin{xca}\label{xca:euclid-div-Z}
+Let $m>0$. Show that $\varphi: (\bn m\times \zet)\we\zet$ with 
+$\varphi(k,n)\defeq k+mn$ is an equivalence.
+\end{xca}
+
 
 \section{\Coverings}
 \label{sec:covering}
@@ -565,7 +568,7 @@ then $A$ is also an $n$-type.\qedhere
 Figure~\ref{fig:covering} visualizes two examples of \coverings over the circle.
 Consider the picture on the left first.
 If we let $b$ be the element on the circle marked at the bottom left hand side,
-then the preimage $f^{-1}(b)$ is marked by the the two dots
+then the preimage $f^{-1}(b)$ is marked by the two dots
 in $A$ straight above $b$, so that in this case each preimage contains
 two points (i.e., each preimage can be merely identified with $\bool$).
 However, $A$ is not the constant family, like $A'$ depicted on the right,
@@ -1300,7 +1303,7 @@ the special case described after \cref{lem:trp-in-function-type}
     Y \ar[r,"{\trp[D]{p}(t)}"'] \& Y
   \end{tikzcd}}
 so that the latter identity type
-type is equivalent to $\ptoe p\circ t\circ \ptoe p^{-1} \eqto u$.
+is equivalent to $\ptoe p\circ t\circ \ptoe p^{-1} \eqto u$.
 If $p\jdeq\etop e$ for an equivalence $e:X\equivto Y$,
 this is equivalent to $e\circ t \eqto u\circ e$, or $e t \eqto u e$ for short.
 In total, we have an equivalence between the identity type
@@ -1924,7 +1927,7 @@ We call $\pow{m}$ the \emph{$m$\th power bundle of the circle}.
 To identify $\dg{m}$ and $\pow{m}$ as \coverings over $\Sc$,
 it suffices to define an equivalence $\psi_m : \Tot(R_m) \to \Sc$
 and an identification $\alpha_m$ of the identity
-type $\dg{m}\psi_m \eqto \pow{m}$ represented by the triangle below.
+type $\pow{m} \eqto \dg{m}\psi_m$ represented by the triangle below.
 \[
   \begin{tikzcd}[column sep=small,ampersand replacement=\&]
     \Tot(R_m) \ar[rr,"\psi_m"]\ar[dr,"\pow{m}"'] \& \& \Sc\ar[dl,"\dg{m}"] \\
@@ -1965,7 +1968,7 @@ This is indicated in red on the outside of the clock.
 \begin{construction}\label{con:psi-alpha-m}
   For each positive integer $m$,
   there is an equivalence $\psi_m : \Tot(R_m) \to \Sc$
-  and an element $\alpha_m : \dg{m}\psi_m \eqto \pow{m}$.
+  and an element $\alpha_m : \pow{m} \eqto \dg{m}\psi_m$.
 \end{construction}
 \begin{implementation}{con:psi-alpha-m}
   Since $\Tot(R_m) \jdeq \sum_{z:\Sc}R_m(z)$,
@@ -2060,9 +2063,9 @@ of the above construction in the case $m=5$.
   \caption{The proof for the case $m=5$ around the clock.}
   \label{fig:psi-alpha-5-clock}
 \end{marginfigure}
-The labels on the inner arcs show $\pow{5}(\Sloop,k)$, on the
-outer arcs $\dg{5}\psi_5(\Sloop,k)$, and on the radiuses
-$\alpha_m(\base,k)$. The proofs $\alpha_m(\Sloop,k)$ prove
+The labels on the inner arcs show $\pow{5}(a_k)$, on the
+outer arcs $\dg{5}\psi_5(a_k)$, and on the radii
+$\alpha_5(\base,k)$. The proofs $\alpha_5(\Sloop,k)$ prove
 the commutativity of the five squares in circular arrangement.
 
 
@@ -2234,12 +2237,12 @@ $(\zs,!): (\bn m,\zs)\eqto(\bn m,\zs)$
 \end{corollary}
 
 \begin{remark}\label{rem:thenonuniquenessofgeneratorsofmodulararithmetic1}
-  In \cref{cor:id-m-cycle}, the equivalence $\zs:\bn m\to\bn m$ is not
-  uniquely determined by the stated property. Its inverse would give the
+  In \cref{cor:id-m-cycle}, the equivalence $\zs:\bn m\to\bn m$ is in general
+  not uniquely determined by the stated property. Its inverse would give the
   same result for any $\bn{m}$ (even for $\zet$). In fact there are
-  as many as there are positive integers less than
-  $m$ that are relatively prime to $m$.  This behavior has number theoretic
-  consequences and origins and will be investigated further when we
+  as many as there are integers between $0$ and $m-1$ (inclusive)
+  that are relatively prime to $m$.  This fact has number theoretic
+  origins and consequences, and will be investigated further when we
   have the proper machinery to put it to good use.
 \end{remark}
 
@@ -2250,7 +2253,7 @@ of the type of connected \coverings over the circle.
 \begin{corollary}\label{cor:set-trunc-cyc}
   Let $H_\blank : \Cyc \to \Sub(\zet)$ be the map sending $(X,t)$ to $H_t$.
   Then the image of $H_\blank$ is equal to the
-  the subset of $\Sub(\zet)$ consisting of those
+  subset of $\Sub(\zet)$ consisting of those
   $H\subseteq\zet$ that contain $0$ and are closed
   under addition and negation.\footnote{%
     By $H\subseteq \zet$ being closed under addition and negation,
@@ -2566,7 +2569,7 @@ then apply~\cref{xca:perm-prod-transpositions} to each cycle.\footnote{%
   This representation is not unique, as for example $(1\;2)=(2\;3)(1\;3)(2\;3)$
   as permutations of $\set{1,2,3}$.
   However, in~\cref{cor:sign-defined} below, we'll show that
-  the \emph{parity} (odd/even) of the number of transitions is invariant.}
+  the \emph{parity} (odd/even) of the number of transpositions is invariant.}
 
 \begin{xca}\label{xca:factorial}
   Show that there are $n!$ permutations of a finite set of cardinality $n$, where $n! \defeq \fact(n)$ is the usual notation for the factorial function.
@@ -2744,7 +2747,8 @@ Only one $m$\th of the time does $\sqrt[\uproot{2}m]t$ use $t:X\to X$,
 the rest of the time it applies the successor in $\bn m$.
 Indeed, iterating $\sqrt[\uproot{2}m]t$
 we get an identification of type $(\sqrt[\uproot{2}m]t)^m(k,x)\eqto(k,t(x))$;
-hence the term ``$m$\th root'' is apt.
+hence the term ``$m$\th root'' is apt. \wip{New} We often refer to this result
+as $(\sqrt[\uproot{2}m]t)^m\eq(\id,t)$, when $X$ is a set.
 
 \begin{definition}\label{def:root}
   The \emph{formal $m$\th root function} is defined by:
@@ -2781,8 +2785,18 @@ of the degree $m$ function.
     of $\sqrt[\uproot{2}m]{t}$ given an inverse of $t$.}
 \end{proof}
 
-\begin{lemma} Let $X:\UU$ and $t:X\to X$.
-  If $(X,t)$ is a cycle, then so is $\cdg{m}(X,t)$.
+\begin{xca}\label{xca:root-NOT-pres-inv}\wip{New: }
+Let $X$ be a set and $t:X\to X$ an equivalence.
+Show that $\mthroot{m}{\inv t}$ and $\mthroot{m}{t}$
+do not necessarily commute.\footnote{%
+Hence $\mthroot{m}{tt'}$ need not be equal
+to $\mthroot{m}{t}\mthroot{m}{t'}$. 
+}
+\end{xca}
+
+\begin{lemma}\label{lem:root-pres-cycle} 
+Let $X:\UU$ and $t:X\to X$.
+If $(X,t)$ is a cycle, then so is $\cdg{m}(X,t)$.
 \end{lemma}
 \begin{proof}
   Clearly, $\bn m\times X$ is a \nonempty set if $X$ is.
@@ -2840,15 +2854,14 @@ We now analyze how $\cdg{m}$ acts on paths.
 Let $({\etop{e}},{!}):(X,t)\eqto(X',t')$.
 Since $\cdg{m}$ maps first components $X$ to $\bn m\times X$, we get that
 the first projection of $\ap{\cdg{m}}({\etop{e}},{!})$ is
-${\id\times e} : (\bn m\times X)\eqto(\bn m\times X')$.
+$(\id\times e) : (\bn m\times X)\eqto(\bn m\times X')$.
 We are particularly interested in the case of the loops,
-that is, $({\etop{e}},{!}):(X,t)\eqto(X,t)$.
-We calculate $(\id\times e)(k,x) = (k,e(x))$,
-which by the property of the $m$\th root is equal to $(\sqrt[\uproot{2}m]e)^m(k,x)$.
-In particular, if we take $e\defeq t^{-1}$,
-then we get $(\id\times t^{-1}) = (\sqrt[\uproot{2}m]{t^{-1}})^m$, which means that
-$\ap{\cdg{m}}({\etop{t}^{-1}},{!})$ is indeed the $m$\th power of a
-generating loop at the image cycle $\cdg{m}(X,t)$.
+that is, $({\etop{e}},{!}):(X,t)\eqto(X,t)$. \wip{New}
+Recall the equality $(\id\times e) = \sqrt[\uproot{2}m]e$ mentioned 
+after \cref{con:root}. If we take $e\defeq t$,
+then we get $(\id\times t) = (\mthroot{m}{t})^m$, which means that
+$\ap{\cdg{m}}(\etop{t},!)$ is indeed the $m$\th power of the canonical
+loop at the image cycle $\cdg{m}(X,t)$.
 In particular, this holds for the standard infinite cycle $(\zet,\zs):\Cyc_0$
 and the standard $n$-cycle $(\bn n,\zs):\Cyc_n$.
 
@@ -2877,8 +2890,8 @@ we must produce an element in
   \Bigl((\bn m\times\zet,\sqrt[\uproot{2}m]{\zs}),\id\times\zs^{-1}\Bigr)
   \eqto \bigl((\zet,\zs),\zs^{-m}\bigr).
 \]
-Consider the equivalence  $\varphi: (\bn m\times \zet)\we\zet$ with $\varphi(k,n)\defeq k+mn$
-also used in \cref{lem:deg-m-on-Cyc}.
+Consider the equivalence  $\varphi: (\bn m\times \zet)\we\zet$ with 
+$\varphi(k,n)\defeq k+mn$ also used in \cref{lem:deg-m-on-Cyc}.
 Transport of $\sqrt[\uproot{2}m]\zs$ along $\varphi$ is exactly $\zs$,
 \ie $\varphi\!\sqrt[\uproot{2}m]\zs=\zs\varphi$.\footnote{%
 Note that we formulate this in such a way that we don't need to talk about the inverse of $\varphi$.
@@ -3095,11 +3108,15 @@ one can construct a (unique) equivalence $e$ with $g\eqto ep$ and $i\eqto he$.
 \end{equation}
 
 The existence of a unique equivalence $e$ as above is called the
-\emph{universal property of the propositional image}.\marginnote{%
+\emph{universal property of the propositional image}.
+Uniqueness of $e$ above also follows from the next exercise, applied
+to the rightmost triangle representing $i\eqto he$.\footnote{%
+By contrast, the triangle representing $g\eqto ep$ does not in general
+imply that $e$ is unique, see \cref{xca:cancel-surjection}.}
+\marginnote{%
 Recall that $i\blank$ and $\blank p$
 are compact denotations of the maps $h\mapsto ih$ and
 $h\mapsto hp$, respectively.}
-Uniqueness of $e$ above also follows from the following two exercises.
 
 \begin{xca}\label{xca:cancel-injection}
 Let $A,B,X$ be types and $i:A\to B$ an injection.
@@ -3108,10 +3125,10 @@ Show that $\ap{i\blank}: (f \eqto g) \to (if \eqto ig)$ is an equivalence,
 for any $f,g: X\to A$.
 \end{xca}
 \begin{xca}\label{xca:cancel-surjection}
-Let $A,B,Y$ be types and $p:A\to B$ be a surjection.
+Let $A,B$ be types, $Y$ a set, and $p:A\to B$ be a surjection.
 Let $\blank p : (B\to Y) \to (A\to Y)$ be precomposition with $p$.
 Show that $\ap{\blank p}: (f \eqto g) \to (fp \eqto gp)$ is an equivalence,
-for any $f,g: B\to Y$.
+for any $f,g: B\to Y$. Show that this is not true for all types $Y$.
 \end{xca}
 
 We will now define higher images and generalize the notions
@@ -3270,8 +3287,8 @@ We can use $\refl{f} : f \eqto ip$ since $\fst(p(a))\jdeq f(a)$ for all $a:A$.
 
 Let $X$ be a type and assume we are given an $n$-connected
 function $g:A\to X$ and an $n$-truncated function $h:X\to B$
-and an identification $y:f\eqto hg$. Our task is
-then to construct a equivalence $e: \im_n(f)\to X$
+and an identification $s:f\eqto hg$. Our task is
+then to construct an equivalence $e: \im_n(f)\to X$
 and to give identifications represented by the left
 and the right triangle in \cref{fig:n-image-univ-prop},
 that is, of types $g\eqto ep$ and $i\eqto he$.
@@ -3357,7 +3374,7 @@ Since $P(b)$ is an $n$-type by assumption, we have the canonical equivalence
 of type $\Trunc{\sum_{y:P(b)} Q(b,y)}_n\to\sum_{y:P(b)}\Trunc{Q(b,y)}_n$ defined
 by mapping $\trunc{(y,q)}_n$ to $(y,\trunc{q}_n)$
 (\cf \cref{xca:trunc-sum-type+fam}).
-Since $Q(y,b)$ is $n$-connected for each $y:P(b)$ by assumption,
+Since $Q(b,y)$ is $n$-connected for each $y:P(b)$ by assumption,
 so that $\Trunc{Q(b,y)}_n$ is contractible,
 we also have the canonical equivalence
 $\fst: \sum_{y:P(b)}\Trunc{Q(b,y)}_n \to P(b)$.
